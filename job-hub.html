@@ -362,6 +362,14 @@
 
     <div class="section-card">
       <div class="section-head">
+        <span class="section-title">Quotes</span>
+        <a class="section-action" href="quote-builder.html">+ New quote</a>
+      </div>
+      <div id="quotesList"></div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-head">
         <span class="section-title">Time on this job</span>
         <a class="section-action" href="my-time.html">+ Log time</a>
       </div>
@@ -388,6 +396,7 @@ const STORE_ENTRIES = 'mama-time-entries';
 const STORE_TEAM = 'mama-time-team';
 const STORE_BRIEFS = 'mama-briefs';
 const STORE_REPORTS = 'mama-reports';
+const STORE_QUOTES = 'mama-quotes';
 
 let memStore = {};
 function storeGet(key) {
@@ -447,6 +456,7 @@ let team = storeGet(STORE_TEAM) || defaultTeam;
 let entries = storeGet(STORE_ENTRIES) || [];
 let briefs = storeGet(STORE_BRIEFS) || [];
 let reports = storeGet(STORE_REPORTS) || [];
+let quotes = storeGet(STORE_QUOTES) || [];
 let currentJob = null;
 
 // Live refresh when other tools save data
@@ -455,6 +465,7 @@ window.addEventListener('storage', () => {
   entries = storeGet(STORE_ENTRIES) || [];
   briefs = storeGet(STORE_BRIEFS) || [];
   reports = storeGet(STORE_REPORTS) || [];
+  quotes = storeGet(STORE_QUOTES) || [];
   renderList();
   if (currentJob) openJob(currentJob, true);
 });
@@ -467,6 +478,9 @@ function jobBriefs(job) {
 }
 function jobReports(job) {
   return reports.filter(r => r.jobId === job.id);
+}
+function jobQuotes(job) {
+  return quotes.filter(q => q.jobId === job.id);
 }
 function jobHours(job) {
   return entries.filter(e => e.jobId === job.id).reduce((s,e)=>s+e.hours,0);
@@ -551,6 +565,18 @@ function openJob(i, keepScroll) {
         </div>`).join('')
     : '<div class="empty-row">No saved reports for this job yet. Save one in Project Reports and it appears here.</div>';
 
+  const jq = jobQuotes(j);
+  document.getElementById('quotesList').innerHTML = jq.length
+    ? jq.map(q => `
+        <div class="doc-row" onclick="viewQuote(${quotes.indexOf(q)})">
+          <div>
+            <div class="doc-title">${q.qNum || 'Quote'} — ${q.client || q.jobName}</div>
+            <div class="doc-meta">${fmtD(q.date)} · ${q.author || '—'} · R ${Number(q.total||0).toLocaleString('en-ZA',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+          </div>
+          <span style="font-size:12px;color:var(--muted)">›</span>
+        </div>`).join('')
+    : '<div class="empty-row">No quotes yet for this job. Build one in Quote Builder and it appears here automatically.</div>';
+
   // Time per member
   const byMember = {};
   entries.filter(e => e.jobId === j.id).forEach(e => {
@@ -586,6 +612,12 @@ function viewBrief(i) {
   const b = briefs[i];
   if (!b) return;
   document.getElementById('docContent').innerHTML = b.html;
+  document.getElementById('docModal').classList.add('open');
+}
+function viewQuote(i) {
+  const q = quotes[i];
+  if (!q) return;
+  document.getElementById('docContent').innerHTML = q.html;
   document.getElementById('docModal').classList.add('open');
 }
 function viewReport(i) {
