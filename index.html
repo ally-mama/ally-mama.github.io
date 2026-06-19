@@ -244,8 +244,33 @@
   .footer span { color: var(--yellow-text); font-weight: 600; }
 </style>
   <script src="mama-shared.js"></script>
+<style>
+#mama-gate{position:fixed;inset:0;background:#0e0e0e;z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+#mama-gate h2{color:#fff;font-size:20px;font-family:sans-serif;margin:0}
+#mama-gate input{padding:10px 16px;border-radius:8px;border:none;font-size:15px;width:220px;background:#222;color:#fff;text-align:center;outline:none}
+#mama-gate button{padding:10px 24px;border-radius:8px;background:#f0c14b;color:#0e0e0e;font-weight:700;font-size:14px;border:none;cursor:pointer}
+#mama-gate .err{color:#ff6b6b;font-size:13px;font-family:sans-serif;min-height:18px}
+</style>
 </head>
 <body>
+<script>
+(function(){
+  if(sessionStorage.getItem('mama-auth')==='ok') return;
+  const gate = document.createElement('div'); gate.id='mama-gate';
+  gate.innerHTML = '<h2>Mama Hub</h2><input type="password" id="gPw" placeholder="Enter password" /><button onclick="gCheck()">Enter</button><div class="err" id="gErr"></div>';
+  document.body.prepend(gate);
+  document.getElementById('gPw').addEventListener('keydown', e => { if(e.key==='Enter') gCheck(); });
+  window.gCheck = function(){
+    if(document.getElementById('gPw').value === 'Smarties716!'){
+      sessionStorage.setItem('mama-auth','ok');
+      document.getElementById('mama-gate').remove();
+    } else {
+      document.getElementById('gErr').textContent = 'Incorrect password';
+      document.getElementById('gPw').value='';
+    }
+  };
+})();
+</script>
 
 <div class="topbar">
   <a href="index.html" class="logo">
@@ -276,7 +301,6 @@
     </svg>
   </div>
   <h1>The <span>Mama</span> Hub</h1>
-  <p>Every tool the team needs — briefs, time, reporting, and client work — in one place, connected to our Google workspace.</p>
 </div>
 
 <div class="container">
