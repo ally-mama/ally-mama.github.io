@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex, nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Time — Mama Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --yellow: #FFC800;
+    --yellow-light: #FFF3B0;
+    --yellow-dark: #E6B400;
+    --yellow-text: #8a6c00;
+    --black: #0e0e0e;
+    --white: #ffffff;
+    --off: #fafaf8;
+    --mid: #f0efe9;
+    --border: #e2e0d8;
+    --muted: #8a8880;
+    --text: #1a1a1a;
+    --text-2: #4a4845;
+    --success: #2e7d52;
+    --success-bg: #eaf4ee;
+    --danger: #c0392b;
+    --danger-bg: #fdecea;
+    --meeting: #7b5cb8;
+    --meeting-bg: #f0ebfa;
+    --serif: 'Playfair Display', Georgia, serif;
+    --sans: 'Inter', system-ui, sans-serif;
+    --radius: 8px;
+    --radius-lg: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--sans);
+    background: var(--off);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* TOPBAR */
+  .topbar {
+    background: var(--black);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    height: 54px;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .logo-mark {
+    width: 32px; height: 32px;
+    background: var(--yellow);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo-mark svg { width: 15px; height: 13px; }
+  .logo-word { font-family: var(--serif); font-size: 17px; font-weight: 700; color: var(--white); letter-spacing: 0.04em; }
+  .topbar-tool {
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--yellow);
+    background: rgba(255,200,0,0.12);
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+  .topbar-nav { display: flex; gap: 4px; }
+  .topbar-nav a {
+    color: rgba(255,255,255,0.4);
+    text-decoration: none;
+    font-size: 12px; font-weight: 500;
+    padding: 5px 12px;
+    border-radius: 20px;
+    transition: all 0.15s;
+  }
+  .topbar-nav a:hover { color: white; background: rgba(255,255,255,0.08); }
+  .topbar-nav a.active { color: var(--yellow); }
+
+  /* IDENTITY GATE */
+  .identity-gate {
+    max-width: 420px;
+    margin: 80px auto;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 40px;
+    text-align: center;
+  }
+  .identity-gate .gate-mark {
+    width: 56px; height: 56px;
+    background: var(--yellow);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 18px;
+  }
+  .identity-gate .gate-mark svg { width: 26px; height: 22px; }
+  .identity-gate h1 { font-family: var(--serif); font-size: 24px; margin-bottom: 6px; }
+  .identity-gate p { font-size: 13px; color: var(--muted); margin-bottom: 22px; }
+  .identity-list { display: flex; flex-direction: column; gap: 8px; }
+  .identity-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--white);
+    cursor: pointer;
+    font-family: var(--sans);
+    transition: all 0.15s;
+    text-align: left;
+  }
+  .identity-btn:hover { border-color: var(--yellow); background: #FFFBEB; }
+  .id-avatar {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .id-name { font-size: 14px; font-weight: 600; }
+  .id-role { font-size: 11px; color: var(--muted); }
+
+  /* MAIN */
+  .container { max-width: 760px; margin: 0 auto; padding: 28px 24px 100px; display: none; }
+  .main-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+  .greeting-row { display: flex; align-items: center; gap: 14px; }
+  .me-avatar {
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 700;
+  }
+  .main-title { font-family: var(--serif); font-size: 24px; font-weight: 700; color: var(--black); line-height: 1.2; }
+  .main-sub { font-size: 12px; color: var(--muted); }
+  .switch-user {
+    font-size: 11px;
+    color: var(--muted);
+    background: none; border: none;
+    cursor: pointer;
+    text-decoration: underline;
+    font-family: var(--sans);
+  }
+  .switch-user:hover { color: var(--text); }
+
+  /* WEEK STRIP */
+  .week-strip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .week-strip button {
+    width: 30px; height: 30px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--white);
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.15s;
+  }
+  .week-strip button:hover { background: var(--yellow); border-color: var(--yellow); }
+  .week-label { font-size: 13px; font-weight: 600; flex: 1; text-align: center; }
+
+  /* STAT CARDS */
+  .stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+  .stat-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px 18px;
+  }
+  .stat-card.dark { background: var(--black); border-color: var(--black); }
+  .stat-num { font-family: var(--serif); font-size: 26px; font-weight: 700; line-height: 1.1; }
+  .stat-card.dark .stat-num { color: var(--yellow); }
+  .stat-num.purple { color: var(--meeting); }
+  .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; }
+  .stat-card.dark .stat-label { color: rgba(255,255,255,0.45); }
+
+  /* LOG FORM */
+  .log-form {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px 22px;
+    margin-bottom: 20px;
+  }
+  .log-form-title { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+  .log-grid { display: grid; grid-template-columns: 1fr 105px 85px 150px; gap: 10px; align-items: end; }
+  .form-field label {
+    display: block;
+    font-size: 10px; font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 5px;
+  }
+  .form-field input, .form-field select {
+    width: 100%;
+    background: var(--off);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 9px 11px;
+    font-family: var(--sans);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .form-field input:focus, .form-field select:focus { border-color: var(--yellow); background: white; }
+  .type-toggle { display: flex; gap: 3px; background: var(--mid); padding: 3px; border-radius: var(--radius); }
+  .type-btn {
+    flex: 1;
+    padding: 7px 4px;
+    border: none; background: none;
+    font-family: var(--sans);
+    font-size: 11px; font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all 0.15s;
+  }
+  .type-btn.active.work { background: var(--yellow); color: var(--black); }
+  .type-btn.active.meeting { background: var(--meeting); color: white; }
+  .desc-row { display: grid; grid-template-columns: 1fr 50px; gap: 10px; align-items: end; margin-top: 10px; }
+  .btn-log {
+    height: 38px;
+    background: var(--yellow);
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 18px;
+    transition: background 0.15s;
+  }
+  .btn-log:hover { background: var(--yellow-dark); }
+
+  /* MY WEEK */
+  .timesheet-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .day-header {
+    display: grid;
+    grid-template-columns: 100px 1fr 70px;
+    align-items: center;
+    padding: 10px 18px;
+    background: var(--off);
+    border-bottom: 1px solid var(--border);
+  }
+  .day-name { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-2); }
+  .day-date { font-size: 11px; color: var(--muted); }
+  .day-total { font-size: 12px; font-weight: 700; text-align: right; }
+  .day-total.good { color: var(--success); }
+  .day-total.over { color: var(--danger); }
+  .entry-row {
+    display: grid;
+    grid-template-columns: 95px 1fr 60px 28px;
+    align-items: center;
+    padding: 9px 18px;
+    border-bottom: 1px solid var(--border);
+    gap: 8px;
+  }
+  .entry-row:hover { background: var(--off); }
+  .entry-row:last-child { border-bottom: none; }
+  .entry-job { font-size: 12px; font-weight: 600; }
+  .entry-sub { font-size: 10px; color: var(--muted); }
+  .entry-desc { font-size: 12px; color: var(--text-2); }
+  .entry-hours { font-size: 13px; font-weight: 700; text-align: right; }
+  .entry-delete {
+    background: none; border: none;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 14px;
+    width: 24px; height: 24px;
+    border-radius: 4px;
+    transition: all 0.12s;
+  }
+  .entry-delete:hover { background: var(--danger-bg); color: var(--danger); }
+  .empty-day { padding: 11px 18px; font-size: 12px; color: var(--muted); font-style: italic; }
+  .type-tag {
+    display: inline-block;
+    font-size: 9px; font-weight: 700;
+    text-transform: uppercase;
+    padding: 1px 6px;
+    border-radius: 8px;
+    margin-left: 4px;
+    background: var(--meeting-bg);
+    color: var(--meeting);
+  }
+
+  /* MY JOBS BREAKDOWN */
+  .bar-row { display: grid; grid-template-columns: 130px 1fr 50px; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .bar-row:last-child { margin-bottom: 0; }
+  .bar-label { font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar-track { height: 9px; background: var(--mid); border-radius: 5px; overflow: hidden; }
+  .bar-fill { height: 100%; background: var(--yellow); transition: width 0.4s; }
+  .bar-val { font-size: 12px; font-weight: 700; text-align: right; }
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px 22px;
+    margin-bottom: 16px;
+  }
+  .card-title { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 9px 16px;
+    border-radius: var(--radius);
+    font-family: var(--sans);
+    font-size: 12px; font-weight: 600;
+    cursor: pointer;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    transition: all 0.15s;
+  }
+  .btn:hover { border-color: var(--black); }
+
+  .privacy-note {
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--mid);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--black);
+    color: white;
+    padding: 11px 18px;
+    border-radius: var(--radius);
+    font-size: 13px; font-weight: 500;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all 0.25s;
+    z-index: 999;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+</style>
+  <script src="mama-shared.js"></script>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html" class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 15 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 0 L7.5 7 L15 0 L15 13 L0 13 Z" fill="#0e0e0e"/>
+      </svg>
+    </div>
+    <span class="logo-word">mama</span>
+  </a>
+  <span class="topbar-tool">My Time</span>
+  <nav class="topbar-nav">
+    <a href="index.html">Hub</a>
+    <a href="job-hub.html">Jobs</a>
+    <a href="quote-builder.html">Quotes</a>
+    <a href="brief-builder.html">Briefs</a>
+    <a href="my-time.html" class="active">My Time</a>
+    <a href="my-todos.html">To-Dos</a>
+    <a href="project-reports.html">Reports</a>
+    <a href="time-tracker.html">Admin</a>
+    <a href="settings.html">Settings</a>
+  </nav>
+</div>
+
+<!-- IDENTITY GATE -->
+<div class="identity-gate" id="identityGate">
+  <div class="gate-mark">
+    <svg viewBox="0 0 15 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 0 L7.5 7 L15 0 L15 13 L0 13 Z" fill="#0e0e0e"/>
+    </svg>
+  </div>
+  <h1 id="gateTitle">Who's logging time?</h1>
+  <p id="gateSub">Your view shows only your own hours. Pick your name to continue.</p>
+  <div class="identity-list" id="identityList"></div>
+  <div id="passwordStep" style="display:none">
+    <input type="password" id="userPassword" placeholder="Your password" style="width:100%; text-align:center; font-size:14px; background:var(--off); border:1px solid var(--border); border-radius:8px; padding:11px; outline:none; font-family:var(--sans); margin-bottom:12px" onkeydown="if(event.key==='Enter')checkPassword()">
+    <button class="identity-btn" style="justify-content:center; background:var(--yellow); border-color:var(--yellow); font-weight:600" onclick="checkPassword()">Sign in</button>
+    <button class="identity-btn" style="justify-content:center; border:none; color:var(--muted); font-size:12px" onclick="backToNames()">← Back to names</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="container" id="mainContainer">
+  <div class="main-header">
+    <div class="greeting-row">
+      <div class="me-avatar" id="meAvatar"></div>
+      <div>
+        <div class="main-title" id="greeting"></div>
+        <div class="main-sub" id="greetingSub"></div>
+      </div>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px">
+      <button class="btn" onclick="exportMyCSV()">↓ My timesheet</button>
+    </div>
+  </div>
+
+  <div class="privacy-note">
+    🔒 This is your personal view — only your own time is shown here. Hours sync to the management dashboard for resourcing and capacity planning.
+  </div>
+
+  <div class="week-strip">
+    <button onclick="changeWeek(-1)">‹</button>
+    <span class="week-label" id="weekLabel"></span>
+    <button onclick="changeWeek(1)">›</button>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card dark">
+      <div class="stat-num" id="statTotal">0h</div>
+      <div class="stat-label">Total this week</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statWork">0h</div>
+      <div class="stat-label">Work</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num purple" id="statMeetings">0h</div>
+      <div class="stat-label">Meetings</div>
+    </div>
+  </div>
+
+  <div class="log-form">
+    <div class="log-form-title">Log time</div>
+    <div class="log-grid">
+      <div class="form-field">
+        <label>Job</label>
+        <select id="logJob"><option value="">— Select job —</option></select>
+      </div>
+      <div class="form-field">
+        <label>Date</label>
+        <input type="date" id="logDate">
+      </div>
+      <div class="form-field">
+        <label>Hours</label>
+        <input type="number" id="logHours" placeholder="0.0" min="0.5" max="24" step="0.5">
+      </div>
+      <div class="form-field">
+        <label>Type</label>
+        <div class="type-toggle">
+          <button class="type-btn work active" id="typeWork" onclick="setType('work')">Work</button>
+          <button class="type-btn meeting" id="typeMeeting" onclick="setType('meeting')">Meeting</button>
+        </div>
+      </div>
+    </div>
+    <div class="desc-row">
+      <div class="form-field" style="margin:0">
+        <label>Description</label>
+        <input type="text" id="logDesc" placeholder="What did you work on?">
+      </div>
+      <button class="btn-log" onclick="logEntry()">+</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">My week by job</div>
+    <div id="myJobBars"><div class="empty-day" style="padding:0">No entries this week yet.</div></div>
+  </div>
+
+  <div class="timesheet-card" id="myWeekSheet"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─────────────────────────────────────────────
+// SHARED STORAGE LAYER
+// Same keys as the admin dashboard (time-tracker.html).
+// On the same device/browser, entries logged here appear
+// in the admin view instantly. Swappable for Google Drive
+// API later without changing anything else.
+// ─────────────────────────────────────────────
+const STORE_ENTRIES = 'mama-time-entries';
+const STORE_TEAM = 'mama-time-team';
+const STORE_ME = 'mama-time-identity';
+
+let memStore = {};
+function storeGet(key) {
+  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : null; }
+  catch(e) { return memStore[key] || null; }
+}
+function storeSet(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); }
+  catch(e) { memStore[key] = val; }
+}
+
+const defaultTeam = [
+  { id: 1, name: 'Cassidy', role: 'Strategist', initials: 'CA' },
+  { id: 2, name: 'Max', role: 'Account Manager', initials: 'MX' },
+  { id: 3, name: 'Ally', role: 'Strategist', initials: 'AL' },
+  { id: 4, name: 'Alexa', role: 'COO', initials: 'AX' },
+];
+
+const STORE_JOBS = 'mama-jobs';
+const defaultJobs = [
+  { id: 'SAFW001', name: 'SA Fashion Week', assignedTo: [] },
+  { id: 'SHA001', name: 'Share Agency', assignedTo: [] },
+  { id: 'GAN001', name: 'Gan Tamar', assignedTo: [] },
+  { id: 'BAN001', name: 'Better Angels', assignedTo: [] },
+  { id: 'INT001', name: 'Internal / Admin', assignedTo: [] },
+];
+let jobList = storeGet(STORE_JOBS) || defaultJobs;
+
+// Jobs visible to the signed-in person:
+// empty assignedTo = open to everyone; otherwise only assigned members
+function myJobs() {
+  return jobList.filter(j => !j.assignedTo || j.assignedTo.length === 0 || j.assignedTo.includes(me));
+}
+
+// Live refresh if admin adds/assigns jobs (or entries change) in another tab
+window.addEventListener('storage', (ev) => {
+  if (ev.key === STORE_JOBS || ev.key === STORE_ENTRIES || ev.key === STORE_TEAM) {
+    jobList = storeGet(STORE_JOBS) || defaultJobs;
+    entries = storeGet(STORE_ENTRIES) || [];
+    team = storeGet(STORE_TEAM) || defaultTeam;
+    if (me) render();
+  }
+});
+
+let team = storeGet(STORE_TEAM) || defaultTeam;
+let entries = storeGet(STORE_ENTRIES) || [];
+let me = storeGet(STORE_ME) || null;
+let currentWeekOffset = 0;
+let entryType = 'work';
+
+function persist() {
+  storeSet(STORE_ENTRIES, entries);
+  storeSet(STORE_TEAM, team);
+}
+
+// ─────────────────────────────────────────────
+// IDENTITY
+// ─────────────────────────────────────────────
+function memberColor(id) {
+  const colors = ['#FFC800','#0e0e0e','#e8c85a','#8a6c00'];
+  return colors[(id-1) % colors.length];
+}
+function memberTextColor(id) { return (id === 2 || id === 4) ? 'white' : '#0e0e0e'; }
+
+function renderIdentityGate() {
+  document.getElementById('identityList').innerHTML = team.map(m =>
+    `<button class="identity-btn" onclick="chooseIdentity(${m.id})">
+      <div class="id-avatar" style="background:${memberColor(m.id)};color:${memberTextColor(m.id)}">${m.initials}</div>
+      <div>
+        <div class="id-name">${m.name}</div>
+        <div class="id-role">${m.role}</div>
+      </div>
+    </button>`
+  ).join('');
+}
+
+// ─────────────────────────────────────────────
+// PASSWORDS
+// Everyone is set to the same starter password for now.
+// Like the admin PIN, this is a casual-access deterrent,
+// not real security (it's visible in the page source).
+// Per-person Google sign-in replaces this once hosted.
+// ─────────────────────────────────────────────
+const DEFAULT_PASSWORD = 'Smarties716!';
+function memberPassword(m) { return m.password || DEFAULT_PASSWORD; }
+
+let pendingIdentity = null;
+
+function chooseIdentity(id) {
+  pendingIdentity = id;
+  const m = team.find(t => t.id === id);
+  document.getElementById('identityList').style.display = 'none';
+  document.getElementById('passwordStep').style.display = 'block';
+  document.getElementById('gateTitle').textContent = 'Hi, ' + m.name;
+  document.getElementById('gateSub').textContent = 'Enter your password to open your timesheet.';
+  document.getElementById('userPassword').value = '';
+  document.getElementById('userPassword').focus();
+}
+
+function checkPassword() {
+  const m = team.find(t => t.id === pendingIdentity);
+  if (!m) { backToNames(); return; }
+  if (document.getElementById('userPassword').value === memberPassword(m)) {
+    me = pendingIdentity;
+    storeSet(STORE_ME, me);
+    Mama.Session.setMember(me);
+    enterApp();
+  } else {
+    showToast('Incorrect password');
+    document.getElementById('userPassword').value = '';
+    document.getElementById('userPassword').focus();
+  }
+}
+
+function backToNames() {
+  pendingIdentity = null;
+  document.getElementById('passwordStep').style.display = 'none';
+  document.getElementById('identityList').style.display = 'flex';
+  document.getElementById('gateTitle').textContent = "Who's logging time?";
+  document.getElementById('gateSub').textContent = 'Your view shows only your own hours. Pick your name to continue.';
+}
+
+function switchUser() {
+  me = null;
+  storeSet(STORE_ME, null);
+  document.getElementById('mainContainer').style.display = 'none';
+  document.getElementById('identityGate').style.display = 'block';
+  backToNames();
+}
+
+function enterApp() {
+  const m = team.find(t => t.id === me);
+  if (!m) { switchUser(); return; }
+  document.getElementById('identityGate').style.display = 'none';
+  document.getElementById('mainContainer').style.display = 'block';
+  document.getElementById('meAvatar').style.background = memberColor(m.id);
+  document.getElementById('meAvatar').style.color = memberTextColor(m.id);
+  document.getElementById('meAvatar').textContent = m.initials;
+  document.getElementById('greeting').textContent = 'Hi, ' + m.name;
+  document.getElementById('greetingSub').textContent = m.role;
+  render();
+}
+
+// ─────────────────────────────────────────────
+// WEEK HELPERS
+// ─────────────────────────────────────────────
+function getWeekBounds(offset = 0) {
+  const now = new Date();
+  const day = now.getDay();
+  const mon = new Date(now);
+  mon.setDate(now.getDate() - (day === 0 ? 6 : day - 1) + offset * 7);
+  mon.setHours(0,0,0,0);
+  const fri = new Date(mon);
+  fri.setDate(mon.getDate() + 4);
+  return { mon, fri };
+}
+function dateInWeek(dateStr, offset) {
+  const { mon } = getWeekBounds(offset);
+  const d = new Date(dateStr);
+  d.setHours(0,0,0,0);
+  const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+  return d >= mon && d <= sun;
+}
+function fmtDate(d) { return d.toLocaleDateString('en-ZA', { day:'numeric', month:'short' }); }
+function changeWeek(dir) { currentWeekOffset += dir; render(); }
+function getDaysOfWeek(offset) {
+  const days = [];
+  const { mon } = getWeekBounds(offset);
+  for (let i = 0; i < 5; i++) {
+    const d = new Date(mon);
+    d.setDate(mon.getDate() + i);
+    days.push(d.toISOString().slice(0,10));
+  }
+  return days;
+}
+
+// ─────────────────────────────────────────────
+// RENDER (everything filtered to `me`)
+// ─────────────────────────────────────────────
+function render() {
+  const { mon, fri } = getWeekBounds(currentWeekOffset);
+  document.getElementById('weekLabel').textContent =
+    fmtDate(mon) + ' – ' + fmtDate(fri) + (currentWeekOffset === 0 ? ' · this week' : '');
+
+  const mine = entries.filter(e => e.memberId === me && dateInWeek(e.date, currentWeekOffset));
+  const total = mine.reduce((s,e)=>s+e.hours,0);
+  const meet = mine.filter(e=>e.type==='meeting').reduce((s,e)=>s+e.hours,0);
+
+  document.getElementById('statTotal').textContent = total + 'h';
+  document.getElementById('statWork').textContent = (total-meet) + 'h';
+  document.getElementById('statMeetings').textContent = meet + 'h';
+
+  // Job select
+  const jSel = document.getElementById('logJob');
+  const cur = jSel.value;
+  jSel.innerHTML = '<option value="">— Select job —</option>' +
+    myJobs().map(j => `<option value="${j.id}"${j.id===cur?' selected':''}>${j.id} — ${j.name}</option>`).join('');
+
+  // My jobs bars
+  const byJob = {};
+  mine.forEach(e => { byJob[e.jobId] = (byJob[e.jobId]||0) + e.hours; });
+  const jobIds = Object.keys(byJob);
+  document.getElementById('myJobBars').innerHTML = jobIds.length
+    ? jobIds.map(jid => {
+        const j = jobList.find(x=>x.id===jid);
+        const pct = total > 0 ? (byJob[jid]/total)*100 : 0;
+        return `<div class="bar-row">
+          <div class="bar-label">${j ? j.name : jid}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+          <div class="bar-val">${byJob[jid]}h</div>
+        </div>`;
+      }).join('')
+    : '<div class="empty-day" style="padding:0">No entries this week yet.</div>';
+
+  // My week sheet
+  const days = getDaysOfWeek(currentWeekOffset);
+  document.getElementById('myWeekSheet').innerHTML = days.map(dateStr => {
+    const dayEntries = mine.filter(e => e.date === dateStr);
+    const dayTotal = dayEntries.reduce((s,e)=>s+e.hours,0);
+    const dayName = new Date(dateStr).toLocaleDateString('en-ZA',{weekday:'short'}).toUpperCase();
+    const dayDate = new Date(dateStr).toLocaleDateString('en-ZA',{day:'numeric',month:'short'});
+    const totalClass = dayTotal > 8 ? 'over' : dayTotal >= 6 ? 'good' : '';
+    return `<div>
+      <div class="day-header">
+        <div class="day-name">${dayName}</div>
+        <div class="day-date">${dayDate}</div>
+        <div class="day-total ${totalClass}">${dayTotal > 0 ? dayTotal+'h' : '—'}</div>
+      </div>
+      ${dayEntries.length
+        ? dayEntries.map(e => {
+            const j = jobList.find(j=>j.id===e.jobId);
+            const tag = e.type === 'meeting' ? '<span class="type-tag">Mtg</span>' : '';
+            return `<div class="entry-row">
+              <div>
+                <div class="entry-job">${e.jobId}${tag}</div>
+                <div class="entry-sub">${j?j.name:''}</div>
+              </div>
+              <div class="entry-desc">${e.desc}</div>
+              <div class="entry-hours">${e.hours}h</div>
+              <button class="entry-delete" onclick="deleteEntry(${e.id})">×</button>
+            </div>`;
+          }).join('')
+        : '<div class="empty-day">No entries</div>'}
+    </div>`;
+  }).join('');
+}
+
+// ─────────────────────────────────────────────
+// ACTIONS
+// ─────────────────────────────────────────────
+function setType(t) {
+  entryType = t;
+  document.getElementById('typeWork').classList.toggle('active', t==='work');
+  document.getElementById('typeMeeting').classList.toggle('active', t==='meeting');
+}
+
+function logEntry() {
+  const jobId = document.getElementById('logJob').value;
+  const date = document.getElementById('logDate').value;
+  const hours = parseFloat(document.getElementById('logHours').value);
+  const desc = document.getElementById('logDesc').value.trim();
+
+  if (!jobId || !date || !hours || !desc) { showToast('Please fill in all fields'); return; }
+  if (hours <= 0 || hours > 24) { showToast('Hours must be between 0.5 and 24'); return; }
+
+  const nextId = entries.length ? Math.max(...entries.map(e=>e.id)) + 1 : 1;
+  entries.push({ id: nextId, memberId: me, jobId, date, hours, desc, type: entryType });
+  persist();
+  document.getElementById('logHours').value = '';
+  document.getElementById('logDesc').value = '';
+  showToast((entryType==='meeting'?'Meeting':'Time') + ' logged — ' + hours + 'h');
+  render();
+}
+
+function deleteEntry(id) {
+  const e = entries.find(x => x.id === id);
+  if (e && e.memberId !== me) { showToast("You can only remove your own entries"); return; }
+  entries = entries.filter(x => x.id !== id);
+  persist();
+  render();
+  showToast('Entry removed');
+}
+
+function exportMyCSV() {
+  const m = team.find(t=>t.id===me);
+  let csv = 'Date,Day,Job,Job Name,Type,Hours,Description\n';
+  entries.filter(e=>e.memberId===me).sort((a,b)=>a.date.localeCompare(b.date)).forEach(e => {
+    const j = jobList.find(j=>j.id===e.jobId);
+    const day = new Date(e.date).toLocaleDateString('en-ZA',{weekday:'short'});
+    csv += `${e.date},${day},"${e.jobId}","${j?.name||''}","${e.type}",${e.hours},"${e.desc}"\n`;
+  });
+  const blob = new Blob([csv], { type:'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${(m?.name||'my').toLowerCase()}-timesheet.csv`;
+  a.click();
+  showToast('Your timesheet exported');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+// INIT
+document.getElementById('logDate').valueAsDate = new Date();
+if (Mama.Session.memberValid()) { me = Mama.Session.member(); storeSet(STORE_ME, me); }
+else { me = null; }
+renderIdentityGate();
+if (me && team.find(t=>t.id===me)) enterApp();
+</script>
+</body>
+</html>

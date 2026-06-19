@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex, nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Time Tracker — Mama Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --yellow: #FFC800;
+    --yellow-light: #FFF3B0;
+    --yellow-dark: #E6B400;
+    --black: #0e0e0e;
+    --white: #ffffff;
+    --off: #fafaf8;
+    --mid: #f0efe9;
+    --border: #e2e0d8;
+    --muted: #8a8880;
+    --text: #1a1a1a;
+    --text-2: #4a4845;
+    --success: #2e7d52;
+    --success-bg: #eaf4ee;
+    --danger: #c0392b;
+    --danger-bg: #fdecea;
+    --meeting: #7b5cb8;
+    --meeting-bg: #f0ebfa;
+    --serif: 'Playfair Display', Georgia, serif;
+    --sans: 'Inter', system-ui, sans-serif;
+    --radius: 8px;
+    --radius-lg: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--sans);
+    background: var(--off);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    background: var(--black);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    height: 54px;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+  .logo-mark {
+    width: 32px; height: 32px;
+    background: var(--yellow);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .logo-mark svg { width: 15px; height: 13px; }
+  .logo-word {
+    font-family: var(--serif);
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: 0.04em;
+  }
+  .topbar-tool {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--yellow);
+    background: rgba(255,200,0,0.12);
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+  .topbar-right { display: flex; align-items: center; gap: 8px; }
+  .topbar-nav { display: flex; gap: 4px; }
+  .topbar-nav a {
+    color: rgba(255,255,255,0.4);
+    text-decoration: none;
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    transition: all 0.15s;
+    font-weight: 500;
+  }
+  .topbar-nav a:hover { color: white; background: rgba(255,255,255,0.08); }
+  .topbar-nav a.active { color: var(--yellow); }
+  .settings-btn {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: none;
+    color: rgba(255,255,255,0.6);
+    cursor: pointer;
+    font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .settings-btn:hover { border-color: var(--yellow); color: var(--yellow); }
+
+  /* ── LAYOUT ── */
+  .layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: calc(100vh - 54px);
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    background: var(--white);
+    border-right: 1px solid var(--border);
+    padding: 24px 0 16px;
+    position: sticky;
+    top: 54px;
+    height: calc(100vh - 54px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .sidebar-section { padding: 0 20px; margin-bottom: 26px; }
+  .sidebar-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .week-nav { display: flex; align-items: center; gap: 8px; }
+  .week-nav button {
+    width: 28px; height: 28px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--white);
+    cursor: pointer;
+    font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+    color: var(--text);
+  }
+  .week-nav button:hover { background: var(--yellow); border-color: var(--yellow); }
+  .week-display { flex: 1; text-align: center; font-size: 12px; font-weight: 600; }
+
+  .team-list { display: flex; flex-direction: column; gap: 3px; }
+  .member-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background 0.12s;
+    border: 1.5px solid transparent;
+  }
+  .member-item:hover { background: var(--mid); }
+  .member-item.active { background: var(--yellow-light); border-color: var(--yellow); }
+  .member-avatar {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .member-info { flex: 1; min-width: 0; }
+  .member-name { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .member-role { font-size: 11px; color: var(--muted); }
+  .member-hours { font-size: 12px; font-weight: 700; color: var(--text-2); }
+
+  .week-total-card {
+    margin: auto 16px 0;
+    background: var(--black);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    color: white;
+  }
+  .week-total-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 4px; }
+  .week-total-num {
+    font-family: var(--serif);
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--yellow);
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+  .week-total-sub { font-size: 11px; color: rgba(255,255,255,0.4); }
+  .week-total-split {
+    display: flex;
+    gap: 14px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+  }
+  .split-item { flex: 1; }
+  .split-num { font-size: 15px; font-weight: 700; color: white; }
+  .split-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.4); }
+
+  /* ── MAIN ── */
+  .main { padding: 28px 32px; max-width: 980px; }
+  .main-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  .main-title {
+    font-family: var(--serif);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--black);
+    margin-bottom: 2px;
+  }
+  .main-sub { font-size: 13px; color: var(--muted); }
+
+  /* ── LOG FORM ── */
+  .log-form {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 22px 24px;
+    margin-bottom: 20px;
+  }
+  .log-form-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+  .log-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 110px 100px 90px;
+    gap: 10px;
+    align-items: end;
+  }
+  .form-field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 5px;
+  }
+  .form-field input, .form-field select {
+    width: 100%;
+    background: var(--off);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 9px 12px;
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .form-field input:focus, .form-field select:focus { border-color: var(--yellow); background: white; }
+  .log-bottom-row {
+    display: grid;
+    grid-template-columns: 1fr 160px 52px;
+    gap: 10px;
+    align-items: end;
+    margin-top: 12px;
+  }
+  .type-toggle { display: flex; gap: 4px; background: var(--mid); padding: 3px; border-radius: var(--radius); }
+  .type-btn {
+    flex: 1;
+    padding: 7px 4px;
+    border: none;
+    background: none;
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all 0.15s;
+  }
+  .type-btn.active.work { background: var(--yellow); color: var(--black); }
+  .type-btn.active.meeting { background: var(--meeting); color: white; }
+  .btn-log {
+    width: 100%; height: 38px;
+    background: var(--yellow);
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+  .btn-log:hover { background: var(--yellow-dark); }
+
+  /* ── CARDS / TABLE ── */
+  .timesheet-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .timesheet-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .timesheet-head-left { display: flex; align-items: center; gap: 12px; }
+  .member-avatar-lg {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .ts-name { font-size: 15px; font-weight: 600; }
+  .ts-role { font-size: 12px; color: var(--muted); }
+  .ts-week-total { font-family: var(--serif); font-size: 22px; font-weight: 700; }
+  .ts-week-label { font-size: 11px; color: var(--muted); text-align: right; }
+
+  .day-header {
+    display: grid;
+    grid-template-columns: 100px 1fr 80px;
+    align-items: center;
+    padding: 10px 20px;
+    background: var(--off);
+    border-bottom: 1px solid var(--border);
+  }
+  .day-name { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-2); }
+  .day-date { font-size: 11px; color: var(--muted); }
+  .day-total { font-size: 12px; font-weight: 700; text-align: right; }
+  .day-total.over { color: var(--danger); }
+  .day-total.good { color: var(--success); }
+
+  .entry-row {
+    display: grid;
+    grid-template-columns: 110px 1fr 80px 32px;
+    align-items: center;
+    padding: 9px 20px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+    gap: 8px;
+  }
+  .entry-row:hover { background: var(--off); }
+  .entry-row:last-child { border-bottom: none; }
+  .entry-job { font-size: 12px; font-weight: 600; }
+  .entry-job-num { font-size: 10px; color: var(--muted); }
+  .entry-desc { font-size: 12px; color: var(--text-2); }
+  .entry-hours { font-size: 13px; font-weight: 700; text-align: right; }
+  .entry-delete {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 14px;
+    width: 24px; height: 24px;
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.12s;
+    margin-left: auto;
+  }
+  .entry-delete:hover { background: var(--danger-bg); color: var(--danger); }
+  .empty-day { padding: 12px 20px; font-size: 12px; color: var(--muted); font-style: italic; }
+
+  .type-tag {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 1px 6px;
+    border-radius: 8px;
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+  .type-tag.meeting { background: var(--meeting-bg); color: var(--meeting); }
+
+  /* ── OVERVIEW BARS ── */
+  .overview-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+  .overview-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .bar-row {
+    display: grid;
+    grid-template-columns: 110px 1fr 90px;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .bar-row:last-child { margin-bottom: 0; }
+  .bar-label { font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar-track {
+    height: 10px;
+    background: var(--mid);
+    border-radius: 5px;
+    overflow: hidden;
+    display: flex;
+  }
+  .bar-fill { height: 100%; background: var(--yellow); transition: width 0.4s ease; }
+  .bar-fill.meeting-fill { background: var(--meeting); }
+  .bar-val { font-size: 11px; font-weight: 600; text-align: right; color: var(--text-2); }
+  .legend { display: flex; gap: 14px; font-size: 10px; font-weight: 600; color: var(--muted); text-transform: none; letter-spacing: 0; }
+  .legend-item { display: flex; align-items: center; gap: 5px; }
+  .legend-dot { width: 9px; height: 9px; border-radius: 3px; }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex;
+    gap: 2px;
+    background: var(--mid);
+    padding: 3px;
+    border-radius: var(--radius);
+    margin-bottom: 20px;
+    width: fit-content;
+  }
+  .tab {
+    padding: 7px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all 0.15s;
+    border: none;
+    background: none;
+    font-family: var(--sans);
+  }
+  .tab.active { background: var(--white); color: var(--black); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+
+  /* ── BUTTONS / CHIPS ── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 9px 18px;
+    border-radius: var(--radius);
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+  }
+  .btn-primary { background: var(--black); color: white; }
+  .btn-primary:hover { background: #2a2a2a; }
+  .btn-yellow { background: var(--yellow); color: var(--black); }
+  .btn-yellow:hover { background: var(--yellow-dark); }
+  .btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
+  .btn-outline:hover { border-color: var(--black); }
+  .chip {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .chip-yellow { background: var(--yellow-light); color: #8a6c00; }
+  .chip-green { background: var(--success-bg); color: var(--success); }
+  .chip-red { background: var(--danger-bg); color: var(--danger); }
+  .chip-purple { background: var(--meeting-bg); color: var(--meeting); }
+
+  .breakdown-row {
+    display: grid;
+    grid-template-columns: 80px 1fr 80px 80px 80px;
+    align-items: center;
+    padding: 11px 20px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    gap: 8px;
+  }
+  .breakdown-row:last-child { border-bottom: none; }
+  .breakdown-header {
+    background: var(--off);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+  .breakdown-row.meetings-cols {
+    grid-template-columns: 1fr 90px 90px 110px;
+  }
+
+  /* ── SETTINGS MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(14,14,14,0.5);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 520px;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 28px;
+  }
+  .modal-title {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 22px; }
+  .modal .form-field { margin-bottom: 16px; }
+  .modal .form-field input { width: 100%; }
+  .modal-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 20px 0 12px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .modal-section-label:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+  .api-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: var(--radius);
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 18px;
+  }
+  .api-status.disconnected { background: var(--mid); color: var(--muted); }
+  .api-status.connected { background: var(--success-bg); color: var(--success); }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+  .modal-note {
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--off);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    line-height: 1.5;
+    margin-top: 6px;
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--black);
+    color: white;
+    padding: 11px 18px;
+    border-radius: var(--radius);
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all 0.25s;
+    z-index: 999;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  .view-panel { display: none; }
+  .view-panel.active { display: block; }
+
+  .sync-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: var(--meeting-bg);
+    border: 1px solid #ded3f2;
+    border-radius: var(--radius-lg);
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    font-size: 12px;
+    color: var(--meeting);
+  }
+</style>
+  <script src="mama-shared.js"></script>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <a href="index.html" class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 15 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 0 L7.5 7 L15 0 L15 13 L0 13 Z" fill="#0e0e0e"/>
+      </svg>
+    </div>
+    <span class="logo-word">mama</span>
+  </a>
+  <span class="topbar-tool">Time — Admin</span>
+  <div class="topbar-right">
+    <nav class="topbar-nav">
+    <a href="index.html">Hub</a>
+    <a href="job-hub.html">Jobs</a>
+    <a href="quote-builder.html">Quotes</a>
+    <a href="brief-builder.html">Briefs</a>
+    <a href="my-time.html">My Time</a>
+    <a href="my-todos.html">To-Dos</a>
+    <a href="project-reports.html">Reports</a>
+    <a href="time-tracker.html" class="active">Admin</a>
+    <a href="settings.html">Settings</a>
+  </nav>
+    <button class="settings-btn" onclick="openSettings()" title="Settings & Google API">⚙</button>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Week</div>
+      <div class="week-nav">
+        <button onclick="changeWeek(-1)">‹</button>
+        <span class="week-display" id="weekDisplay"></span>
+        <button onclick="changeWeek(1)">›</button>
+      </div>
+    </div>
+
+    <div class="sidebar-section" style="flex:1">
+      <div class="sidebar-label">Team</div>
+      <div class="team-list" id="teamList"></div>
+      <div style="margin-top:16px">
+        <div class="sidebar-label">Add team member</div>
+        <div style="display:flex; gap:6px">
+          <input type="text" id="newMemberName" placeholder="Full name" style="flex:1; background:var(--off); border:1px solid var(--border); border-radius:var(--radius); padding:7px 10px; font-family:var(--sans); font-size:12px; outline:none;">
+          <button class="btn btn-yellow" style="padding:7px 12px; font-size:16px;" onclick="addMember()">+</button>
+        </div>
+        <input type="text" id="newMemberRole" placeholder="Role (e.g. Strategist)" style="margin-top:6px; width:100%; background:var(--off); border:1px solid var(--border); border-radius:var(--radius); padding:7px 10px; font-family:var(--sans); font-size:12px; outline:none;">
+      </div>
+    </div>
+
+    <div class="week-total-card">
+      <div class="week-total-label">Team total this week</div>
+      <div class="week-total-num" id="teamTotalHours">0h</div>
+      <div class="week-total-sub" id="teamTotalSub"></div>
+      <div class="week-total-split">
+        <div class="split-item">
+          <div class="split-num" id="splitWork">0h</div>
+          <div class="split-label">Work</div>
+        </div>
+        <div class="split-item">
+          <div class="split-num" id="splitMeetings" style="color:#b9a3e3">0h</div>
+          <div class="split-label">Meetings</div>
+        </div>
+      </div>
+    </div>
+    <div style="height:16px"></div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="main-header">
+      <div>
+        <div class="main-title" id="mainTitle">All team</div>
+        <div class="main-sub" id="mainSub">Log time, track meetings, and see where the week is going</div>
+      </div>
+      <div style="display:flex; gap:8px; align-items:center">
+        <button class="btn btn-outline" onclick="exportCSV()">↓ Export CSV</button>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab active" onclick="switchView('log')" id="tabLog">Log time</button>
+      <button class="tab" onclick="switchView('week')" id="tabWeek">This week</button>
+      <button class="tab" onclick="switchView('overview')" id="tabOverview">Team overview</button>
+      <button class="tab" onclick="switchView('meetings')" id="tabMeetings">Meetings</button>
+      <button class="tab" onclick="switchView('jobs')" id="tabJobs">By job</button>
+    </div>
+
+    <!-- VIEW: LOG -->
+    <div class="view-panel active" id="viewLog">
+      <div class="log-form">
+        <div class="log-form-title">Log an entry</div>
+        <div class="log-form-grid">
+          <div class="form-field">
+            <label>Team member</label>
+            <select id="logMember"><option value="">— Select —</option></select>
+          </div>
+          <div class="form-field">
+            <label>Job</label>
+            <select id="logJob"><option value="">— Select job —</option></select>
+          </div>
+          <div class="form-field">
+            <label>Date</label>
+            <input type="date" id="logDate">
+          </div>
+          <div class="form-field">
+            <label>Hours</label>
+            <input type="number" id="logHours" placeholder="0.0" min="0.5" max="24" step="0.5">
+          </div>
+          <div class="form-field">
+            <label>Type</label>
+            <div class="type-toggle">
+              <button class="type-btn work active" id="typeWork" onclick="setType('work')">Work</button>
+              <button class="type-btn meeting" id="typeMeeting" onclick="setType('meeting')">Meeting</button>
+            </div>
+          </div>
+        </div>
+        <div class="log-bottom-row">
+          <div class="form-field" style="margin:0">
+            <label>Description / task</label>
+            <input type="text" id="logDesc" placeholder="What did you work on? e.g. Strategy deck for Gan Tamar Q3">
+          </div>
+          <div></div>
+          <button class="btn-log" onclick="logEntry()" title="Log time">+</button>
+        </div>
+      </div>
+
+      <div class="timesheet-card">
+        <div class="timesheet-head">
+          <span style="font-size:13px; font-weight:600; color:var(--muted)">Recent entries</span>
+        </div>
+        <div id="recentList"></div>
+      </div>
+    </div>
+
+    <!-- VIEW: WEEK -->
+    <div class="view-panel" id="viewWeek">
+      <div id="weekSheets"></div>
+    </div>
+
+    <!-- VIEW: OVERVIEW -->
+    <div class="view-panel" id="viewOverview">
+      <div class="overview-card">
+        <div class="overview-title">
+          <span>Team hours — <span id="overviewWeekLabel"></span></span>
+          <div class="legend">
+            <div class="legend-item"><div class="legend-dot" style="background:var(--yellow)"></div> Work</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--meeting)"></div> Meetings</div>
+          </div>
+        </div>
+        <div id="overviewBars"></div>
+      </div>
+      <div class="timesheet-card">
+        <div class="breakdown-row breakdown-header">
+          <div>Member</div>
+          <div>Role</div>
+          <div style="text-align:right">Work</div>
+          <div style="text-align:right">Meetings</div>
+          <div style="text-align:right">Total</div>
+        </div>
+        <div id="overviewTable"></div>
+      </div>
+    </div>
+
+    <!-- VIEW: MEETINGS -->
+    <div class="view-panel" id="viewMeetings">
+      <div class="sync-banner" id="syncBanner">
+        <span><strong>Google Calendar sync available.</strong> Connect your Google API in settings to pull meeting time automatically from everyone's calendars — no manual logging needed.</span>
+        <button class="btn btn-primary" style="flex-shrink:0" onclick="openSettings()">Connect Google →</button>
+      </div>
+
+      <div class="overview-card">
+        <div class="overview-title">Time in meetings — <span id="meetingsWeekLabel"></span></div>
+        <div id="meetingsBars"></div>
+      </div>
+
+      <div class="timesheet-card">
+        <div class="breakdown-row breakdown-header meetings-cols">
+          <div>Meeting</div>
+          <div style="text-align:right">Member</div>
+          <div style="text-align:right">Date</div>
+          <div style="text-align:right">Duration</div>
+        </div>
+        <div id="meetingsTable"></div>
+      </div>
+    </div>
+
+    <!-- VIEW: JOBS -->
+    <div class="view-panel" id="viewJobs">
+      <div class="log-form">
+        <div class="log-form-title">Add a job</div>
+        <div style="display:grid; grid-template-columns: 1fr 140px; gap:10px; margin-bottom:12px">
+          <div class="form-field">
+            <label>Job name</label>
+            <input type="text" id="newJobName" placeholder="e.g. Nando's SA">
+          </div>
+          <div class="form-field">
+            <label>Job number</label>
+            <input type="text" id="newJobId" placeholder="e.g. NAN001">
+          </div>
+        </div>
+        <div class="form-field" style="margin-bottom:12px">
+          <label>Assign to (leave empty = visible to everyone)</label>
+          <div id="newJobAssign" style="display:flex; gap:6px; flex-wrap:wrap; padding-top:4px"></div>
+        </div>
+        <button class="btn btn-yellow" onclick="addJob()">+ Add job</button>
+      </div>
+
+      <div class="timesheet-card">
+        <div class="breakdown-row breakdown-header" style="grid-template-columns: 80px 1fr 70px 70px 150px 28px">
+          <div>Job #</div>
+          <div>Job name</div>
+          <div style="text-align:right">Week</div>
+          <div style="text-align:right">Total</div>
+          <div style="text-align:right">Assigned to (click to toggle)</div>
+          <div></div>
+        </div>
+        <div id="jobsTable"></div>
+      </div>
+      <div style="font-size:11px; color:var(--muted); padding:4px 6px">
+        Assignment controls which jobs appear in each person's My Time dropdown. A job with nobody assigned is open to the whole team. Jobs with logged hours can't be deleted.
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settingsModal" onclick="if(event.target===this)closeSettings()">
+  <div class="modal">
+    <div class="modal-title">Settings</div>
+    <div class="modal-sub">Google integration &amp; workspace configuration</div>
+
+    <div class="api-status disconnected" id="apiStatus">
+      <div class="status-dot"></div>
+      <span id="apiStatusText">Google not connected</span>
+    </div>
+
+    <div class="modal-section-label">Google API</div>
+    <div class="form-field">
+      <label>Google API key</label>
+      <input type="text" id="gApiKey" placeholder="AIzaSy...">
+    </div>
+    <div class="form-field">
+      <label>OAuth 2.0 Client ID</label>
+      <input type="text" id="gClientId" placeholder="xxxxxxx.apps.googleusercontent.com">
+    </div>
+    <div class="modal-note">
+      Get these from <strong>console.cloud.google.com</strong> → APIs &amp; Services → Credentials. Enable the <strong>Google Drive API</strong> and <strong>Google Calendar API</strong> for your project. Once connected, meeting time pulls automatically from team calendars and exports save directly to Drive.
+    </div>
+
+    <div class="modal-section-label">Google Drive</div>
+    <div class="form-field">
+      <label>Drive folder ID (where exports save)</label>
+      <input type="text" id="gDriveFolder" placeholder="1IkvW4HGv2w_Ro2RSYy0Ii52CfhG_SQUO">
+    </div>
+
+    <div class="modal-section-label">Google Calendar</div>
+    <div class="form-field">
+      <label>Workspace domain (for team calendars)</label>
+      <input type="text" id="gCalDomain" placeholder="e.g. mama.agency">
+    </div>
+
+    <div style="display:flex; gap:8px; margin-top:24px">
+      <button class="btn btn-yellow" onclick="saveSettings()">Save &amp; connect</button>
+      <button class="btn btn-outline" onclick="closeSettings()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ADMIN ACCESS GATE -->
+<div id="adminGate" style="position:fixed; inset:0; background:var(--off); z-index:1000; display:flex; align-items:center; justify-content:center; padding:20px">
+  <div style="background:var(--white); border:1px solid var(--border); border-radius:14px; padding:40px; max-width:380px; width:100%; text-align:center">
+    <div style="width:56px;height:56px;background:var(--yellow);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px">
+      <svg viewBox="0 0 15 13" style="width:26px;height:22px" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 0 L7.5 7 L15 0 L15 13 L0 13 Z" fill="#0e0e0e"/></svg>
+    </div>
+    <h1 style="font-family:var(--serif); font-size:22px; margin-bottom:6px">Management view</h1>
+    <p style="font-size:13px; color:var(--muted); margin-bottom:20px">This dashboard shows the whole team's hours. Enter the admin PIN to continue.</p>
+    <input type="password" id="adminPin" placeholder="Admin PIN" style="width:100%; text-align:center; font-size:16px; letter-spacing:0.3em; background:var(--off); border:1px solid var(--border); border-radius:8px; padding:11px; outline:none; font-family:var(--sans); margin-bottom:12px" onkeydown="if(event.key==='Enter')checkAdminPin()">
+    <button class="btn btn-yellow" style="width:100%; justify-content:center" onclick="checkAdminPin()">Enter dashboard</button>
+    <a href="my-time.html" style="display:block; margin-top:14px; font-size:12px; color:var(--muted)">Just logging your own time? Go to My Time →</a>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// DATA
+// ─────────────────────────────────────────────
+let currentWeekOffset = 0;
+let selectedMember = null;
+let entryType = 'work';
+let googleConnected = false;
+
+// ─────────────────────────────────────────────
+// SHARED STORAGE LAYER
+// Same keys as my-time.html (employee view). Entries
+// logged by employees appear here automatically.
+// Swappable for Google Drive/Sheets API later.
+// ─────────────────────────────────────────────
+const STORE_ENTRIES = 'mama-time-entries';
+const STORE_TEAM = 'mama-time-team';
+
+let memStore = {};
+function storeGet(key) {
+  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : null; }
+  catch(e) { return memStore[key] || null; }
+}
+function storeSet(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); }
+  catch(e) { memStore[key] = val; }
+}
+
+const defaultTeam = [
+  { id: 1, name: 'Cassidy', role: 'Strategist', initials: 'CA' },
+  { id: 2, name: 'Max', role: 'Account Manager', initials: 'MX' },
+  { id: 3, name: 'Ally', role: 'Strategist', initials: 'AL' },
+  { id: 4, name: 'Alexa', role: 'COO', initials: 'AX' },
+];
+
+const STORE_JOBS = 'mama-jobs';
+
+const defaultJobs = [
+  { id: 'SAFW001', name: 'SA Fashion Week', assignedTo: [] },
+  { id: 'SHA001', name: 'Share Agency', assignedTo: [] },
+  { id: 'GAN001', name: 'Gan Tamar', assignedTo: [] },
+  { id: 'BAN001', name: 'Better Angels', assignedTo: [] },
+  { id: 'INT001', name: 'Internal / Admin', assignedTo: [] },
+];
+
+// assignedTo: [] = visible to everyone; [ids] = only those members
+let jobList = storeGet(STORE_JOBS) || defaultJobs;
+
+function persistJobs() { storeSet(STORE_JOBS, jobList); }
+
+let team = storeGet(STORE_TEAM) || defaultTeam;
+
+// entries: { id, memberId, jobId, date, hours, desc, type }
+let entries = storeGet(STORE_ENTRIES) || [];
+
+function persist() {
+  storeSet(STORE_ENTRIES, entries);
+  storeSet(STORE_TEAM, team);
+}
+
+// Refresh automatically when an employee logs time in another tab
+window.addEventListener('storage', (ev) => {
+  if (ev.key === STORE_ENTRIES || ev.key === STORE_TEAM || ev.key === STORE_JOBS) {
+    team = storeGet(STORE_TEAM) || defaultTeam;
+    entries = storeGet(STORE_ENTRIES) || [];
+    jobList = storeGet(STORE_JOBS) || defaultJobs;
+    render();
+  }
+});
+
+function getTodayStr(offsetDays = 0) {
+  const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
+  return d.toISOString().slice(0,10);
+}
+
+// ─────────────────────────────────────────────
+// WEEK HELPERS
+// ─────────────────────────────────────────────
+function getWeekBounds(offset = 0) {
+  const now = new Date();
+  const day = now.getDay();
+  const mon = new Date(now);
+  mon.setDate(now.getDate() - (day === 0 ? 6 : day - 1) + offset * 7);
+  mon.setHours(0,0,0,0);
+  const fri = new Date(mon);
+  fri.setDate(mon.getDate() + 4);
+  return { mon, fri };
+}
+function dateInWeek(dateStr, offset) {
+  const { mon } = getWeekBounds(offset);
+  const d = new Date(dateStr);
+  d.setHours(0,0,0,0);
+  const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+  return d >= mon && d <= sun;
+}
+function fmtDate(d) { return d.toLocaleDateString('en-ZA', { day:'numeric', month:'short' }); }
+function fmtDay(dateStr) { return new Date(dateStr).toLocaleDateString('en-ZA', { weekday:'long' }); }
+function changeWeek(dir) { currentWeekOffset += dir; render(); }
+function getDaysOfWeek(offset) {
+  const days = [];
+  const { mon } = getWeekBounds(offset);
+  for (let i = 0; i < 5; i++) {
+    const d = new Date(mon);
+    d.setDate(mon.getDate() + i);
+    days.push(d.toISOString().slice(0,10));
+  }
+  return days;
+}
+
+// ─────────────────────────────────────────────
+// RENDER
+// ─────────────────────────────────────────────
+function render() {
+  const { mon, fri } = getWeekBounds(currentWeekOffset);
+  const weekLabel = fmtDate(mon) + ' – ' + fmtDate(fri);
+  document.getElementById('weekDisplay').textContent = weekLabel;
+  document.getElementById('overviewWeekLabel').textContent = weekLabel;
+  document.getElementById('meetingsWeekLabel').textContent = weekLabel;
+
+  renderTeamList();
+  renderSelects();
+  renderRecent();
+  renderWeekSheets();
+  renderOverview();
+  renderMeetings();
+  renderJobs();
+  updateTotals();
+}
+
+function memberColor(id) {
+  const colors = ['#FFC800','#0e0e0e','#e8c85a','#8a6c00'];
+  return colors[(id-1) % colors.length];
+}
+function memberTextColor(id) {
+  return (id === 2 || id === 4) ? 'white' : '#0e0e0e';
+}
+
+function renderTeamList() {
+  const list = document.getElementById('teamList');
+  list.innerHTML = team.map(m => {
+    const wkHours = entries
+      .filter(e => e.memberId === m.id && dateInWeek(e.date, currentWeekOffset))
+      .reduce((s,e) => s + e.hours, 0);
+    return `<div class="member-item${selectedMember===m.id?' active':''}" onclick="selectMember(${m.id})">
+      <div class="member-avatar" style="background:${memberColor(m.id)};color:${memberTextColor(m.id)}">${m.initials}</div>
+      <div class="member-info">
+        <div class="member-name">${m.name}</div>
+        <div class="member-role">${m.role}</div>
+      </div>
+      <div class="member-hours">${wkHours > 0 ? wkHours+'h' : '—'}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderSelects() {
+  const sel = document.getElementById('logMember');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Select —</option>' +
+    team.map(m => `<option value="${m.id}"${m.id==cur?' selected':''}>${m.name} — ${m.role}</option>`).join('');
+  const jSel = document.getElementById('logJob');
+  const curJ = jSel.value;
+  jSel.innerHTML = '<option value="">— Select job —</option>' +
+    jobList.map(j => `<option value="${j.id}"${j.id===curJ?' selected':''}>${j.id} — ${j.name}</option>`).join('');
+}
+
+function entryRowHTML(e, showMember) {
+  const m = team.find(t => t.id === e.memberId);
+  const j = jobList.find(j => j.id === e.jobId);
+  const tag = e.type === 'meeting' ? '<span class="type-tag meeting">Meeting</span>' : '';
+  return `<div class="entry-row">
+    <div>
+      <div class="entry-job">${showMember ? (m?m.name:'?') : e.jobId}${tag}</div>
+      <div class="entry-job-num">${showMember ? fmtDay(e.date) : (j?j.name:'')}</div>
+    </div>
+    <div>
+      ${showMember ? `<div class="entry-desc">${j?j.name:e.jobId}</div>` : ''}
+      <div class="entry-job-num" style="font-size:${showMember?'10':'12'}px; color:var(--text-2)">${e.desc}</div>
+    </div>
+    <div class="entry-hours">${e.hours}h</div>
+    <button class="entry-delete" onclick="deleteEntry(${e.id})" title="Remove">×</button>
+  </div>`;
+}
+
+function renderRecent() {
+  const recent = [...entries].sort((a,b) => b.date.localeCompare(a.date) || b.id - a.id).slice(0,10);
+  document.getElementById('recentList').innerHTML = recent.length
+    ? recent.map(e => entryRowHTML(e, true)).join('')
+    : '<div class="empty-day">No entries yet — log your first entry above.</div>';
+}
+
+function renderWeekSheets() {
+  const days = getDaysOfWeek(currentWeekOffset);
+  const membersToShow = selectedMember ? team.filter(m => m.id === selectedMember) : team;
+  document.getElementById('weekSheets').innerHTML = membersToShow.map(m => {
+    const wkEntries = entries.filter(e => e.memberId === m.id && dateInWeek(e.date, currentWeekOffset));
+    const wkTotal = wkEntries.reduce((s,e) => s + e.hours, 0);
+    const meetTotal = wkEntries.filter(e=>e.type==='meeting').reduce((s,e)=>s+e.hours,0);
+
+    const daysHtml = days.map(dateStr => {
+      const dayEntries = wkEntries.filter(e => e.date === dateStr);
+      const dayTotal = dayEntries.reduce((s,e) => s + e.hours, 0);
+      const dayName = new Date(dateStr).toLocaleDateString('en-ZA', { weekday:'short' }).toUpperCase();
+      const dayDate = new Date(dateStr).toLocaleDateString('en-ZA', { day:'numeric', month:'short' });
+      const totalClass = dayTotal > 8 ? 'over' : dayTotal >= 6 ? 'good' : '';
+      return `<div>
+        <div class="day-header">
+          <div class="day-name">${dayName}</div>
+          <div class="day-date">${dayDate}</div>
+          <div class="day-total ${totalClass}">${dayTotal > 0 ? dayTotal+'h' : '—'}</div>
+        </div>
+        ${dayEntries.length ? dayEntries.map(e => entryRowHTML(e, false)).join('') : '<div class="empty-day">No entries</div>'}
+      </div>`;
+    }).join('');
+
+    const statusClass = wkTotal >= 40 ? 'chip-green' : wkTotal > 20 ? 'chip-yellow' : 'chip-red';
+    const statusLabel = wkTotal >= 40 ? 'On track' : wkTotal > 0 ? 'In progress' : 'No entries';
+
+    return `<div class="timesheet-card">
+      <div class="timesheet-head">
+        <div class="timesheet-head-left">
+          <div class="member-avatar-lg" style="background:${memberColor(m.id)};color:${memberTextColor(m.id)}">${m.initials}</div>
+          <div>
+            <div class="ts-name">${m.name}</div>
+            <div class="ts-role">${m.role}</div>
+          </div>
+          <span class="chip ${statusClass}" style="margin-left:8px">${statusLabel}</span>
+          ${meetTotal > 0 ? `<span class="chip chip-purple">${meetTotal}h meetings</span>` : ''}
+        </div>
+        <div>
+          <div class="ts-week-total">${wkTotal}h</div>
+          <div class="ts-week-label">this week</div>
+        </div>
+      </div>
+      ${daysHtml}
+    </div>`;
+  }).join('');
+}
+
+function renderOverview() {
+  const maxHours = 40;
+  document.getElementById('overviewBars').innerHTML = team.map(m => {
+    const wkEntries = entries.filter(e => e.memberId === m.id && dateInWeek(e.date, currentWeekOffset));
+    const work = wkEntries.filter(e=>e.type!=='meeting').reduce((s,e)=>s+e.hours,0);
+    const meet = wkEntries.filter(e=>e.type==='meeting').reduce((s,e)=>s+e.hours,0);
+    const workPct = Math.min((work / maxHours) * 100, 100);
+    const meetPct = Math.min((meet / maxHours) * 100, 100 - workPct);
+    return `<div class="bar-row">
+      <div class="bar-label">${m.name}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${workPct}%"></div>
+        <div class="bar-fill meeting-fill" style="width:${meetPct}%"></div>
+      </div>
+      <div class="bar-val">${work+meet}h <span style="color:var(--muted)">/ 40</span></div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('overviewTable').innerHTML = team.map(m => {
+    const wkEntries = entries.filter(e => e.memberId === m.id && dateInWeek(e.date, currentWeekOffset));
+    const work = wkEntries.filter(e=>e.type!=='meeting').reduce((s,e)=>s+e.hours,0);
+    const meet = wkEntries.filter(e=>e.type==='meeting').reduce((s,e)=>s+e.hours,0);
+    return `<div class="breakdown-row">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="member-avatar" style="width:24px;height:24px;font-size:9px;background:${memberColor(m.id)};color:${memberTextColor(m.id)}">${m.initials}</div>
+        <span style="font-weight:500">${m.name}</span>
+      </div>
+      <div style="font-size:12px;color:var(--muted)">${m.role}</div>
+      <div style="text-align:right;font-weight:500">${work > 0 ? work+'h' : '—'}</div>
+      <div style="text-align:right;font-weight:500;color:var(--meeting)">${meet > 0 ? meet+'h' : '—'}</div>
+      <div style="text-align:right;font-weight:700">${(work+meet) > 0 ? (work+meet)+'h' : '—'}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderMeetings() {
+  const meetEntries = entries.filter(e => e.type === 'meeting' && dateInWeek(e.date, currentWeekOffset));
+
+  // Bars: % of each person's total time spent in meetings
+  document.getElementById('meetingsBars').innerHTML = team.map(m => {
+    const wkEntries = entries.filter(e => e.memberId === m.id && dateInWeek(e.date, currentWeekOffset));
+    const total = wkEntries.reduce((s,e)=>s+e.hours,0);
+    const meet = wkEntries.filter(e=>e.type==='meeting').reduce((s,e)=>s+e.hours,0);
+    const pct = total > 0 ? (meet/total)*100 : 0;
+    return `<div class="bar-row">
+      <div class="bar-label">${m.name}</div>
+      <div class="bar-track"><div class="bar-fill meeting-fill" style="width:${pct}%"></div></div>
+      <div class="bar-val">${meet}h <span style="color:var(--muted)">(${Math.round(pct)}%)</span></div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('meetingsTable').innerHTML = meetEntries.length
+    ? meetEntries.sort((a,b)=>b.date.localeCompare(a.date)).map(e => {
+        const m = team.find(t=>t.id===e.memberId);
+        return `<div class="breakdown-row meetings-cols">
+          <div style="font-weight:500">${e.desc}</div>
+          <div style="text-align:right;font-size:12px">${m?m.name:'?'}</div>
+          <div style="text-align:right;font-size:11px;color:var(--muted)">${new Date(e.date).toLocaleDateString('en-ZA',{day:'numeric',month:'short'})}</div>
+          <div style="text-align:right;font-weight:700;color:var(--meeting)">${e.hours}h</div>
+        </div>`;
+      }).join('')
+    : '<div class="empty-day">No meetings logged this week. Log one with the "Meeting" type, or connect Google Calendar to sync automatically.</div>';
+}
+
+function assignChip(memberId, jobIdx, assigned) {
+  const m = team.find(t => t.id === memberId);
+  if (!m) return '';
+  const bg = assigned ? memberColor(memberId) : 'transparent';
+  const fg = assigned ? memberTextColor(memberId) : 'var(--muted)';
+  const bd = assigned ? memberColor(memberId) : 'var(--border)';
+  return `<span onclick="toggleAssign(${jobIdx},${memberId})" title="${m.name}${assigned?' — assigned':''}" style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:${bg};color:${fg};border:1.5px solid ${bd};font-size:9px;font-weight:700;margin-left:3px;cursor:pointer;user-select:none">${m.initials}</span>`;
+}
+
+function renderJobs() {
+  document.getElementById('jobsTable').innerHTML = jobList.map((j, idx) => {
+    const wkHours = entries.filter(e => e.jobId === j.id && dateInWeek(e.date, currentWeekOffset)).reduce((s,e) => s + e.hours, 0);
+    const totalHours = entries.filter(e => e.jobId === j.id).reduce((s,e) => s + e.hours, 0);
+    const assigned = j.assignedTo || [];
+    const chips = team.map(m => assignChip(m.id, idx, assigned.includes(m.id))).join('');
+    const canDelete = totalHours === 0;
+    return `<div class="breakdown-row" style="grid-template-columns: 80px 1fr 70px 70px 150px 28px">
+      <div style="font-size:11px;font-weight:700;color:var(--muted)">${j.id}</div>
+      <div style="font-weight:500">${j.name}${assigned.length === 0 ? ' <span style="font-size:9px;color:var(--muted);font-weight:400">(everyone)</span>' : ''}</div>
+      <div style="text-align:right;font-weight:600">${wkHours > 0 ? wkHours+'h' : '—'}</div>
+      <div style="text-align:right;font-weight:700">${totalHours > 0 ? totalHours+'h' : '—'}</div>
+      <div style="text-align:right">${chips}</div>
+      <div>${canDelete ? `<button class="entry-delete" onclick="deleteJob(${idx})" title="Delete job">×</button>` : ''}</div>
+    </div>`;
+  }).join('');
+
+  // Assignment chips in the add-job form
+  document.getElementById('newJobAssign').innerHTML = team.map(m => {
+    const sel = newJobAssignees.includes(m.id);
+    const bg = sel ? memberColor(m.id) : 'transparent';
+    const fg = sel ? memberTextColor(m.id) : 'var(--muted)';
+    const bd = sel ? memberColor(m.id) : 'var(--border)';
+    return `<span onclick="toggleNewAssign(${m.id})" style="display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:14px;border:1.5px solid ${bd};background:${bg};color:${fg};font-size:11px;font-weight:600;cursor:pointer;user-select:none">${m.name}</span>`;
+  }).join('');
+}
+
+let newJobAssignees = [];
+
+function toggleNewAssign(memberId) {
+  newJobAssignees = newJobAssignees.includes(memberId)
+    ? newJobAssignees.filter(id => id !== memberId)
+    : [...newJobAssignees, memberId];
+  renderJobs();
+}
+
+function toggleAssign(jobIdx, memberId) {
+  const j = jobList[jobIdx];
+  if (!j.assignedTo) j.assignedTo = [];
+  j.assignedTo = j.assignedTo.includes(memberId)
+    ? j.assignedTo.filter(id => id !== memberId)
+    : [...j.assignedTo, memberId];
+  persistJobs();
+  renderJobs();
+  const m = team.find(t => t.id === memberId);
+  showToast(m.name + (j.assignedTo.includes(memberId) ? ' assigned to ' : ' removed from ') + j.id);
+}
+
+function addJob() {
+  const name = document.getElementById('newJobName').value.trim();
+  let id = document.getElementById('newJobId').value.trim().toUpperCase();
+  if (!name) { showToast('Enter a job name'); return; }
+  if (!id) {
+    // Auto-generate: first 3 letters + next number
+    const prefix = name.replace(/[^A-Za-z]/g,'').slice(0,3).toUpperCase() || 'JOB';
+    let n = 1;
+    while (jobList.some(j => j.id === prefix + String(n).padStart(3,'0'))) n++;
+    id = prefix + String(n).padStart(3,'0');
+  }
+  if (jobList.some(j => j.id === id)) { showToast('Job number ' + id + ' already exists'); return; }
+
+  jobList.push({ id, name, assignedTo: [...newJobAssignees] });
+  persistJobs();
+  document.getElementById('newJobName').value = '';
+  document.getElementById('newJobId').value = '';
+  newJobAssignees = [];
+  render();
+  showToast('Job ' + id + ' — ' + name + ' added');
+}
+
+function deleteJob(idx) {
+  const j = jobList[idx];
+  const hasHours = entries.some(e => e.jobId === j.id);
+  if (hasHours) { showToast('Jobs with logged hours can\'t be deleted'); return; }
+  if (!confirm('Delete ' + j.id + ' — ' + j.name + '?')) return;
+  jobList.splice(idx, 1);
+  persistJobs();
+  render();
+  showToast('Job removed');
+}
+
+function updateTotals() {
+  const wk = entries.filter(e => dateInWeek(e.date, currentWeekOffset));
+  const total = wk.reduce((s,e) => s + e.hours, 0);
+  const meet = wk.filter(e=>e.type==='meeting').reduce((s,e)=>s+e.hours,0);
+  document.getElementById('teamTotalHours').textContent = total + 'h';
+  document.getElementById('teamTotalSub').textContent = `${team.length} team members`;
+  document.getElementById('splitWork').textContent = (total - meet) + 'h';
+  document.getElementById('splitMeetings').textContent = meet + 'h';
+}
+
+// ─────────────────────────────────────────────
+// ACTIONS
+// ─────────────────────────────────────────────
+function selectMember(id) {
+  selectedMember = selectedMember === id ? null : id;
+  const m = team.find(t => t.id === id);
+  if (selectedMember && m) {
+    document.getElementById('mainTitle').textContent = m.name;
+    document.getElementById('mainSub').textContent = m.role;
+    document.getElementById('logMember').value = id;
+  } else {
+    document.getElementById('mainTitle').textContent = 'All team';
+    document.getElementById('mainSub').textContent = 'Log time, track meetings, and see where the week is going';
+  }
+  render();
+}
+
+function setType(t) {
+  entryType = t;
+  document.getElementById('typeWork').classList.toggle('active', t === 'work');
+  document.getElementById('typeMeeting').classList.toggle('active', t === 'meeting');
+}
+
+function logEntry() {
+  const memberId = parseInt(document.getElementById('logMember').value);
+  const jobId = document.getElementById('logJob').value;
+  const date = document.getElementById('logDate').value;
+  const hours = parseFloat(document.getElementById('logHours').value);
+  const desc = document.getElementById('logDesc').value.trim();
+
+  if (!memberId || !jobId || !date || !hours || !desc) { showToast('Please fill in all fields'); return; }
+  if (hours <= 0 || hours > 24) { showToast('Hours must be between 0.5 and 24'); return; }
+
+  const nextId = entries.length ? Math.max(...entries.map(e=>e.id)) + 1 : 1;
+  entries.push({ id: nextId, memberId, jobId, date, hours, desc, type: entryType });
+  persist();
+  document.getElementById('logHours').value = '';
+  document.getElementById('logDesc').value = '';
+  showToast((entryType==='meeting'?'Meeting':'Entry') + ' logged — ' + hours + 'h on ' + jobId);
+  render();
+}
+
+function deleteEntry(id) {
+  entries = entries.filter(e => e.id !== id);
+  persist();
+  render();
+  showToast('Entry removed');
+}
+
+function addMember() {
+  const name = document.getElementById('newMemberName').value.trim();
+  const role = document.getElementById('newMemberRole').value.trim() || 'Team member';
+  if (!name) { showToast('Enter a name'); return; }
+  const initials = name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+  team.push({ id: Math.max(...team.map(m=>m.id)) + 1, name, role, initials });
+  persist();
+  document.getElementById('newMemberName').value = '';
+  document.getElementById('newMemberRole').value = '';
+  render();
+  showToast(name + ' added to the team');
+}
+
+function switchView(view) {
+  document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  const cap = view.charAt(0).toUpperCase() + view.slice(1);
+  document.getElementById('view' + cap).classList.add('active');
+  document.getElementById('tab' + cap).classList.add('active');
+}
+
+function exportCSV() {
+  const { mon } = getWeekBounds(currentWeekOffset);
+  let csv = 'Date,Day,Member,Role,Job,Job Name,Type,Hours,Description\n';
+  [...entries].sort((a,b) => a.date.localeCompare(b.date)).forEach(e => {
+    const m = team.find(t => t.id === e.memberId);
+    const j = jobList.find(j => j.id === e.jobId);
+    const day = new Date(e.date).toLocaleDateString('en-ZA', { weekday:'short' });
+    csv += `${e.date},${day},"${m?.name||''}","${m?.role||''}","${e.jobId}","${j?.name||''}","${e.type}",${e.hours},"${e.desc}"\n`;
+  });
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `mama-timesheets-${mon.toISOString().slice(0,10)}.csv`;
+  a.click();
+  showToast('Timesheet exported');
+}
+
+// ─────────────────────────────────────────────
+// SETTINGS / GOOGLE API
+// ─────────────────────────────────────────────
+function openSettings() { document.getElementById('settingsModal').classList.add('open'); }
+function closeSettings() { document.getElementById('settingsModal').classList.remove('open'); }
+
+function saveSettings() {
+  const key = document.getElementById('gApiKey').value.trim();
+  const clientId = document.getElementById('gClientId').value.trim();
+  const status = document.getElementById('apiStatus');
+  const statusText = document.getElementById('apiStatusText');
+
+  if (key && clientId) {
+    googleConnected = true;
+    status.classList.remove('disconnected');
+    status.classList.add('connected');
+    statusText.textContent = 'Google credentials saved — sync ready when hosted';
+    document.getElementById('syncBanner').innerHTML =
+      '<span><strong>Credentials saved.</strong> Calendar sync activates once this tool is hosted on your domain (Google OAuth requires a registered web origin). Until then, log meetings manually.</span>';
+    showToast('Google API credentials saved');
+    closeSettings();
+  } else {
+    showToast('Enter both the API key and Client ID');
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+// ─────────────────────────────────────────────
+// ADMIN GATE
+// PIN is a light deterrent for casual access, not real
+// security (it's visible in the page source). Proper
+// role-based access comes with hosting + Google sign-in.
+// Change the PIN below before sharing internally.
+// ─────────────────────────────────────────────
+const ADMIN_PIN = '2026';
+
+function checkAdminPin() {
+  const val = document.getElementById('adminPin').value;
+  if (val === ADMIN_PIN) {
+    document.getElementById('adminGate').style.display = 'none';
+    Mama.Session.setAdmin();
+  } else {
+    showToast('Incorrect PIN');
+    document.getElementById('adminPin').value = '';
+  }
+}
+try {
+  if (Mama.Session.adminValid()) {
+    document.getElementById('adminGate').style.display = 'none';
+  }
+} catch(e) {}
+
+// INIT
+document.getElementById('logDate').valueAsDate = new Date();
+render();
+</script>
+</body>
+</html>

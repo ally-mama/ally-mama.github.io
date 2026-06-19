@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex, nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brief Builder — Mama Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0e0e0e;
+    --white: #ffffff;
+    --off: #fafaf8;
+    --mid: #f0efe9;
+    --border: #e2e0d8;
+    --muted: #8a8880;
+    --accent: #FFC800;
+    --accent-dark: #E6B400;
+    --accent-text: #8a6c00;
+    --accent-light: #FFF3B0;
+    --danger: #c0392b;
+    --success: #2e7d52;
+    --text: #1a1a1a;
+    --text-2: #4a4845;
+    --radius: 8px;
+    --radius-sm: 4px;
+    --font: 'Inter', system-ui, -apple-system, sans-serif;
+    --serif: 'Playfair Display', Georgia, serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font);
+    background: var(--off);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  /* TOP BAR */
+  .topbar {
+    background: var(--black);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    height: 54px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+  .logo-mark {
+    width: 32px; height: 32px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .logo-mark svg { width: 15px; height: 13px; }
+  .logo-word {
+    font-family: var(--serif);
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: 0.04em;
+  }
+  .topbar-tool {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(255,200,0,0.12);
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+  .topbar-nav {
+    display: flex;
+    gap: 4px;
+  }
+  .topbar-nav a {
+    color: rgba(255,255,255,0.4);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 12px;
+    border-radius: 20px;
+    transition: all 0.15s;
+  }
+  .topbar-nav a:hover { color: white; background: rgba(255,255,255,0.08); }
+  .topbar-nav a.active { color: var(--accent); }
+  /* PROGRESS */
+  .progress-bar {
+    background: var(--mid);
+    height: 3px;
+  }
+  .progress-fill {
+    background: var(--accent);
+    height: 100%;
+    transition: width 0.4s ease;
+  }
+  .progress-steps {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    padding: 20px 32px 0;
+  }
+  .step-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--muted);
+    padding: 6px 16px;
+    border-radius: 20px;
+    transition: all 0.2s;
+  }
+  .step-pill.active { color: var(--black); font-weight: 600; background: var(--white); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  .step-pill.done { color: var(--success); }
+  .step-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--border);
+    flex-shrink: 0;
+  }
+  .step-pill.active .step-dot { background: var(--accent); }
+  .step-pill.done .step-dot { background: var(--success); }
+  /* MAIN */
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 24px 120px;
+  }
+  /* PAGE SECTIONS */
+  .page { display: none; }
+  .page.active { display: block; }
+  /* CARDS */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+  .page-heading {
+    font-family: var(--serif);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--black);
+    margin-bottom: 6px;
+  }
+  .page-sub {
+    font-size: 14px;
+    color: var(--text-2);
+    margin-bottom: 28px;
+  }
+  /* FORM ELEMENTS */
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  label .req { color: var(--accent-text); margin-left: 2px; }
+  input[type=text], input[type=email], input[type=date], textarea, select {
+    width: 100%;
+    background: var(--off);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 9px 12px;
+    font-family: var(--font);
+    font-size: 13px;
+    color: var(--text);
+    transition: border-color 0.15s;
+    outline: none;
+  }
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--accent);
+    background: var(--white);
+  }
+  textarea { resize: vertical; min-height: 80px; }
+  .field { margin-bottom: 18px; }
+  .field:last-child { margin-bottom: 0; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .field-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  /* RADIO / CHECKBOX */
+  .options-group { display: flex; flex-wrap: wrap; gap: 8px; }
+  .opt-btn {
+    padding: 6px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    background: var(--white);
+    color: var(--text-2);
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .opt-btn:hover { border-color: var(--accent); color: var(--accent-text); }
+  .opt-btn.selected { background: var(--accent); border-color: var(--accent); color: var(--black); }
+  .yn-group { display: flex; gap: 8px; }
+  .yn-btn {
+    flex: 1;
+    padding: 8px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    background: var(--white);
+    color: var(--text-2);
+    transition: all 0.15s;
+    text-align: center;
+    user-select: none;
+  }
+  .yn-btn:hover { border-color: var(--accent); }
+  .yn-btn.yes.selected { background: #e8f5ee; border-color: var(--success); color: var(--success); }
+  .yn-btn.no.selected { background: #fdecea; border-color: var(--danger); color: var(--danger); }
+  /* SELECT DROPDOWN */
+  select { cursor: pointer; }
+  /* ACCORDION / SUBFORM */
+  .subform {
+    display: none;
+    margin-top: 16px;
+    padding: 20px;
+    background: var(--off);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    border-left: 3px solid var(--accent);
+  }
+  .subform.open { display: block; }
+  .dim-badge {
+    display: inline-block;
+    background: var(--black);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 3px 10px;
+    border-radius: 12px;
+    margin-bottom: 14px;
+  }
+  /* OFFERING CHECKBOXES */
+  .offering-list { display: flex; flex-direction: column; gap: 4px; }
+  .offering-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    background: var(--white);
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .offering-item:hover { border-color: var(--accent); background: #fdf9f2; }
+  .offering-item.selected { border-color: var(--accent); background: #fdf9f2; }
+  .offering-check {
+    width: 18px; height: 18px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+    font-size: 11px;
+    color: white;
+  }
+  .offering-item.selected .offering-check { background: var(--accent); border-color: var(--accent); }
+  .offering-label { font-size: 13px; font-weight: 500; }
+  .offering-sub { font-size: 12px; color: var(--muted); margin-left: auto; }
+  /* SECTION HEADER inside cards */
+  .section-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent-text);
+    padding: 12px 0 8px;
+    border-bottom: 1px solid var(--mid);
+    margin-bottom: 16px;
+    margin-top: 8px;
+  }
+  .section-label:first-child { margin-top: 0; }
+  /* JOB CARD in dropdown */
+  .job-info-card {
+    display: none;
+    background: var(--off);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-top: 12px;
+  }
+  .job-info-card.open { display: block; }
+  .job-bio { font-size: 13px; color: var(--text-2); margin-bottom: 12px; line-height: 1.6; }
+  .social-links { display: flex; flex-wrap: wrap; gap: 6px; }
+  .social-link {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; font-weight: 600;
+    padding: 4px 10px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    text-decoration: none;
+    color: var(--text-2);
+    transition: all 0.15s;
+  }
+  .social-link:hover { border-color: var(--accent); color: var(--accent-text); }
+  /* ADD JOB FORM */
+  .add-job-trigger {
+    font-size: 12px;
+    color: var(--accent-text);
+    cursor: pointer;
+    text-decoration: underline;
+    display: inline-block;
+    margin-top: 8px;
+  }
+  .add-job-form {
+    display: none;
+    margin-top: 14px;
+    padding: 18px;
+    background: #fdf9f2;
+    border: 1.5px dashed var(--accent);
+    border-radius: var(--radius);
+  }
+  .add-job-form.open { display: block; }
+  /* STATUS SELECT */
+  .status-select {
+    display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .status-opt {
+    padding: 5px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    background: var(--white);
+    color: var(--text-2);
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .status-opt.selected { background: var(--black); color: white; border-color: var(--black); }
+  /* BUTTONS */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 22px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+    text-decoration: none;
+  }
+  .btn-primary { background: var(--black); color: white; }
+  .btn-primary:hover { background: #333; }
+  .btn-accent { background: var(--accent); color: var(--black); }
+  .btn-accent:hover { background: var(--accent-dark); }
+  .btn-outline { background: transparent; color: var(--text); border: 1.5px solid var(--border); }
+  .btn-outline:hover { border-color: var(--black); }
+  .btn-sm { padding: 7px 14px; font-size: 12px; }
+  .btn-ghost { background: transparent; color: var(--muted); font-size: 12px; padding: 6px 10px; border-radius: var(--radius-sm); border: none; }
+  .btn-ghost:hover { background: var(--mid); color: var(--text); }
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: white;
+    border-top: 1px solid var(--border);
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 90;
+  }
+  .bottom-nav-right { display: flex; gap: 10px; align-items: center; }
+  /* NOTES AREA PAGE 3 */
+  .notes-area textarea { min-height: 120px; }
+  /* PREVIEW / GENERATE PAGE */
+  .brief-preview {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px;
+    font-family: var(--font);
+  }
+  .brief-preview h1 { font-family: var(--serif); font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .brief-preview .brief-meta { font-size: 12px; color: var(--muted); margin-bottom: 24px; }
+  .brief-preview h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; color: var(--accent-text); margin: 24px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--mid); }
+  .brief-preview h3 { font-size: 13px; font-weight: 600; margin: 14px 0 4px; }
+  .brief-preview p { font-size: 13px; color: var(--text-2); margin-bottom: 6px; line-height: 1.6; }
+  .brief-preview .answer { font-size: 13px; color: var(--text); margin-bottom: 10px; }
+  .brief-preview .q { font-size: 12px; color: var(--muted); margin-bottom: 2px; }
+  .brief-preview .link-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; background: var(--off); padding: 3px 10px; border-radius: 12px; color: var(--accent-text); text-decoration: none; margin: 2px; }
+  /* ACTION BAR */
+  .action-bar {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    margin-top: 20px;
+  }
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 80px; right: 24px;
+    background: var(--black);
+    color: white;
+    padding: 12px 20px;
+    border-radius: var(--radius);
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all 0.3s;
+    z-index: 999;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  /* DIVIDER */
+  .divider { border: none; border-top: 1px solid var(--mid); margin: 20px 0; }
+  /* CHARACTER COUNT */
+  .char-count { font-size: 11px; color: var(--muted); text-align: right; margin-top: 4px; }
+  /* REQUIRED NOTICE */
+  .req-notice { font-size: 11px; color: var(--muted); margin-bottom: 16px; }
+  .req-notice span { color: var(--accent-text); }
+</style>
+  <script src="mama-shared.js"></script>
+</head>
+<body data-mama-guard="1">
+
+<div class="topbar">
+  <a href="index.html" class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 15 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 0 L7.5 7 L15 0 L15 13 L0 13 Z" fill="#0e0e0e"/>
+      </svg>
+    </div>
+    <span class="logo-word">mama</span>
+  </a>
+  <span class="topbar-tool">Brief Builder</span>
+  <nav class="topbar-nav">
+    <a href="index.html">Hub</a>
+    <a href="job-hub.html">Jobs</a>
+    <a href="quote-builder.html">Quotes</a>
+    <a href="brief-builder.html" class="active">Briefs</a>
+    <a href="my-time.html">My Time</a>
+    <a href="my-todos.html">To-Dos</a>
+    <a href="project-reports.html">Reports</a>
+    <a href="time-tracker.html">Admin</a>
+    <a href="settings.html">Settings</a>
+  </nav>
+</div>
+
+<div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:33%"></div></div>
+
+<div class="progress-steps">
+  <div class="step-pill active" id="step1pill"><div class="step-dot"></div> Job &amp; details</div>
+  <div class="step-pill" id="step2pill"><div class="step-dot"></div> Studio offerings</div>
+  <div class="step-pill" id="step3pill"><div class="step-dot"></div> Notes &amp; generate</div>
+</div>
+
+<div class="container">
+
+  <!-- ===== PAGE 1: JOB & DETAILS ===== -->
+  <div class="page active" id="page1">
+    <div class="page-heading">Start a brief</div>
+    <div class="page-sub">Select an existing job or add a new one, then fill in the project details.</div>
+    <p class="req-notice"><span>*</span> All fields are required</p>
+
+    <!-- JOB SELECTION -->
+    <div class="card">
+      <div class="card-title">Job / Client</div>
+      <div class="field">
+        <label>Select a job <span class="req">*</span></label>
+        <select id="jobSelect" onchange="onJobSelect()">
+          <option value="">— Choose existing job —</option>
+          <option value="safw">SA Fashion Week</option>
+          <option value="share-agency">Share Agency</option>
+          <option value="gan-tamar">Gan Tamar</option>
+          <option value="better-angels">Better Angels</option>
+        </select>
+        <span class="add-job-trigger" onclick="toggleAddJob()">+ This job isn't listed — add it now</span>
+      </div>
+
+      <!-- ADD NEW JOB INLINE -->
+      <div class="add-job-form" id="addJobForm">
+        <div class="card-title" style="margin-bottom:16px">New job details</div>
+        <div class="field-row">
+          <div class="field">
+            <label>Job name <span class="req">*</span></label>
+            <input type="text" id="newJobName" placeholder="e.g. Nike SA">
+          </div>
+          <div class="field">
+            <label>Job number <span class="req">*</span></label>
+            <input type="text" id="newJobNumber" placeholder="e.g. NIK1001">
+          </div>
+        </div>
+        <div class="field">
+          <label>Job bio / description</label>
+          <textarea id="newJobBio" placeholder="Brief description of the client or project..."></textarea>
+        </div>
+        <div class="field">
+          <label>Social / website links (one per line)</label>
+          <textarea id="newJobLinks" placeholder="https://instagram.com/...&#10;https://..." style="min-height:64px"></textarea>
+        </div>
+        <div class="field">
+          <label>Creator studio guide link (optional)</label>
+          <input type="text" id="newJobStudio" placeholder="https://drive.google.com/...">
+        </div>
+        <button class="btn btn-accent btn-sm" onclick="addNewJob()">Add job &amp; select it</button>
+      </div>
+
+      <!-- JOB INFO CARD (populates when job selected) -->
+      <div class="job-info-card" id="jobInfoCard">
+        <div class="job-bio" id="jobBio"></div>
+        <div class="social-links" id="jobSocialLinks"></div>
+        <div id="jobStudioLink" style="margin-top:10px; font-size:12px;"></div>
+      </div>
+    </div>
+
+    <!-- PROJECT DETAILS -->
+    <div class="card">
+      <div class="card-title">Project details</div>
+      <div class="field-row">
+        <div class="field">
+          <label>Job number <span class="req">*</span></label>
+          <input type="text" id="jobNumber" placeholder="e.g. SAF3046">
+        </div>
+        <div class="field">
+          <label>Date <span class="req">*</span></label>
+          <input type="date" id="briefDate">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Account executive <span class="req">*</span></label>
+          <input type="text" id="accountExec" placeholder="Full name">
+        </div>
+        <div class="field">
+          <label>Relationship manager <span class="req">*</span></label>
+          <input type="text" id="relManager" placeholder="Full name">
+        </div>
+      </div>
+      <div class="field">
+        <label>Presentation / campaign name <span class="req">*</span></label>
+        <input type="text" id="campaignName" placeholder="e.g. SAFW SS26 Fashion Show Campaign">
+      </div>
+      <div class="field">
+        <label>Internal approval status <span class="req">*</span></label>
+        <div class="status-select" id="internalApproval">
+          <div class="status-opt" onclick="selectStatus(this,'internalApproval')">Approved</div>
+          <div class="status-opt" onclick="selectStatus(this,'internalApproval')">Pending</div>
+          <div class="status-opt" onclick="selectStatus(this,'internalApproval')">Not approved</div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Client approval status</label>
+        <div class="status-select" id="clientApproval">
+          <div class="status-opt" onclick="selectStatus(this,'clientApproval')">Approved</div>
+          <div class="status-opt" onclick="selectStatus(this,'clientApproval')">Pending</div>
+          <div class="status-opt" onclick="selectStatus(this,'clientApproval')">Not approved</div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Sub-edited?</label>
+        <div class="yn-group">
+          <div class="yn-btn yes" onclick="toggleYN(this)">Yes</div>
+          <div class="yn-btn no" onclick="toggleYN(this)">No</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PLATFORMS -->
+    <div class="card">
+      <div class="card-title">Platforms (tick all that apply)</div>
+      <div class="options-group" id="platforms">
+        <div class="opt-btn" onclick="toggleOpt(this)">Instagram static</div>
+        <div class="opt-btn" onclick="toggleOpt(this)">Instagram reel</div>
+        <div class="opt-btn" onclick="toggleOpt(this)">TikTok</div>
+        <div class="opt-btn" onclick="toggleOpt(this)">Facebook</div>
+        <div class="opt-btn" onclick="toggleOpt(this)">YouTube</div>
+        <div class="opt-btn" onclick="toggleOpt(this)">X / Twitter</div>
+        <div class="opt-btn" onclick="toggleOpt(this)">LinkedIn</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PAGE 2: STUDIO OFFERINGS ===== -->
+  <div class="page" id="page2">
+    <div class="page-heading">Studio offerings</div>
+    <div class="page-sub">Select what the studio needs to produce. You can choose multiple offerings.</div>
+    <p class="req-notice"><span>*</span> All questions within selected offerings are required</p>
+
+    <!-- DESIGN -->
+    <div class="card">
+      <div class="card-title">Design</div>
+      <div class="offering-list" id="designOfferings">
+        <div class="offering-item" onclick="toggleOffering(this,'carousels-form')">
+          <div class="offering-check">✓</div>
+          <span class="offering-label">Carousels &amp; statics</span>
+          <span class="offering-sub">1080 × 1350</span>
+        </div>
+        <div class="offering-item" onclick="toggleOffering(this,'mediakit-form')">
+          <div class="offering-check">✓</div>
+          <span class="offering-label">Media kit</span>
+          <span class="offering-sub">A4</span>
+        </div>
+        <div class="offering-item" onclick="toggleOffering(this,'stickers-form')">
+          <div class="offering-check">✓</div>
+          <span class="offering-label">Sticker design</span>
+          <span class="offering-sub">500 × 500</span>
+        </div>
+        <div class="offering-item" onclick="toggleOffering(this,'illustrations-form')">
+          <div class="offering-check">✓</div>
+          <span class="offering-label">Illustrations</span>
+          <span class="offering-sub">TBC</span>
+        </div>
+        <div class="offering-item" onclick="toggleOffering(this,'reelcovers-form')">
+          <div class="offering-check">✓</div>
+          <span class="offering-label">Reel covers</span>
+          <span class="offering-sub">1080 × 1920</span>
+        </div>
+        <div class="offering-item" onclick="toggleOffering(this,'highlights-form')">
+          <div class="offering-check">✓</div>
+          <span class="offering-label">Highlight buttons</span>
+          <span class="offering-sub">1500 × 500</span>
+        </div>
+        <div class="offering-item" onclick="toggleOffering(this,'thumbnails-form')">
+          <div class="offering-check">✓</div>
+          <span class="offering-label">YouTube thumbnails</span>
+          <span class="offering-sub">1280 × 720</span>
+        </div>
+        <div class="offering-item" onclick="toggleOffering(this,'profilepic-form')">
+          <div class="offering-check">✓</div>
+          <span class="offering-label">Profile pictures</span>
+          <span class="offering-sub">500 × 500</span>
+        </div>
+        <div class="offering-item" onclick="toggleOffering(this,'banners-form')">
+          <div class="offering-check">✓</div>
+          <span class="offering-label">Banners</span>
+          <span class="offering-sub">TBC by platform</span>
+        </div>
+        <div class="offering-item" onclick="toggleOffering(this,'posters-form')">
+          <div class="offering-check">✓</div>
+          <span class="offering-label">Posters</span>
+          <span class="offering-sub">Various</span>
+        </div>
+        <div class="offering-item" onclick="toggleOffering(this,'logo-form')">
+          <div class="offering-check">✓</div>
+          <span class="offering-label">Logo</span>
+          <span class="offering-sub">Vector</span>
+        </div>
+        <div class="offering-item" onclick="toggleOffering(this,'digitalscreen-form')">
+          <div class="offering-check">✓</div>
+          <span class="offering-label">Digital screen advert</span>
+          <span class="offering-sub">Various</span>
+        </div>
+        <div class="offering-item" onclick="toggleOffering(this,'vinyl-form')">
+          <div class="offering-check">✓</div>
+          <span class="offering-label">Vinyls</span>
+          <span class="offering-sub">Custom</span>
+        </div>
+      </div>
+
+      <!-- CAROUSELS SUBFORM -->
+      <div class="subform" id="carousels-form">
+        <div class="dim-badge">1080 × 1350</div>
+        <div class="card-title">Carousels &amp; statics — questions</div>
+        <div class="field"><label>Context of carousel <span class="req">*</span></label><textarea id="c_context" placeholder="What is this carousel about?"></textarea></div>
+        <div class="field"><label>Are you supplying copy for the carousel? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Yes</div><div class="yn-btn no" onclick="toggleYN(this)">No</div></div></div>
+        <div class="field"><label>Do you want your handle on each slide? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Yes</div><div class="yn-btn no" onclick="toggleYN(this)">No</div></div></div>
+        <div class="field"><label>Do you have images to supply? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Yes</div><div class="yn-btn no" onclick="toggleYN(this)">No</div></div></div>
+        <div class="field"><label>If not, what specific images do you want? <span class="req">*</span></label><textarea id="c_images" placeholder="Describe the images needed..."></textarea></div>
+        <div class="field"><label>Is there a call to action &amp; cover slide? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Yes</div><div class="yn-btn no" onclick="toggleYN(this)">No</div></div></div>
+        <div class="field"><label>Is there a specific cover slide you want to use? <span class="req">*</span></label><textarea id="c_cover" placeholder="Describe or link the cover slide..."></textarea></div>
+        <div class="field"><label>References — what about the reference do you like? <span class="req">*</span></label><textarea id="c_refs" placeholder="Link references and describe what you like..."></textarea></div>
+        <div class="field"><label>Is post caption needed? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Yes</div><div class="yn-btn no" onclick="toggleYN(this)">No</div></div></div>
+        <div class="field"><label>Do you want it built into your Canva? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Yes</div><div class="yn-btn no" onclick="toggleYN(this)">No</div></div></div>
+      </div>
+
+      <!-- MEDIA KIT SUBFORM -->
+      <div class="subform" id="mediakit-form">
+        <div class="dim-badge">A4</div>
+        <div class="card-title">Media kit — questions</div>
+        <div class="section-label">Copy &amp; strategy</div>
+        <div class="field"><label>Do you have a bio? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Yes — proofread it</div><div class="yn-btn no" onclick="toggleYN(this)">No — write one</div></div></div>
+        <div class="field"><label>Do you want 1 or 2 pages? <span class="req">*</span></label><div class="options-group"><div class="opt-btn" onclick="toggleOpt(this)">1 page</div><div class="opt-btn" onclick="toggleOpt(this)">2 pages</div></div></div>
+        <div class="field"><label>What is the media kit going to be used for? <span class="req">*</span></label><textarea id="mk_use" placeholder="Brand partnerships, press, etc."></textarea></div>
+        <div class="field"><label>What is the tone of the media kit? <span class="req">*</span></label><textarea id="mk_tone" placeholder="e.g. Professional, playful, editorial..."></textarea></div>
+        <div class="field"><label>What are the main points you want included? <span class="req">*</span></label><textarea id="mk_points" placeholder="Audience stats, achievements, services..."></textarea></div>
+        <div class="field"><label>What stats are important to include? <span class="req">*</span></label><textarea id="mk_stats" placeholder="Follower counts, engagement rates, reach..."></textarea></div>
+        <div class="section-label">Design</div>
+        <div class="field"><label>Has a headshot been supplied? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Yes</div><div class="yn-btn no" onclick="toggleYN(this)">No</div></div></div>
+        <div class="field"><label>Do you want 1 or 2 pages? <span class="req">*</span></label><div class="options-group"><div class="opt-btn" onclick="toggleOpt(this)">1 page</div><div class="opt-btn" onclick="toggleOpt(this)">2 pages</div></div></div>
+        <div class="field"><label>Supply 2–3 layouts you like and why <span class="req">*</span></label><textarea id="mk_layouts" placeholder="Link Pinterest boards or references and describe what you like..."></textarea></div>
+      </div>
+
+      <!-- STICKERS SUBFORM -->
+      <div class="subform" id="stickers-form">
+        <div class="dim-badge">500 × 500</div>
+        <div class="card-title">Sticker design — questions</div>
+        <div class="field"><label>What are the stickers for? <span class="req">*</span></label><textarea id="st_for" placeholder="Platform, campaign, product launch..."></textarea></div>
+        <div class="field"><label>How many stickers do you want? List them. <span class="req">*</span></label><textarea id="st_list" placeholder="e.g. 1. Logo sticker, 2. Campaign slogan, 3. Character..."></textarea></div>
+        <div class="field"><label>References and why you like them <span class="req">*</span></label><textarea id="st_refs" placeholder="Link references and describe what you like..."></textarea></div>
+      </div>
+
+      <!-- ILLUSTRATIONS SUBFORM -->
+      <div class="subform" id="illustrations-form">
+        <div class="dim-badge">TBC</div>
+        <div class="card-title">Illustrations — questions</div>
+        <div class="field"><label>What are the illustrations for? <span class="req">*</span></label><textarea id="il_for" placeholder="Campaign, branding, editorial..."></textarea></div>
+        <div class="field"><label>How many illustrations do you want? List them. <span class="req">*</span></label><textarea id="il_list" placeholder="e.g. 1. Portrait of founder, 2. Product illustration..."></textarea></div>
+        <div class="field"><label>References and why you like them <span class="req">*</span></label><textarea id="il_refs" placeholder="Link references and describe what appeals to you..."></textarea></div>
+      </div>
+
+      <!-- REEL COVERS SUBFORM -->
+      <div class="subform" id="reelcovers-form">
+        <div class="dim-badge">1080 × 1920</div>
+        <div class="card-title">Reel covers — questions</div>
+        <div class="field"><label>What is the context? <span class="req">*</span></label><textarea id="rc_context" placeholder="What is this reel about?"></textarea></div>
+        <div class="field"><label>Do you have copy? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Yes</div><div class="yn-btn no" onclick="toggleYN(this)">No — need copy</div></div></div>
+        <div class="field"><label>What imagery do you want? <span class="req">*</span></label><textarea id="rc_imagery" placeholder="Describe the visual direction..."></textarea></div>
+        <div class="field"><label>Which reel cover from your brand kit do you want to use? <span class="req">*</span></label><textarea id="rc_kit" placeholder="Specify or link brand kit..."></textarea></div>
+      </div>
+
+      <!-- HIGHLIGHT BUTTONS SUBFORM -->
+      <div class="subform" id="highlights-form">
+        <div class="dim-badge">1500 × 500</div>
+        <div class="card-title">Highlight buttons — questions</div>
+        <div class="field"><label>List the highlight buttons you want <span class="req">*</span></label><textarea id="hb_list" placeholder="e.g. Travel, Fashion, Food, Collabs..."></textarea></div>
+        <div class="field"><label>What kind of design do you want? <span class="req">*</span></label><div class="options-group" id="hb_style"><div class="opt-btn" onclick="toggleOpt(this)">Icons</div><div class="opt-btn" onclick="toggleOpt(this)">Illustrations</div><div class="opt-btn" onclick="toggleOpt(this)">Imagery</div><div class="opt-btn" onclick="toggleOpt(this)">Textures</div><div class="opt-btn" onclick="toggleOpt(this)">Text</div></div></div>
+        <div class="field"><label>References and what you like about them <span class="req">*</span></label><textarea id="hb_refs" placeholder="Link references and describe what you like..."></textarea></div>
+      </div>
+
+      <!-- THUMBNAILS SUBFORM -->
+      <div class="subform" id="thumbnails-form">
+        <div class="dim-badge">1280 × 720</div>
+        <div class="card-title">YouTube thumbnails — questions</div>
+        <div class="field"><label>Context &amp; tone <span class="req">*</span></label><textarea id="yt_context" placeholder="What is the video about? What feeling should the thumbnail evoke?"></textarea></div>
+        <div class="field"><label>Do you have copy or do you need it? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Have copy</div><div class="yn-btn no" onclick="toggleYN(this)">Need copy</div></div></div>
+        <div class="field"><label>Supply headshots / images <span class="req">*</span></label><textarea id="yt_headshots" placeholder="Link Google Drive folder or describe what's available..."></textarea></div>
+        <div class="field"><label>References and what you like about them <span class="req">*</span></label><textarea id="yt_refs" placeholder="Link references and describe what appeals..."></textarea></div>
+      </div>
+
+      <!-- PROFILE PIC SUBFORM -->
+      <div class="subform" id="profilepic-form">
+        <div class="dim-badge">500 × 500</div>
+        <div class="card-title">Profile pictures — questions</div>
+        <div class="field"><label>Platform <span class="req">*</span></label><div class="options-group" id="pp_platform"><div class="opt-btn" onclick="toggleOpt(this)">YouTube</div><div class="opt-btn" onclick="toggleOpt(this)">Facebook</div><div class="opt-btn" onclick="toggleOpt(this)">X</div><div class="opt-btn" onclick="toggleOpt(this)">TikTok</div><div class="opt-btn" onclick="toggleOpt(this)">Instagram</div></div></div>
+        <div class="field"><label>Headshot or design? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Headshot</div><div class="yn-btn no" onclick="toggleYN(this)">Design (supply headshot)</div></div></div>
+      </div>
+
+      <!-- BANNERS SUBFORM -->
+      <div class="subform" id="banners-form">
+        <div class="dim-badge">TBC by platform</div>
+        <div class="card-title">Banners — questions</div>
+        <div class="field"><label>Platform <span class="req">*</span></label><div class="options-group" id="bn_platform"><div class="opt-btn" onclick="toggleOpt(this)">YouTube</div><div class="opt-btn" onclick="toggleOpt(this)">Facebook</div><div class="opt-btn" onclick="toggleOpt(this)">X</div></div></div>
+        <div class="field"><label>Do you want copy? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Yes</div><div class="yn-btn no" onclick="toggleYN(this)">No</div></div></div>
+        <div class="field"><label>Are you supplying copy or do you need us to write it? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Supplying</div><div class="yn-btn no" onclick="toggleYN(this)">Write for me</div></div></div>
+        <div class="field"><label>Supply headshot <span class="req">*</span></label><textarea id="bn_headshot" placeholder="Link or describe..."></textarea></div>
+        <div class="field"><label>What handles do you want on the banner? <span class="req">*</span></label><div class="options-group" id="bn_handles"><div class="opt-btn" onclick="toggleOpt(this)">Instagram</div><div class="opt-btn" onclick="toggleOpt(this)">YouTube</div><div class="opt-btn" onclick="toggleOpt(this)">TikTok</div><div class="opt-btn" onclick="toggleOpt(this)">Website</div><div class="opt-btn" onclick="toggleOpt(this)">Spotify</div><div class="opt-btn" onclick="toggleOpt(this)">Discord</div><div class="opt-btn" onclick="toggleOpt(this)">Other</div></div></div>
+        <div class="field"><label>References and what you like about them <span class="req">*</span></label><textarea id="bn_refs" placeholder="Link references..."></textarea></div>
+      </div>
+
+      <!-- POSTERS, LOGO, DIGITAL SCREEN, VINYL — minimal subforms -->
+      <div class="subform" id="posters-form">
+        <div class="dim-badge">Various sizes</div>
+        <div class="card-title">Posters — questions</div>
+        <div class="field"><label>What is the poster for? <span class="req">*</span></label><textarea placeholder="Event, campaign, awareness..."></textarea></div>
+        <div class="field"><label>Required sizes / formats <span class="req">*</span></label><textarea placeholder="A3, A2, digital, print-ready..."></textarea></div>
+        <div class="field"><label>Do you have copy or do you need it? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Have copy</div><div class="yn-btn no" onclick="toggleYN(this)">Need copy</div></div></div>
+        <div class="field"><label>References and what you like about them <span class="req">*</span></label><textarea placeholder="Link references..."></textarea></div>
+      </div>
+      <div class="subform" id="logo-form">
+        <div class="dim-badge">Vector</div>
+        <div class="card-title">Logo — questions</div>
+        <div class="field"><label>New logo or refresh of existing? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">New logo</div><div class="yn-btn no" onclick="toggleYN(this)">Refresh existing</div></div></div>
+        <div class="field"><label>Brand personality / direction <span class="req">*</span></label><textarea placeholder="Describe tone, feel, keywords..."></textarea></div>
+        <div class="field"><label>References and what you like about them <span class="req">*</span></label><textarea placeholder="Link references..."></textarea></div>
+      </div>
+      <div class="subform" id="digitalscreen-form">
+        <div class="dim-badge">Various</div>
+        <div class="card-title">Digital screen advert — questions</div>
+        <div class="field"><label>Where will the advert be displayed? <span class="req">*</span></label><textarea placeholder="Billboard, in-store screen, website..."></textarea></div>
+        <div class="field"><label>Required dimensions <span class="req">*</span></label><textarea placeholder="e.g. 1920×1080, 300×250..."></textarea></div>
+        <div class="field"><label>Do you have copy or do you need it? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Have copy</div><div class="yn-btn no" onclick="toggleYN(this)">Need copy</div></div></div>
+        <div class="field"><label>References and what you like about them <span class="req">*</span></label><textarea placeholder="Link references..."></textarea></div>
+      </div>
+      <div class="subform" id="vinyl-form">
+        <div class="dim-badge">Custom</div>
+        <div class="card-title">Vinyls — questions</div>
+        <div class="field"><label>What is the vinyl for? <span class="req">*</span></label><textarea placeholder="Vehicle wrap, wall vinyl, window..."></textarea></div>
+        <div class="field"><label>Dimensions / surface area <span class="req">*</span></label><textarea placeholder="Provide measurements or surface description..."></textarea></div>
+        <div class="field"><label>References and what you like about them <span class="req">*</span></label><textarea placeholder="Link references..."></textarea></div>
+      </div>
+    </div>
+
+    <!-- VIDEO EDITING -->
+    <div class="card" style="margin-top:16px">
+      <div class="card-title">Video editing</div>
+      <div class="offering-list">
+        <div class="offering-item" onclick="toggleOffering(this,'video-form')">
+          <div class="offering-check">✓</div>
+          <span class="offering-label">Video editing</span>
+          <span class="offering-sub">1080 × 1920</span>
+        </div>
+      </div>
+      <div class="subform" id="video-form">
+        <div class="dim-badge">1080 × 1920</div>
+        <div class="card-title">Video editing — questions</div>
+        <div class="field"><label>Are you supplying b-roll? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Yes</div><div class="yn-btn no" onclick="toggleYN(this)">No</div></div></div>
+        <div class="field"><label>What b-roll do you want? <span class="req">*</span></label><textarea placeholder="Describe or list the b-roll footage needed..."></textarea></div>
+        <div class="field"><label>What platforms is it going on? <span class="req">*</span></label><div class="options-group"><div class="opt-btn" onclick="toggleOpt(this)">Instagram</div><div class="opt-btn" onclick="toggleOpt(this)">TikTok</div><div class="opt-btn" onclick="toggleOpt(this)">YouTube</div><div class="opt-btn" onclick="toggleOpt(this)">Facebook</div><div class="opt-btn" onclick="toggleOpt(this)">X</div></div></div>
+        <div class="field"><label>How long does the video need to be? <span class="req">*</span></label><input type="text" placeholder="e.g. 30 seconds, 60 seconds, 3 minutes"></div>
+        <div class="field"><label>Specific timestamps to include from footage? <span class="req">*</span></label><textarea placeholder="List any specific moments you want included..."></textarea></div>
+        <div class="field"><label>Are captions needed? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Yes</div><div class="yn-btn no" onclick="toggleYN(this)">No</div></div></div>
+        <div class="field"><label>Do you want music? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Yes</div><div class="yn-btn no" onclick="toggleYN(this)">No</div></div></div>
+        <div class="field"><label>Do you want your wordmark on the video? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Yes</div><div class="yn-btn no" onclick="toggleYN(this)">No</div></div></div>
+        <div class="field"><label>Do you want your handle on the video? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Yes</div><div class="yn-btn no" onclick="toggleYN(this)">No</div></div></div>
+        <div class="field"><label>Is there a voiceover? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Yes</div><div class="yn-btn no" onclick="toggleYN(this)">No</div></div></div>
+        <div class="field"><label>References and what you like about them <span class="req">*</span></label><textarea placeholder="Link references and describe what you like..."></textarea></div>
+        <div class="field"><label>Do you have an outro to include? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Yes</div><div class="yn-btn no" onclick="toggleYN(this)">No</div></div></div>
+        <div class="field"><label>Is there a specific call to action? <span class="req">*</span></label><textarea placeholder="What should viewers do after watching?"></textarea></div>
+        <div class="field"><label>Is post caption needed? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Yes</div><div class="yn-btn no" onclick="toggleYN(this)">No</div></div></div>
+        <div class="field"><label>Is a script needed? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Yes</div><div class="yn-btn no" onclick="toggleYN(this)">No</div></div></div>
+        <div class="field"><label>Do you want a reel cover included? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Yes</div><div class="yn-btn no" onclick="toggleYN(this)">No</div></div></div>
+        <div class="field"><label>Copy for reel cover <span class="req">*</span></label><textarea placeholder="What text should appear on the reel cover?"></textarea></div>
+      </div>
+    </div>
+
+    <!-- COPY WRITING -->
+    <div class="card" style="margin-top:16px">
+      <div class="card-title">Copywriting</div>
+      <div class="offering-list">
+        <div class="offering-item" onclick="toggleOffering(this,'copy-form')">
+          <div class="offering-check">✓</div>
+          <span class="offering-label">Copywriting</span>
+          <span class="offering-sub">Script · Caption · IG bio</span>
+        </div>
+      </div>
+      <div class="subform" id="copy-form">
+        <div class="card-title">Copywriting — what do you need?</div>
+        <div class="offering-list" style="margin-bottom:16px">
+          <div class="offering-item" onclick="toggleOffering(this,'script-form')"><div class="offering-check">✓</div><span class="offering-label">Script</span></div>
+          <div class="offering-item" onclick="toggleOffering(this,'caption-form')"><div class="offering-check">✓</div><span class="offering-label">Caption</span></div>
+          <div class="offering-item" onclick="toggleOffering(this,'igbio-form')"><div class="offering-check">✓</div><span class="offering-label">Instagram bio</span><span class="offering-sub">150 chars</span></div>
+        </div>
+        <div class="subform" id="script-form" style="margin-left:0">
+          <div class="card-title">Script — questions</div>
+          <div class="field"><label>Please give context on the script — what is the video/series about? <span class="req">*</span></label><textarea placeholder="Describe the concept, series, or episode..."></textarea></div>
+          <div class="field"><label>Tell us your take on the script <span class="req">*</span></label><textarea placeholder="Your angle, what you want to say..."></textarea></div>
+          <div class="field"><label>What is the POV you want to get across? <span class="req">*</span></label><textarea placeholder="First person, narrator, educational..."></textarea></div>
+          <div class="field"><label>What is the tone of voice? <span class="req">*</span></label><textarea placeholder="e.g. Conversational, authoritative, funny..."></textarea></div>
+          <div class="field"><label>Do you want a full script or a framework to base your script off? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Full script</div><div class="yn-btn no" onclick="toggleYN(this)">Framework</div></div></div>
+          <div class="field"><label>How long should the video be? <span class="req">*</span></label><input type="text" placeholder="e.g. 60 seconds, 3 minutes..."></div>
+        </div>
+        <div class="subform" id="caption-form" style="margin-left:0">
+          <div class="card-title">Caption — questions</div>
+          <div class="field"><label>Please give context of the post that you need a caption for <span class="req">*</span></label><textarea placeholder="What is the post about?"></textarea></div>
+          <div class="field"><label>What is the tone of voice? <span class="req">*</span></label><textarea placeholder="e.g. Professional, fun, inspirational..."></textarea></div>
+          <div class="field"><label>Do you want a specific call to action? <span class="req">*</span></label><textarea placeholder="e.g. Link in bio, comment below, tag a friend..."></textarea></div>
+        </div>
+        <div class="subform" id="igbio-form" style="margin-left:0">
+          <div class="dim-badge">150 characters</div>
+          <div class="card-title">Instagram bio — questions</div>
+          <div class="field"><label>What are you trying to achieve with your IG bio? <span class="req">*</span></label><textarea placeholder="Awareness, conversions, credibility..."></textarea></div>
+          <div class="field"><label>What is the most important point at first glance? <span class="req">*</span></label><textarea placeholder="The one thing people must know immediately..."></textarea></div>
+          <div class="field"><label>What is your call to action? <span class="req">*</span></label><input type="text" placeholder="e.g. Link in bio for bookings, DM for collabs..."></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IDEATION -->
+    <div class="card" style="margin-top:16px">
+      <div class="card-title">Strategy &amp; ideation</div>
+      <div class="offering-list">
+        <div class="offering-item" onclick="toggleOffering(this,'ideation-form')">
+          <div class="offering-check">✓</div>
+          <span class="offering-label">Strategy &amp; ideation</span>
+          <span class="offering-sub">Content &amp; brainstorm</span>
+        </div>
+      </div>
+      <div class="subform" id="ideation-form">
+        <div class="card-title">Ideation — questions</div>
+        <div class="field"><label>What are you ideating on? <span class="req">*</span></label><textarea placeholder="A new series, a product launch, a rebrand..."></textarea></div>
+        <div class="field"><label>New content series or expand on current content? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">New series</div><div class="yn-btn no" onclick="toggleYN(this)">Expand current</div></div></div>
+        <div class="field"><label>How to expand on existing content? <span class="req">*</span></label><textarea placeholder="Formats, angles, spin-offs, repurposing..."></textarea></div>
+        <div class="field"><label>New trends to explore? <span class="req">*</span></label><textarea placeholder="Trends you've spotted or want to tap into..."></textarea></div>
+        <div class="field"><label>Do you want a brainstorm launch meeting? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Yes</div><div class="yn-btn no" onclick="toggleYN(this)">No</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PAGE 3: NOTES & GENERATE ===== -->
+  <div class="page" id="page3">
+    <div class="page-heading">Final notes &amp; generate</div>
+    <div class="page-sub">Add any additional context or instructions for the studio, then generate your brief.</div>
+
+    <div class="card notes-area">
+      <div class="card-title">Additional notes for studio</div>
+      <div class="field">
+        <label>Anything else the studio should know? Deadlines, special requirements, context.</label>
+        <textarea id="studioNotes" placeholder="Include any deadlines, asset links, special instructions, or anything not covered above..." style="min-height:160px"></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Brief summary</div>
+      <div id="briefSummary" style="font-size:13px; color:var(--text-2); line-height:1.8">
+        Complete pages 1 and 2 to see your brief summary here.
+      </div>
+    </div>
+
+    <!-- GENERATED BRIEF -->
+    <div id="generatedBriefSection" style="display:none">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px">
+        <div class="page-heading" style="margin-bottom:0">Generated brief</div>
+        <div class="action-bar" style="margin-top:0">
+          <button class="btn btn-outline btn-sm" onclick="copyBrief()">📋 Copy to clipboard</button>
+          <button class="btn btn-outline btn-sm" onclick="downloadPDF()">⬇ Download PDF</button>
+          <button class="btn btn-accent btn-sm" onclick="openDriveUpload()">☁ Add to Google Drive</button>
+        </div>
+      </div>
+      <div class="brief-preview" id="briefPreview"></div>
+    </div>
+  </div>
+
+</div><!-- end container -->
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div>
+    <button class="btn btn-ghost" id="btnBack" onclick="prevPage()" style="display:none">← Back</button>
+    <button class="btn btn-outline btn-sm" onclick="startNew()">Start new</button>
+  </div>
+  <div class="bottom-nav-right">
+    <span style="font-size:12px; color:var(--muted)" id="pageIndicator">Page 1 of 3</span>
+    <button class="btn btn-primary" id="btnNext" onclick="nextPage()">Continue →</button>
+    <button class="btn btn-accent" id="btnGenerate" onclick="generateBrief()" style="display:none">Generate brief ✦</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// DATA STORE
+// ============================================================
+const jobs = {
+  safw: {
+    name: 'SA Fashion Week',
+    bio: 'SA Fashion Week is the premier platform for South African fashion talent, staging bi-annual collections and connecting local designers with industry, press, and consumers.',
+    links: [
+      { label: 'Instagram', url: 'https://www.instagram.com/safashionweek/' },
+      { label: 'Website', url: 'https://www.safashionweek.co.za/' },
+      { label: 'YouTube', url: 'https://www.youtube.com/user/SAFashionWeek' },
+      { label: 'X / Twitter', url: 'https://x.com/safashionweek' },
+      { label: 'TikTok', url: 'https://www.tiktok.com/@safashionweek' },
+      { label: 'Facebook', url: 'https://www.facebook.com/safashionweek/' },
+    ],
+    studio: ''
+  },
+  'share-agency': {
+    name: 'Share Agency',
+    bio: 'Share Agency is a creative and digital agency delivering brand strategy, content, and client-facing creative work.',
+    links: [],
+    studio: ''
+  },
+  'gan-tamar': {
+    name: 'Gan Tamar',
+    bio: 'Gan Tamar — add the client bio, positioning, and any standing brand notes here so every brief starts with shared context.',
+    links: [],
+    studio: ''
+  },
+  'better-angels': {
+    name: 'Better Angels',
+    bio: 'Better Angels — add the client bio, positioning, and any standing brand notes here so every brief starts with shared context.',
+    links: [],
+    studio: ''
+  }
+};
+
+let currentPage = 1;
+let userAddedJobs = {};
+
+// ============================================================
+// PAGE NAVIGATION
+// ============================================================
+function goToPage(n) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page' + n).classList.add('active');
+  currentPage = n;
+
+  // Progress
+  const pct = n === 1 ? 33 : n === 2 ? 66 : 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+
+  // Step pills
+  ['1','2','3'].forEach(i => {
+    const pill = document.getElementById('step' + i + 'pill');
+    pill.classList.remove('active','done');
+    if (parseInt(i) < n) pill.classList.add('done');
+    if (parseInt(i) === n) pill.classList.add('active');
+  });
+
+  // Buttons
+  document.getElementById('btnBack').style.display = n > 1 ? 'inline-flex' : 'none';
+  document.getElementById('btnNext').style.display = n < 3 ? 'inline-flex' : 'none';
+  document.getElementById('btnGenerate').style.display = n === 3 ? 'inline-flex' : 'none';
+  document.getElementById('pageIndicator').textContent = 'Page ' + n + ' of 3';
+
+  if (n === 3) buildSummary();
+  window.scrollTo(0,0);
+}
+
+function nextPage() { if (currentPage < 3) goToPage(currentPage + 1); }
+function prevPage() { if (currentPage > 1) goToPage(currentPage - 1); }
+function startNew() {
+  if (confirm('Start a new brief? All current data will be cleared.')) location.reload();
+}
+
+// Set today's date
+document.getElementById('briefDate').valueAsDate = new Date();
+
+// ============================================================
+// JOB SELECT
+// ============================================================
+function onJobSelect() {
+  const val = document.getElementById('jobSelect').value;
+  const card = document.getElementById('jobInfoCard');
+  const allJobs = {...jobs, ...userAddedJobs};
+
+  if (val && allJobs[val]) {
+    const job = allJobs[val];
+    document.getElementById('jobBio').textContent = job.bio || '';
+    const linksEl = document.getElementById('jobSocialLinks');
+    linksEl.innerHTML = job.links.map(l =>
+      `<a class="social-link" href="${l.url}" target="_blank">${l.label}</a>`
+    ).join('');
+    const studioEl = document.getElementById('jobStudioLink');
+    studioEl.innerHTML = job.studio
+      ? `<a class="social-link" href="${job.studio}" target="_blank">📁 Creator studio guide</a>`
+      : '';
+    card.classList.add('open');
+  } else {
+    card.classList.remove('open');
+  }
+}
+
+function toggleAddJob() {
+  document.getElementById('addJobForm').classList.toggle('open');
+}
+
+function addNewJob() {
+  const name = document.getElementById('newJobName').value.trim();
+  const num = document.getElementById('newJobNumber').value.trim();
+  const bio = document.getElementById('newJobBio').value.trim();
+  const linksRaw = document.getElementById('newJobLinks').value.trim();
+  const studio = document.getElementById('newJobStudio').value.trim();
+
+  if (!name) { showToast('Please enter a job name'); return; }
+
+  const key = name.toLowerCase().replace(/\s+/g,'-');
+  const links = linksRaw ? linksRaw.split('\n').filter(Boolean).map(u => ({ label: u.replace(/https?:\/\/(www\.)?/,'').split('/')[0], url: u.trim() })) : [];
+
+  userAddedJobs[key] = { name, bio, links, studio };
+
+  // Add to select
+  const sel = document.getElementById('jobSelect');
+  const opt = document.createElement('option');
+  opt.value = key;
+  opt.textContent = name;
+  sel.appendChild(opt);
+  sel.value = key;
+
+  if (num) document.getElementById('jobNumber').value = num;
+
+  document.getElementById('addJobForm').classList.remove('open');
+  onJobSelect();
+  showToast('Job "' + name + '" added and selected');
+}
+
+// ============================================================
+// INTERACTIVE ELEMENTS
+// ============================================================
+function toggleOpt(el) { el.classList.toggle('selected'); }
+
+function toggleYN(el) {
+  const group = el.parentElement;
+  group.querySelectorAll('.yn-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function selectStatus(el, groupId) {
+  document.querySelectorAll('#' + groupId + ' .status-opt').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function toggleOffering(el, formId) {
+  el.classList.toggle('selected');
+  const check = el.querySelector('.offering-check');
+  const form = document.getElementById(formId);
+  if (el.classList.contains('selected')) {
+    check.textContent = '✓';
+    form.classList.add('open');
+    form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } else {
+    check.textContent = '';
+    form.classList.remove('open');
+  }
+}
+
+// ============================================================
+// SUMMARY BUILD
+// ============================================================
+function buildSummary() {
+  const jobKey = document.getElementById('jobSelect').value;
+  const allJobs = {...jobs, ...userAddedJobs};
+  const jobName = jobKey && allJobs[jobKey] ? allJobs[jobKey].name : '—';
+
+  const selected = [];
+  document.querySelectorAll('.offering-item.selected .offering-label').forEach(el => {
+    selected.push(el.textContent);
+  });
+
+  const el = document.getElementById('briefSummary');
+  el.innerHTML = `
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
+      <div><strong>Job:</strong> ${jobName}</div>
+      <div><strong>Number:</strong> ${document.getElementById('jobNumber').value || '—'}</div>
+      <div><strong>Campaign:</strong> ${document.getElementById('campaignName').value || '—'}</div>
+      <div><strong>AE:</strong> ${document.getElementById('accountExec').value || '—'}</div>
+    </div>
+    <div style="margin-top:12px"><strong>Offerings selected:</strong> ${selected.length ? selected.join(', ') : 'None yet'}</div>
+  `;
+}
+
+// ============================================================
+// GENERATE BRIEF
+// ============================================================
+function generateBrief() {
+  const jobKey = document.getElementById('jobSelect').value;
+  const allJobs = {...jobs, ...userAddedJobs};
+  const job = jobKey && allJobs[jobKey] ? allJobs[jobKey] : null;
+  const jobName = job ? job.name : document.getElementById('jobNumber').value || 'Unknown job';
+
+  const date = document.getElementById('briefDate').value;
+  const jobNum = document.getElementById('jobNumber').value;
+  const ae = document.getElementById('accountExec').value;
+  const rm = document.getElementById('relManager').value;
+  const campaign = document.getElementById('campaignName').value;
+  const notes = document.getElementById('studioNotes').value;
+
+  const platforms = [...document.querySelectorAll('#platforms .opt-btn.selected')].map(e=>e.textContent).join(', ');
+
+  const selectedOfferings = [...document.querySelectorAll('.offering-item.selected .offering-label')].map(e=>e.textContent);
+
+  let html = `
+    <h1>${campaign || jobName}</h1>
+    <div class="brief-meta">Job ${jobNum} &nbsp;·&nbsp; ${date} &nbsp;·&nbsp; AE: ${ae} &nbsp;·&nbsp; RM: ${rm}</div>
+  `;
+
+  // Internal approval
+  const intApp = document.querySelector('#internalApproval .status-opt.selected');
+  const cliApp = document.querySelector('#clientApproval .status-opt.selected');
+  html += `<h2>Project keys</h2>`;
+  html += `<p><strong>Internal approval:</strong> ${intApp ? intApp.textContent : '—'}</p>`;
+  html += `<p><strong>Client approval:</strong> ${cliApp ? cliApp.textContent : '—'}</p>`;
+  html += `<p><strong>Platforms:</strong> ${platforms || '—'}</p>`;
+
+  if (job) {
+    html += `<h2>Client — ${job.name}</h2>`;
+    if (job.bio) html += `<p>${job.bio}</p>`;
+    if (job.links && job.links.length) {
+      html += job.links.map(l => `<a class="link-chip" href="${l.url}" target="_blank">↗ ${l.label}</a>`).join('');
+    }
+    if (job.studio) html += `<br><a class="link-chip" href="${job.studio}" target="_blank">📁 Creator studio guide</a>`;
+  }
+
+  if (selectedOfferings.length) {
+    html += `<h2>Studio offerings</h2>`;
+    html += `<p>${selectedOfferings.join(' · ')}</p>`;
+
+    // Pull all filled-in subform data
+    document.querySelectorAll('.subform.open').forEach(sf => {
+      const title = sf.querySelector('.card-title');
+      if (!title) return;
+      html += `<h3>${title.textContent}</h3>`;
+      const dimBadge = sf.querySelector('.dim-badge');
+      if (dimBadge) html += `<p style="color:var(--accent-text); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em">${dimBadge.textContent}</p>`;
+      sf.querySelectorAll('.field').forEach(field => {
+        const lbl = field.querySelector('label');
+        if (!lbl) return;
+        const labelText = lbl.textContent.replace('*','').trim();
+        // Text inputs / textareas
+        const inp = field.querySelector('input[type=text], input[type=date], textarea');
+        if (inp && inp.value.trim()) {
+          html += `<div class="q">${labelText}</div><div class="answer">${inp.value}</div>`;
+        }
+        // YN buttons
+        const ynSelected = field.querySelector('.yn-btn.selected');
+        if (ynSelected) {
+          html += `<div class="q">${labelText}</div><div class="answer">${ynSelected.textContent}</div>`;
+        }
+        // Opt-btn groups
+        const opts = [...field.querySelectorAll('.opt-btn.selected')].map(e=>e.textContent);
+        if (opts.length) {
+          html += `<div class="q">${labelText}</div><div class="answer">${opts.join(', ')}</div>`;
+        }
+      });
+    });
+  }
+
+  if (notes.trim()) {
+    html += `<h2>Notes for studio</h2><p>${notes}</p>`;
+  }
+
+  html += `<p style="margin-top:32px; font-size:11px; color:var(--muted)">Generated via Mama Hub · ${new Date().toLocaleDateString('en-ZA', {day:'numeric',month:'long',year:'numeric'})}</p>`;
+
+  document.getElementById('briefPreview').innerHTML = html;
+  document.getElementById('generatedBriefSection').style.display = 'block';
+  document.getElementById('generatedBriefSection').scrollIntoView({ behavior: 'smooth' });
+  showToast('Brief generated successfully');
+}
+
+// ============================================================
+// EXPORT ACTIONS
+// ============================================================
+function copyBrief() {
+  const text = document.getElementById('briefPreview').innerText;
+  navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard'));
+}
+
+function downloadPDF() {
+  showToast('Preparing PDF download…');
+  // Using print dialog as PDF export (works everywhere, no lib needed)
+  const content = document.getElementById('briefPreview').innerHTML;
+  const w = window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><title>Brief</title>
+  <style>
+    body { font-family: sans-serif; max-width:720px; margin:40px auto; color:#1a1a1a; font-size:13px; line-height:1.7; }
+    h1 { font-size:22px; margin-bottom:4px; }
+    h2 { font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:#8a6c00; margin:24px 0 8px; border-bottom:1px solid #eee; padding-bottom:4px; }
+    h3 { font-size:13px; font-weight:600; margin:14px 0 4px; }
+    .q { font-size:11px; color:#888; margin-bottom:2px; margin-top:10px; }
+    .answer { font-size:13px; }
+    .link-chip { display:inline-block; background:#f5f5f5; padding:2px 8px; border-radius:10px; font-size:11px; color:#8a6c00; margin:2px; text-decoration:none; }
+    .brief-meta { font-size:12px; color:#888; margin-bottom:24px; }
+  </style></head><body>${content}</body></html>`);
+  w.document.close();
+  setTimeout(() => { w.focus(); w.print(); }, 500);
+}
+
+function openDriveUpload() {
+  showToast('Opening Google Drive folder…');
+  window.open('https://drive.google.com/drive/folders/1IkvW4HGv2w_Ro2RSYy0Ii52CfhG_SQUO', '_blank');
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex, nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quotes — Mama Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --yellow: #FFC800;
+    --yellow-light: #FFF3B0;
+    --yellow-dark: #E6B400;
+    --yellow-text: #8a6c00;
+    --black: #0e0e0e;
+    --white: #ffffff;
+    --off: #fafaf8;
+    --mid: #f0efe9;
+    --border: #e2e0d8;
+    --muted: #8a8880;
+    --text: #1a1a1a;
+    --text-2: #4a4845;
+    --success: #2e7d52;
+    --success-bg: #eaf4ee;
+    --danger: #c0392b;
+    --danger-bg: #fdecea;
+    --serif: 'Playfair Display', Georgia, serif;
+    --sans: 'Inter', system-ui, sans-serif;
+    --radius: 8px;
+    --radius-lg: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--sans);
+    background: var(--off);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .topbar {
+    background: var(--black);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    height: 54px;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .logo-mark {
+    width: 32px; height: 32px;
+    background: var(--yellow);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo-mark svg { width: 15px; height: 13px; }
+  .logo-word { font-family: var(--serif); font-size: 17px; font-weight: 700; color: var(--white); letter-spacing: 0.04em; }
+  .topbar-tool {
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--yellow);
+    background: rgba(255,200,0,0.12);
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+  .topbar-nav { display: flex; gap: 4px; }
+  .topbar-nav a {
+    color: rgba(255,255,255,0.4);
+    text-decoration: none;
+    font-size: 12px; font-weight: 500;
+    padding: 5px 12px;
+    border-radius: 20px;
+    transition: all 0.15s;
+  }
+  .topbar-nav a:hover { color: white; background: rgba(255,255,255,0.08); }
+  .topbar-nav a.active { color: var(--yellow); }
+
+  .container { max-width: 960px; margin: 0 auto; padding: 28px 24px 100px; }
+  .main-header { margin-bottom: 22px; }
+  .main-title { font-family: var(--serif); font-size: 26px; font-weight: 700; }
+  .main-sub { font-size: 13px; color: var(--muted); }
+
+  .layout { display: grid; grid-template-columns: 1fr 320px; gap: 18px; align-items: start; }
+  @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 22px 24px;
+    margin-bottom: 16px;
+  }
+  .card-title { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+
+  label {
+    display: block;
+    font-size: 10px; font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 5px;
+  }
+  input, select, textarea {
+    width: 100%;
+    background: var(--off);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 9px 11px;
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--yellow); background: white; }
+  .field { margin-bottom: 14px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* CATALOGUE */
+  .cat-row {
+    display: grid;
+    grid-template-columns: 1fr 95px 70px;
+    gap: 8px;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--mid);
+  }
+  .cat-row:last-child { border-bottom: none; }
+  .cat-name { font-size: 13px; font-weight: 500; }
+  .cat-price { font-size: 12px; color: var(--muted); text-align: right; }
+  .cat-add {
+    padding: 6px 10px;
+    background: var(--yellow);
+    border: none;
+    border-radius: 6px;
+    font-family: var(--sans);
+    font-size: 11px; font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .cat-add:hover { background: var(--yellow-dark); }
+
+  /* LINE ITEMS */
+  .li-head, .li-row {
+    display: grid;
+    grid-template-columns: 1fr 60px 100px 100px 28px;
+    gap: 8px;
+    align-items: center;
+  }
+  .li-head {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+  .li-row { margin-bottom: 8px; }
+  .li-row input { padding: 8px 10px; font-size: 12px; }
+  .li-total { font-size: 13px; font-weight: 700; text-align: right; }
+  .li-remove {
+    background: none; border: none;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 15px;
+    width: 26px; height: 26px;
+    border-radius: 4px;
+    transition: all 0.12s;
+  }
+  .li-remove:hover { background: var(--danger-bg); color: var(--danger); }
+  .add-custom {
+    background: none;
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 9px;
+    width: 100%;
+    font-family: var(--sans);
+    font-size: 12px; font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-top: 4px;
+  }
+  .add-custom:hover { border-color: var(--yellow); color: var(--yellow-text); }
+  .empty-items { font-size: 12px; color: var(--muted); font-style: italic; padding: 12px 0; }
+
+  /* TOTALS PANEL */
+  .totals-panel {
+    background: var(--black);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    color: white;
+    position: sticky;
+    top: 72px;
+  }
+  .tp-title { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 16px; }
+  .tp-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    padding: 6px 0;
+    color: rgba(255,255,255,0.75);
+  }
+  .tp-row.sub { border-top: 1px solid rgba(255,255,255,0.12); margin-top: 6px; padding-top: 12px; font-weight: 600; color: white; }
+  .tp-row.grand { border-top: 2px solid var(--yellow); margin-top: 8px; padding-top: 12px; }
+  .tp-grand-num { font-family: var(--serif); font-size: 26px; font-weight: 700; color: var(--yellow); }
+  .tp-label-sm { font-size: 10px; color: rgba(255,255,255,0.4); display: block; }
+  .tp-input {
+    width: 76px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: white;
+    text-align: right;
+    padding: 5px 8px;
+    font-size: 12px;
+    border-radius: 6px;
+  }
+  .tp-input:focus { border-color: var(--yellow); background: rgba(255,255,255,0.12); }
+  .discount-toggle { display: flex; gap: 3px; }
+  .dt-btn {
+    padding: 4px 9px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: none;
+    color: rgba(255,255,255,0.5);
+    font-size: 10px; font-weight: 700;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: var(--sans);
+  }
+  .dt-btn.active { background: var(--yellow); color: var(--black); border-color: var(--yellow); }
+  .tp-note { font-size: 10px; color: rgba(255,255,255,0.35); margin-top: 12px; line-height: 1.5; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+    padding: 10px 18px;
+    border-radius: var(--radius);
+    font-family: var(--sans);
+    font-size: 12px; font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+  }
+  .btn-yellow { background: var(--yellow); color: var(--black); }
+  .btn-yellow:hover { background: var(--yellow-dark); }
+  .btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
+  .btn-outline:hover { border-color: var(--black); }
+  .btn-dark-outline { background: transparent; border: 1.5px solid rgba(255,255,255,0.25); color: white; width: 100%; margin-top: 14px; }
+  .btn-dark-outline:hover { border-color: var(--yellow); color: var(--yellow); }
+
+  /* QUOTE PREVIEW */
+  .quote-preview {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 48px 52px;
+    margin-top: 24px;
+  }
+  .qp-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 24px;
+    border-bottom: 2px solid var(--black);
+    margin-bottom: 28px;
+  }
+  .qp-mark { width: 44px; height: 44px; background: var(--yellow); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .qp-mark svg { width: 20px; height: 17px; }
+  .qp-title { font-family: var(--serif); font-size: 30px; font-weight: 700; }
+  .qp-meta { font-size: 12px; color: var(--muted); }
+  .qp-section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--yellow-text); margin-bottom: 4px; }
+  .qp-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px; }
+  .qp-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 24px; }
+  .qp-table th {
+    text-align: left;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    padding: 9px 10px;
+    border-bottom: 1.5px solid var(--black);
+  }
+  .qp-table th.r, .qp-table td.r { text-align: right; }
+  .qp-table td { padding: 11px 10px; border-bottom: 1px solid var(--mid); }
+  .qp-totals { margin-left: auto; width: 300px; font-size: 13px; }
+  .qp-totals .row { display: flex; justify-content: space-between; padding: 6px 10px; }
+  .qp-totals .row.discount { color: var(--success); }
+  .qp-totals .row.subtotal { border-top: 1px solid var(--border); font-weight: 600; }
+  .qp-totals .row.grand {
+    background: var(--black);
+    color: var(--yellow);
+    font-weight: 700;
+    font-size: 15px;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-top: 8px;
+  }
+  .qp-terms { margin-top: 32px; padding-top: 18px; border-top: 1px solid var(--mid); font-size: 11px; color: var(--muted); line-height: 1.7; }
+  .action-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+
+  .toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--black);
+    color: white;
+    padding: 11px 18px;
+    border-radius: var(--radius);
+    font-size: 13px; font-weight: 500;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all 0.25s;
+    z-index: 999;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  @media print {
+    .topbar, .layout, .main-header, .action-bar, .toast { display: none !important; }
+    .quote-preview { border: none; padding: 0; margin: 0; }
+    body { background: white; }
+  }
+</style>
+  <script src="mama-shared.js"></script>
+</head>
+<body data-mama-guard="1">
+
+<div class="topbar">
+  <a href="index.html" class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 15 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 0 L7.5 7 L15 0 L15 13 L0 13 Z" fill="#0e0e0e"/>
+      </svg>
+    </div>
+    <span class="logo-word">mama</span>
+  </a>
+  <span class="topbar-tool">Quotes</span>
+  <nav class="topbar-nav">
+    <a href="index.html">Hub</a>
+    <a href="job-hub.html">Jobs</a>
+    <a href="quote-builder.html" class="active">Quotes</a>
+    <a href="brief-builder.html">Briefs</a>
+    <a href="my-time.html">My Time</a>
+    <a href="my-todos.html">To-Dos</a>
+    <a href="project-reports.html">Reports</a>
+    <a href="time-tracker.html">Admin</a>
+    <a href="settings.html">Settings</a>
+  </nav>
+</div>
+
+<div class="container">
+  <div class="main-header">
+    <div class="main-title">Quote Calculator &amp; Builder</div>
+    <div class="main-sub">Add elements from the catalogue, apply markup and discounts, and generate a client-ready quote. All amounts in ZAR.</div>
+  </div>
+
+  <div class="layout">
+    <div>
+      <!-- QUOTE DETAILS -->
+      <div class="card">
+        <div class="card-title">Quote details</div>
+        <div class="field-row">
+          <div class="field">
+            <label>Job</label>
+            <select id="qJob">
+              <option value="">— Select job —</option>
+              <option value="SAFW001|SA Fashion Week">SAFW001 — SA Fashion Week</option>
+              <option value="SHA001|Share Agency">SHA001 — Share Agency</option>
+              <option value="GAN001|Gan Tamar">GAN001 — Gan Tamar</option>
+              <option value="BAN001|Better Angels">BAN001 — Better Angels</option>
+              <option value="NEW|New client">+ New client (type below)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Client name (for the quote)</label>
+            <input type="text" id="qClient" placeholder="Client / company name">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Quote number</label>
+            <input type="text" id="qNumber" placeholder="e.g. Q-2026-014">
+          </div>
+          <div class="field">
+            <label>Date</label>
+            <input type="date" id="qDate">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Prepared by</label>
+            <select id="qAuthor">
+              <option value="">— Select —</option>
+              <option>Cassidy — Strategist</option>
+              <option>Max — Account Manager</option>
+              <option>Ally — Strategist</option>
+              <option>Alexa — COO</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Valid for (days)</label>
+            <input type="number" id="qValidity" value="30" min="1">
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label>Project description</label>
+          <textarea id="qDesc" placeholder="Short description of the scope this quote covers..." style="min-height:60px"></textarea>
+        </div>
+      </div>
+
+      <!-- CATALOGUE -->
+      <div class="card">
+        <div class="card-title">Element catalogue — click + to add to the quote (base costs, before markup)</div>
+        <div id="catalogue"></div>
+      </div>
+
+      <!-- LINE ITEMS -->
+      <div class="card">
+        <div class="card-title">Quote line items — everything editable</div>
+        <div class="li-head">
+          <div>Element</div>
+          <div>Qty</div>
+          <div>Unit cost (R)</div>
+          <div style="text-align:right">Line total</div>
+          <div></div>
+        </div>
+        <div id="lineItems"><div class="empty-items">No items yet — add elements from the catalogue above, or add a custom line.</div></div>
+        <button class="add-custom" onclick="addLine('Custom item', 0)">+ Add custom line item</button>
+      </div>
+
+      <div style="display:flex; gap:10px">
+        <button class="btn btn-yellow" onclick="generateQuote()">Generate quote ✦</button>
+        <button class="btn btn-outline" onclick="clearAll()">Clear</button>
+      </div>
+    </div>
+
+    <!-- TOTALS SIDEBAR -->
+    <div class="totals-panel">
+      <div class="tp-title">Internal calculation</div>
+      <div class="tp-row"><span>Base cost</span><strong id="tBase">R 0.00</strong></div>
+      <div class="tp-row">
+        <span>Markup <span class="tp-label-sm">applied to full job</span></span>
+        <span style="display:flex;align-items:center;gap:5px">
+          <input type="number" class="tp-input" id="tMarkup" value="30" min="0" step="1" oninput="recalc()" style="width:58px">%
+        </span>
+      </div>
+      <div class="tp-row sub"><span>Subtotal (marked up)</span><strong id="tMarked">R 0.00</strong></div>
+      <div class="tp-row">
+        <span>Discount</span>
+        <span style="display:flex;align-items:center;gap:6px">
+          <div class="discount-toggle">
+            <button class="dt-btn active" id="dtPct" onclick="setDiscType('pct')">%</button>
+            <button class="dt-btn" id="dtAmt" onclick="setDiscType('amt')">R</button>
+          </div>
+          <input type="number" class="tp-input" id="tDiscount" value="0" min="0" oninput="recalc()">
+        </span>
+      </div>
+      <div class="tp-row sub"><span>Total excl VAT</span><strong id="tExcl">R 0.00</strong></div>
+      <div class="tp-row">
+        <span>VAT <span class="tp-label-sm">South Africa</span></span>
+        <span style="display:flex;align-items:center;gap:5px">
+          <input type="number" class="tp-input" id="tVat" value="15" min="0" step="0.5" oninput="recalc()" style="width:58px">%
+        </span>
+      </div>
+      <div class="tp-row"><span>VAT amount</span><strong id="tVatAmt">R 0.00</strong></div>
+      <div class="tp-row grand">
+        <span style="font-size:11px; text-transform:uppercase; letter-spacing:0.08em">Total incl VAT</span>
+        <span class="tp-grand-num" id="tGrand">R 0.00</span>
+      </div>
+      <div class="tp-note">Markup is internal — the client quote shows unit prices with markup already applied. Base costs never appear on the client document.</div>
+      <button class="btn btn-dark-outline" onclick="generateQuote()">Generate client quote →</button>
+    </div>
+  </div>
+
+  <!-- GENERATED QUOTE -->
+  <div id="quoteSection" style="display:none">
+    <div class="action-bar">
+      <button class="btn btn-yellow" onclick="saveQuote()">💾 Save quote</button>
+      <button class="btn btn-outline" onclick="copyQuote()">📋 Copy text</button>
+      <button class="btn btn-outline" onclick="window.print()">⬇ Download PDF</button>
+      <button class="btn btn-outline" onclick="window.open('https://drive.google.com/drive/folders/1IkvW4HGv2w_Ro2RSYy0Ii52CfhG_SQUO','_blank')">☁ Open Drive folder</button>
+    </div>
+    <div class="quote-preview" id="quotePreview"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─────────────────────────────────────────────
+// CATALOGUE — base costs BEFORE markup.
+// Edit these defaults to match your real rate card.
+// ─────────────────────────────────────────────
+const catalogue = [
+  { name: 'Carousel / static set (per post)', cost: 1500 },
+  { name: 'Media kit (1–2 pages)', cost: 3500 },
+  { name: 'Sticker design (per sticker)', cost: 450 },
+  { name: 'Illustration (per piece)', cost: 1200 },
+  { name: 'Reel cover (per cover)', cost: 350 },
+  { name: 'Highlight buttons (set of 5)', cost: 900 },
+  { name: 'YouTube thumbnail (per thumbnail)', cost: 550 },
+  { name: 'Profile picture design', cost: 400 },
+  { name: 'Banner (per platform)', cost: 850 },
+  { name: 'Poster design', cost: 1800 },
+  { name: 'Logo design', cost: 8500 },
+  { name: 'Digital screen advert', cost: 2200 },
+  { name: 'Video edit — short form (per video)', cost: 1800 },
+  { name: 'Video edit — long form (per video)', cost: 4500 },
+  { name: 'Script (per script)', cost: 950 },
+  { name: 'Caption pack (per 10)', cost: 750 },
+  { name: 'Instagram bio rewrite', cost: 350 },
+  { name: 'Strategy & ideation session', cost: 3000 },
+  { name: 'Content strategy (monthly)', cost: 12000 },
+  { name: 'Account management (monthly)', cost: 8000 },
+];
+
+let lines = [];
+let nextLineId = 1;
+let discType = 'pct';
+
+const fmtR = n => 'R ' + n.toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+// ─────────────────────────────────────────────
+// CATALOGUE RENDER
+// ─────────────────────────────────────────────
+function renderCatalogue() {
+  document.getElementById('catalogue').innerHTML = catalogue.map((c, i) => `
+    <div class="cat-row">
+      <div class="cat-name">${c.name}</div>
+      <div class="cat-price">${fmtR(c.cost)}</div>
+      <button class="cat-add" onclick="addLine('${c.name.replace(/'/g,"\\'")}', ${c.cost})">+ Add</button>
+    </div>
+  `).join('');
+}
+
+// ─────────────────────────────────────────────
+// LINE ITEMS
+// ─────────────────────────────────────────────
+function addLine(name, cost) {
+  lines.push({ id: nextLineId++, name, qty: 1, cost });
+  renderLines();
+  recalc();
+}
+
+function removeLine(id) {
+  lines = lines.filter(l => l.id !== id);
+  renderLines();
+  recalc();
+}
+
+function updateLine(id, field, value) {
+  const l = lines.find(l => l.id === id);
+  if (!l) return;
+  if (field === 'name') l.name = value;
+  if (field === 'qty') l.qty = Math.max(0, parseFloat(value) || 0);
+  if (field === 'cost') l.cost = Math.max(0, parseFloat(value) || 0);
+  recalc();
+  // update just this row's total
+  const totEl = document.getElementById('lt-' + id);
+  if (totEl) totEl.textContent = fmtR(l.qty * l.cost);
+}
+
+function renderLines() {
+  const el = document.getElementById('lineItems');
+  if (!lines.length) {
+    el.innerHTML = '<div class="empty-items">No items yet — add elements from the catalogue above, or add a custom line.</div>';
+    return;
+  }
+  el.innerHTML = lines.map(l => `
+    <div class="li-row">
+      <input type="text" value="${l.name.replace(/"/g,'&quot;')}" oninput="updateLine(${l.id},'name',this.value)">
+      <input type="number" value="${l.qty}" min="0" step="1" oninput="updateLine(${l.id},'qty',this.value)">
+      <input type="number" value="${l.cost}" min="0" step="50" oninput="updateLine(${l.id},'cost',this.value)">
+      <div class="li-total" id="lt-${l.id}">${fmtR(l.qty * l.cost)}</div>
+      <button class="li-remove" onclick="removeLine(${l.id})">×</button>
+    </div>
+  `).join('');
+}
+
+// ─────────────────────────────────────────────
+// CALC
+// ─────────────────────────────────────────────
+function setDiscType(t) {
+  discType = t;
+  document.getElementById('dtPct').classList.toggle('active', t==='pct');
+  document.getElementById('dtAmt').classList.toggle('active', t==='amt');
+  recalc();
+}
+
+function getCalc() {
+  const base = lines.reduce((s,l) => s + l.qty * l.cost, 0);
+  const markupPct = parseFloat(document.getElementById('tMarkup').value) || 0;
+  const marked = base * (1 + markupPct/100);
+  const discVal = parseFloat(document.getElementById('tDiscount').value) || 0;
+  const discount = discType === 'pct' ? marked * (discVal/100) : Math.min(discVal, marked);
+  const excl = marked - discount;
+  const vatPct = parseFloat(document.getElementById('tVat').value) || 0;
+  const vat = excl * (vatPct/100);
+  const incl = excl + vat;
+  return { base, markupPct, marked, discVal, discount, excl, vatPct, vat, incl };
+}
+
+function recalc() {
+  const c = getCalc();
+  document.getElementById('tBase').textContent = fmtR(c.base);
+  document.getElementById('tMarked').textContent = fmtR(c.marked);
+  document.getElementById('tExcl').textContent = fmtR(c.excl);
+  document.getElementById('tVatAmt').textContent = fmtR(c.vat);
+  document.getElementById('tGrand').textContent = fmtR(c.incl);
+}
+
+// ─────────────────────────────────────────────
+// GENERATE CLIENT QUOTE
+// ─────────────────────────────────────────────
+const logoSVG = '<svg viewBox="0 0 15 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 0 L7.5 7 L15 0 L15 13 L0 13 Z" fill="#0e0e0e"/></svg>';
+let lastQuote = null;
+
+function generateQuote() {
+  if (!lines.length) { showToast('Add at least one line item'); return; }
+  const c = getCalc();
+
+  const jobVal = document.getElementById('qJob').value;
+  const [jobId, jobName] = jobVal ? jobVal.split('|') : ['',''];
+  const client = document.getElementById('qClient').value.trim() || jobName || 'Client';
+  const qNum = document.getElementById('qNumber').value.trim() || 'Q-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random()*900)+100);
+  const date = document.getElementById('qDate').value || new Date().toISOString().slice(0,10);
+  const author = document.getElementById('qAuthor').value || '—';
+  const validity = parseInt(document.getElementById('qValidity').value) || 30;
+  const desc = document.getElementById('qDesc').value.trim();
+
+  const validUntil = new Date(date);
+  validUntil.setDate(validUntil.getDate() + validity);
+
+  // Client-facing line items: unit price WITH markup applied
+  const mk = 1 + c.markupPct/100;
+
+  let rows = lines.filter(l => l.qty > 0).map(l => `
+    <tr>
+      <td>${l.name}</td>
+      <td class="r">${l.qty}</td>
+      <td class="r">${fmtR(l.cost * mk)}</td>
+      <td class="r"><strong>${fmtR(l.qty * l.cost * mk)}</strong></td>
+    </tr>`).join('');
+
+  let totalsRows = '';
+  if (c.discount > 0) {
+    totalsRows += `<div class="row"><span>Subtotal</span><span>${fmtR(c.marked)}</span></div>`;
+    totalsRows += `<div class="row discount"><span>Discount${discType==='pct' ? ' ('+c.discVal+'%)' : ''}</span><span>− ${fmtR(c.discount)}</span></div>`;
+  }
+  totalsRows += `<div class="row subtotal"><span>Total excl. VAT</span><span>${fmtR(c.excl)}</span></div>`;
+  totalsRows += `<div class="row"><span>VAT @ ${c.vatPct}%</span><span>${fmtR(c.vat)}</span></div>`;
+  totalsRows += `<div class="row grand"><span>Total incl. VAT</span><span>${fmtR(c.incl)}</span></div>`;
+
+  const html = `
+    <div class="qp-head">
+      <div>
+        <div class="qp-title">Quotation</div>
+        <div class="qp-meta">${qNum} · ${new Date(date).toLocaleDateString('en-ZA',{day:'numeric',month:'long',year:'numeric'})}</div>
+      </div>
+      <div class="qp-mark">${logoSVG}</div>
+    </div>
+
+    <div class="qp-detail-grid">
+      <div>
+        <div class="qp-section-label">Prepared for</div>
+        <div style="font-size:15px; font-weight:600">${client}</div>
+        ${jobId ? `<div style="font-size:12px; color:var(--muted)">Job ${jobId}</div>` : ''}
+      </div>
+      <div>
+        <div class="qp-section-label">Prepared by</div>
+        <div style="font-size:15px; font-weight:600">Mama</div>
+        <div style="font-size:12px; color:var(--muted)">${author}</div>
+      </div>
+    </div>
+
+    ${desc ? `<div style="margin-bottom:24px"><div class="qp-section-label">Scope</div><p style="font-size:13px; color:var(--text-2)">${desc}</p></div>` : ''}
+
+    <table class="qp-table">
+      <tr><th>Item</th><th class="r">Qty</th><th class="r">Unit price</th><th class="r">Amount</th></tr>
+      ${rows}
+    </table>
+
+    <div class="qp-totals">${totalsRows}</div>
+
+    <div class="qp-terms">
+      <strong>Terms:</strong> This quotation is valid until ${validUntil.toLocaleDateString('en-ZA',{day:'numeric',month:'long',year:'numeric'})} (${validity} days from date of issue). All prices are quoted in South African Rand (ZAR). VAT is charged at ${c.vatPct}% in accordance with the Value-Added Tax Act 89 of 1991. Work commences on written acceptance of this quotation. Unless otherwise agreed, 50% is payable on acceptance and the balance on delivery.
+      <br><br>Generated via Mama Hub · ${new Date().toLocaleDateString('en-ZA',{day:'numeric',month:'long',year:'numeric'})}
+    </div>
+  `;
+
+  document.getElementById('quotePreview').innerHTML = html;
+  document.getElementById('quoteSection').style.display = 'block';
+  document.getElementById('quoteSection').scrollIntoView({ behavior: 'smooth' });
+
+  lastQuote = { qNum, jobId, jobName, client, date, author, total: c.incl, excl: c.excl, html };
+  showToast('Quote generated');
+}
+
+// ─────────────────────────────────────────────
+// SAVE / EXPORT
+// ─────────────────────────────────────────────
+function saveQuote() {
+  if (!lastQuote) return;
+  try {
+    const quotes = JSON.parse(localStorage.getItem('mama-quotes') || '[]');
+    quotes.unshift({ ...lastQuote, savedAt: new Date().toISOString() });
+    localStorage.setItem('mama-quotes', JSON.stringify(quotes));
+    showToast('Quote saved');
+  } catch(e) {
+    showToast('Saved for this session');
+  }
+}
+
+function copyQuote() {
+  navigator.clipboard.writeText(document.getElementById('quotePreview').innerText)
+    .then(() => showToast('Copied to clipboard'));
+}
+
+function clearAll() {
+  if (!confirm('Clear the whole quote?')) return;
+  lines = [];
+  renderLines();
+  recalc();
+  document.getElementById('quoteSection').style.display = 'none';
+  document.getElementById('tDiscount').value = 0;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+// INIT
+document.getElementById('qDate').valueAsDate = new Date();
+renderCatalogue();
+recalc();
+</script>
+</body>
+</html>

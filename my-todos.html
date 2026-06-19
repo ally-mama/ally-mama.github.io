@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex, nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My To-Dos — Mama Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --yellow: #FFC800;
+    --yellow-light: #FFF3B0;
+    --yellow-dark: #E6B400;
+    --yellow-text: #8a6c00;
+    --black: #0e0e0e;
+    --white: #ffffff;
+    --off: #fafaf8;
+    --mid: #f0efe9;
+    --border: #e2e0d8;
+    --muted: #8a8880;
+    --text: #1a1a1a;
+    --text-2: #4a4845;
+    --success: #2e7d52;
+    --success-bg: #eaf4ee;
+    --danger: #c0392b;
+    --danger-bg: #fdecea;
+    --warn: #b07d10;
+    --warn-bg: #fdf4e0;
+    --serif: 'Playfair Display', Georgia, serif;
+    --sans: 'Inter', system-ui, sans-serif;
+    --radius: 8px;
+    --radius-lg: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--sans);
+    background: var(--off);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .topbar {
+    background: var(--black);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    height: 54px;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .logo-mark { width: 32px; height: 32px; background: var(--yellow); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .logo-mark svg { width: 15px; height: 13px; }
+  .logo-word { font-family: var(--serif); font-size: 17px; font-weight: 700; color: var(--white); letter-spacing: 0.04em; }
+  .topbar-tool { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--yellow); background: rgba(255,200,0,0.12); padding: 4px 12px; border-radius: 20px; }
+  .topbar-nav { display: flex; gap: 4px; }
+  .topbar-nav a { color: rgba(255,255,255,0.4); text-decoration: none; font-size: 12px; font-weight: 500; padding: 5px 12px; border-radius: 20px; transition: all 0.15s; }
+  .topbar-nav a:hover { color: white; background: rgba(255,255,255,0.08); }
+  .topbar-nav a.active { color: var(--yellow); }
+
+  /* IDENTITY GATE (same pattern as My Time) */
+  .identity-gate {
+    max-width: 420px;
+    margin: 80px auto;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 40px;
+    text-align: center;
+  }
+  .gate-mark { width: 56px; height: 56px; background: var(--yellow); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; }
+  .gate-mark svg { width: 26px; height: 22px; }
+  .identity-gate h1 { font-family: var(--serif); font-size: 24px; margin-bottom: 6px; }
+  .identity-gate p { font-size: 13px; color: var(--muted); margin-bottom: 22px; }
+  .identity-list { display: flex; flex-direction: column; gap: 8px; }
+  .identity-btn {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--white);
+    cursor: pointer;
+    font-family: var(--sans);
+    transition: all 0.15s;
+    text-align: left;
+  }
+  .identity-btn:hover { border-color: var(--yellow); background: #FFFBEB; }
+  .id-avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .id-name { font-size: 14px; font-weight: 600; }
+  .id-role { font-size: 11px; color: var(--muted); }
+  #passwordStep input[type=password] {
+    width: 100%; text-align: center; font-size: 14px;
+    background: var(--off); border: 1px solid var(--border);
+    border-radius: 8px; padding: 11px; outline: none;
+    font-family: var(--sans); margin-bottom: 12px;
+  }
+
+  /* MAIN */
+  .container { max-width: 720px; margin: 0 auto; padding: 28px 24px 100px; display: none; }
+  .main-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .greeting-row { display: flex; align-items: center; gap: 14px; }
+  .me-avatar { width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; }
+  .main-title { font-family: var(--serif); font-size: 24px; font-weight: 700; line-height: 1.2; }
+  .main-sub { font-size: 12px; color: var(--muted); }
+  .switch-user { font-size: 11px; color: var(--muted); background: none; border: none; cursor: pointer; text-decoration: underline; font-family: var(--sans); }
+  .switch-user:hover { color: var(--text); }
+
+  .privacy-note {
+    font-size: 11px; color: var(--muted);
+    background: var(--mid);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    margin-bottom: 20px;
+  }
+
+  /* STATS */
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+  .stat-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px 16px; }
+  .stat-card.dark { background: var(--black); border-color: var(--black); }
+  .stat-num { font-family: var(--serif); font-size: 24px; font-weight: 700; line-height: 1.1; }
+  .stat-card.dark .stat-num { color: var(--yellow); }
+  .stat-num.red { color: var(--danger); }
+  .stat-num.green { color: var(--success); }
+  .stat-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); font-weight: 600; }
+  .stat-card.dark .stat-label { color: rgba(255,255,255,0.45); }
+
+  /* ADD FORM */
+  .add-form {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    margin-bottom: 20px;
+  }
+  .add-grid { display: grid; grid-template-columns: 1fr 105px 105px 105px 46px; gap: 8px; align-items: end; }
+  .form-field label { display: block; font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 5px; }
+  .form-field input, .form-field select {
+    width: 100%; background: var(--off);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 9px 11px;
+    font-family: var(--sans); font-size: 13px;
+    outline: none; transition: border-color 0.15s;
+  }
+  .form-field input:focus, .form-field select:focus { border-color: var(--yellow); background: white; }
+  .btn-add { height: 38px; background: var(--yellow); border: none; border-radius: var(--radius); cursor: pointer; font-size: 18px; transition: background 0.15s; }
+  .btn-add:hover { background: var(--yellow-dark); }
+
+  /* TABS */
+  .tabs { display: flex; gap: 2px; background: var(--mid); padding: 3px; border-radius: var(--radius); margin-bottom: 18px; width: fit-content; }
+  .tab { padding: 7px 16px; font-size: 12px; font-weight: 600; border-radius: 6px; cursor: pointer; color: var(--muted); border: none; background: none; font-family: var(--sans); transition: all 0.15s; }
+  .tab.active { background: var(--white); color: var(--black); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .view-panel { display: none; }
+  .view-panel.active { display: block; }
+
+  /* TASK GROUPS */
+  .group-label {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted);
+    margin: 18px 0 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .group-label.overdue { color: var(--danger); }
+  .group-label .count { background: var(--mid); color: var(--text-2); padding: 0 7px; border-radius: 9px; font-size: 10px; }
+  .group-label.overdue .count { background: var(--danger-bg); color: var(--danger); }
+
+  /* TASK CARD */
+  .task {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    transition: all 0.15s;
+  }
+  .task:hover { border-color: var(--yellow); }
+  .task.done { opacity: 0.6; }
+  .task.done .task-title { text-decoration: line-through; }
+  .task-top { display: flex; align-items: flex-start; gap: 12px; }
+  .task-check {
+    width: 22px; height: 22px;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    color: white;
+    transition: all 0.15s;
+    margin-top: 1px;
+    background: var(--white);
+  }
+  .task-check:hover { border-color: var(--success); }
+  .task.done .task-check { background: var(--success); border-color: var(--success); }
+  .task-body { flex: 1; min-width: 0; }
+  .task-title { font-size: 14px; font-weight: 600; border: none; background: none; width: 100%; font-family: var(--sans); outline: none; padding: 0; color: var(--text); }
+  .task-meta { display: flex; align-items: center; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 9px;
+    border-radius: 10px;
+    font-size: 10px; font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    user-select: none;
+    border: none;
+    font-family: var(--sans);
+  }
+  .chip-todo { background: var(--mid); color: var(--text-2); }
+  .chip-progress { background: var(--yellow-light); color: var(--yellow-text); }
+  .chip-done { background: var(--success-bg); color: var(--success); }
+  .chip-due { background: var(--off); color: var(--muted); border: 1px solid var(--border); cursor: default; }
+  .chip-due.overdue { background: var(--danger-bg); color: var(--danger); border-color: transparent; }
+  .chip-due.today { background: var(--warn-bg); color: var(--warn); border-color: transparent; }
+  .chip-job { background: var(--off); color: var(--muted); border: 1px solid var(--border); cursor: default; }
+  .task-delete {
+    background: none; border: none;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 15px;
+    width: 26px; height: 26px;
+    border-radius: 4px;
+    transition: all 0.12s;
+    flex-shrink: 0;
+  }
+  .task-delete:hover { background: var(--danger-bg); color: var(--danger); }
+
+  /* PROGRESS BAR */
+  .progress-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+  .progress-track { flex: 1; height: 7px; background: var(--mid); border-radius: 4px; overflow: hidden; cursor: pointer; }
+  .progress-fill { height: 100%; background: var(--yellow); border-radius: 4px; transition: width 0.2s; }
+  .progress-fill.full { background: var(--success); }
+  .progress-pct { font-size: 11px; font-weight: 700; color: var(--text-2); width: 34px; text-align: right; }
+  .progress-slider { width: 100%; accent-color: var(--yellow); height: 7px; cursor: pointer; }
+
+  /* TIMELINE VIEW */
+  .tl-day { margin-bottom: 16px; }
+  .tl-day-label {
+    font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; gap: 10px;
+    color: var(--text-2);
+    margin-bottom: 8px;
+  }
+  .tl-day-label .line { flex: 1; height: 1px; background: var(--border); }
+  .tl-day-label.overdue { color: var(--danger); }
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px; }
+
+  /* PRIORITY CHIPS */
+  .chip-pri { cursor: pointer; }
+  .pri-low { background: var(--mid); color: var(--muted); }
+  .pri-medium { background: #e8f0fd; color: #3b6fc4; }
+  .pri-high { background: var(--warn-bg); color: var(--warn); }
+  .pri-urgent { background: var(--danger-bg); color: var(--danger); }
+
+  /* JOB FILTER */
+  .job-filter { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+  .jf-pill {
+    padding: 5px 13px;
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    background: var(--white);
+    font-family: var(--sans);
+    font-size: 11px; font-weight: 600;
+    color: var(--text-2);
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .jf-pill:hover { border-color: var(--yellow); }
+  .jf-pill.active { background: var(--black); border-color: var(--black); color: var(--yellow); }
+  .jf-pill .jf-count { opacity: 0.6; margin-left: 4px; }
+
+  /* COMMENTS */
+  .comment-btn {
+    background: none; border: none;
+    cursor: pointer;
+    font-size: 13px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-family: var(--sans);
+    color: var(--muted);
+    display: inline-flex; align-items: center; gap: 4px;
+    transition: all 0.12s;
+  }
+  .comment-btn:hover { background: var(--yellow-light); }
+  .comment-btn .cmt-count { font-size: 10px; font-weight: 700; }
+  .comments-panel {
+    margin-top: 10px;
+    padding: 12px 14px;
+    background: var(--off);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  .comment-item {
+    font-size: 12px;
+    color: var(--text-2);
+    padding: 7px 0;
+    border-bottom: 1px solid var(--mid);
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .comment-item:last-of-type { border-bottom: none; }
+  .comment-time { font-size: 10px; color: var(--muted); white-space: nowrap; flex-shrink: 0; }
+  .comment-add { display: flex; gap: 6px; margin-top: 8px; }
+  .comment-add input {
+    flex: 1;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 7px 10px;
+    font-family: var(--sans);
+    font-size: 12px;
+    outline: none;
+  }
+  .comment-add input:focus { border-color: var(--yellow); }
+  .comment-add button {
+    background: var(--yellow);
+    border: none;
+    border-radius: 6px;
+    padding: 0 12px;
+    font-family: var(--sans);
+    font-size: 11px; font-weight: 700;
+    cursor: pointer;
+  }
+  .comment-add button:hover { background: var(--yellow-dark); }
+
+  .toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--black); color: white;
+    padding: 11px 18px; border-radius: var(--radius);
+    font-size: 13px; font-weight: 500;
+    opacity: 0; transform: translateY(8px);
+    transition: all 0.25s;
+    z-index: 999; pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+</style>
+  <script src="mama-shared.js"></script>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html" class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 15 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 0 L7.5 7 L15 0 L15 13 L0 13 Z" fill="#0e0e0e"/>
+      </svg>
+    </div>
+    <span class="logo-word">mama</span>
+  </a>
+  <span class="topbar-tool">My To-Dos</span>
+  <nav class="topbar-nav">
+    <a href="index.html">Hub</a>
+    <a href="job-hub.html">Jobs</a>
+    <a href="quote-builder.html">Quotes</a>
+    <a href="brief-builder.html">Briefs</a>
+    <a href="my-time.html">My Time</a>
+    <a href="my-todos.html" class="active">To-Dos</a>
+    <a href="project-reports.html">Reports</a>
+    <a href="time-tracker.html">Admin</a>
+    <a href="settings.html">Settings</a>
+  </nav>
+</div>
+
+<!-- GATE -->
+<div class="identity-gate" id="identityGate">
+  <div class="gate-mark">
+    <svg viewBox="0 0 15 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 0 L7.5 7 L15 0 L15 13 L0 13 Z" fill="#0e0e0e"/>
+    </svg>
+  </div>
+  <h1 id="gateTitle">Whose to-dos?</h1>
+  <p id="gateSub">This space is private — only you see your tasks. Pick your name.</p>
+  <div class="identity-list" id="identityList"></div>
+  <div id="passwordStep" style="display:none">
+    <input type="password" id="userPassword" placeholder="Your password" onkeydown="if(event.key==='Enter')checkPassword()">
+    <button class="identity-btn" style="justify-content:center; background:var(--yellow); border-color:var(--yellow); font-weight:600" onclick="checkPassword()">Sign in</button>
+    <button class="identity-btn" style="justify-content:center; border:none; color:var(--muted); font-size:12px" onclick="backToNames()">← Back to names</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="container" id="mainContainer">
+  <div class="main-header">
+    <div class="greeting-row">
+      <div class="me-avatar" id="meAvatar"></div>
+      <div>
+        <div class="main-title" id="greeting"></div>
+        <div class="main-sub" id="standing"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="privacy-note">🔒 Private workspace — your to-dos are yours alone and don't appear on any dashboard.</div>
+
+  <div class="stats-row">
+    <div class="stat-card dark"><div class="stat-num" id="stOpen">0</div><div class="stat-label">Open</div></div>
+    <div class="stat-card"><div class="stat-num red" id="stOverdue">0</div><div class="stat-label">Overdue</div></div>
+    <div class="stat-card"><div class="stat-num" id="stWeek">0</div><div class="stat-label">Due this week</div></div>
+    <div class="stat-card"><div class="stat-num green" id="stDone">0</div><div class="stat-label">Done this week</div></div>
+  </div>
+
+  <div class="add-form">
+    <div class="add-grid" style="grid-template-columns: 1fr 95px 95px 115px 115px 46px">
+      <div class="form-field">
+        <label>New to-do</label>
+        <input type="text" id="newTask" placeholder="What needs doing?" onkeydown="if(event.key==='Enter')addTask()">
+      </div>
+      <div class="form-field">
+        <label>Job (optional)</label>
+        <select id="newJob"><option value="">—</option></select>
+      </div>
+      <div class="form-field">
+        <label>Priority</label>
+        <select id="newPriority">
+          <option value="low">Low</option>
+          <option value="medium" selected>Medium</option>
+          <option value="high">High</option>
+          <option value="urgent">Urgent</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label>Due / start date</label>
+        <input type="date" id="newDue">
+      </div>
+      <div class="form-field">
+        <label>To (optional)</label>
+        <input type="date" id="newDueEnd" title="Leave empty for a single-day due date">
+      </div>
+      <button class="btn-add" onclick="addTask()">+</button>
+    </div>
+  </div>
+
+  <div class="job-filter" id="jobFilterBar"></div>
+
+  <div class="tabs">
+    <button class="tab active" id="tabOpen" onclick="switchView('open')">Open</button>
+    <button class="tab" id="tabTimeline" onclick="switchView('timeline')">Timeline</button>
+    <button class="tab" id="tabDoneV" onclick="switchView('doneV')">Done</button>
+  </div>
+
+  <div class="view-panel active" id="viewOpen"></div>
+  <div class="view-panel" id="viewTimeline"></div>
+  <div class="view-panel" id="viewDoneV"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─────────────────────────────────────────────
+// SHARED STORAGE + IDENTITY (same pattern as My Time)
+// ─────────────────────────────────────────────
+const STORE_TEAM = 'mama-time-team';
+const STORE_JOBS = 'mama-jobs';
+const STORE_TODOS = 'mama-todos';
+const STORE_ME = 'mama-todos-identity';
+
+let memStore = {};
+function storeGet(key) {
+  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : null; }
+  catch(e) { return memStore[key] || null; }
+}
+function storeSet(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); }
+  catch(e) { memStore[key] = val; }
+}
+
+const defaultTeam = [
+  { id: 1, name: 'Cassidy', role: 'Strategist', initials: 'CA' },
+  { id: 2, name: 'Max', role: 'Account Manager', initials: 'MX' },
+  { id: 3, name: 'Ally', role: 'Strategist', initials: 'AL' },
+  { id: 4, name: 'Alexa', role: 'COO', initials: 'AX' },
+];
+const defaultJobs = [
+  { id: 'SAFW001', name: 'SA Fashion Week', assignedTo: [] },
+  { id: 'SHA001', name: 'Share Agency', assignedTo: [] },
+  { id: 'GAN001', name: 'Gan Tamar', assignedTo: [] },
+  { id: 'BAN001', name: 'Better Angels', assignedTo: [] },
+  { id: 'INT001', name: 'Internal / Admin', assignedTo: [] },
+];
+
+let team = storeGet(STORE_TEAM) || defaultTeam;
+let jobList = storeGet(STORE_JOBS) || defaultJobs;
+let todos = storeGet(STORE_TODOS) || [];
+let me = storeGet(STORE_ME) || null;
+let pendingIdentity = null;
+
+const DEFAULT_PASSWORD = 'Smarties716!';
+function memberPassword(m) { return m.password || DEFAULT_PASSWORD; }
+
+function persist() { storeSet(STORE_TODOS, todos); }
+
+function memberColor(id) {
+  const colors = ['#FFC800','#0e0e0e','#e8c85a','#8a6c00'];
+  return colors[(id-1) % colors.length];
+}
+function memberTextColor(id) { return (id === 2 || id === 4) ? 'white' : '#0e0e0e'; }
+
+// ─────────────────────────────────────────────
+// GATE
+// ─────────────────────────────────────────────
+function renderIdentityGate() {
+  document.getElementById('identityList').innerHTML = team.map(m =>
+    `<button class="identity-btn" onclick="chooseIdentity(${m.id})">
+      <div class="id-avatar" style="background:${memberColor(m.id)};color:${memberTextColor(m.id)}">${m.initials}</div>
+      <div><div class="id-name">${m.name}</div><div class="id-role">${m.role}</div></div>
+    </button>`
+  ).join('');
+}
+
+function chooseIdentity(id) {
+  pendingIdentity = id;
+  const m = team.find(t => t.id === id);
+  document.getElementById('identityList').style.display = 'none';
+  document.getElementById('passwordStep').style.display = 'block';
+  document.getElementById('gateTitle').textContent = 'Hi, ' + m.name;
+  document.getElementById('gateSub').textContent = 'Enter your password to open your to-dos.';
+  document.getElementById('userPassword').value = '';
+  document.getElementById('userPassword').focus();
+}
+
+function checkPassword() {
+  const m = team.find(t => t.id === pendingIdentity);
+  if (!m) { backToNames(); return; }
+  if (document.getElementById('userPassword').value === memberPassword(m)) {
+    me = pendingIdentity;
+    storeSet(STORE_ME, me);
+    Mama.Session.setMember(me);
+    enterApp();
+  } else {
+    showToast('Incorrect password');
+    document.getElementById('userPassword').value = '';
+    document.getElementById('userPassword').focus();
+  }
+}
+
+function backToNames() {
+  pendingIdentity = null;
+  document.getElementById('passwordStep').style.display = 'none';
+  document.getElementById('identityList').style.display = 'flex';
+  document.getElementById('gateTitle').textContent = 'Whose to-dos?';
+  document.getElementById('gateSub').textContent = 'This space is private — only you see your tasks. Pick your name.';
+}
+
+function switchUser() {
+  me = null;
+  storeSet(STORE_ME, null);
+  document.getElementById('mainContainer').style.display = 'none';
+  document.getElementById('identityGate').style.display = 'block';
+  backToNames();
+}
+
+function enterApp() {
+  const m = team.find(t => t.id === me);
+  if (!m) { switchUser(); return; }
+  document.getElementById('identityGate').style.display = 'none';
+  document.getElementById('mainContainer').style.display = 'block';
+  document.getElementById('meAvatar').style.background = memberColor(m.id);
+  document.getElementById('meAvatar').style.color = memberTextColor(m.id);
+  document.getElementById('meAvatar').textContent = m.initials;
+  document.getElementById('greeting').textContent = m.name + "'s to-dos";
+  render();
+}
+
+// ─────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────
+const todayStr = () => new Date().toISOString().slice(0,10);
+function daysFromToday(dateStr) {
+  if (!dateStr) return null;
+  const d = new Date(dateStr); d.setHours(0,0,0,0);
+  const t = new Date(); t.setHours(0,0,0,0);
+  return Math.round((d - t) / 86400000);
+}
+function fmtDue(dateStr) {
+  const dd = daysFromToday(dateStr);
+  if (dd === null) return '';
+  if (dd < 0) return Math.abs(dd) + 'd overdue';
+  if (dd === 0) return 'Due today';
+  if (dd === 1) return 'Due tomorrow';
+  return new Date(dateStr).toLocaleDateString('en-ZA', { day:'numeric', month:'short' });
+}
+function fmtDueRange(t) {
+  if (t.start && t.due) {
+    const s = new Date(t.start).toLocaleDateString('en-ZA', { day:'numeric', month:'short' });
+    const dd = daysFromToday(t.due);
+    const startedClass = daysFromToday(t.start) <= 0 && dd >= 0 ? ' · running' : '';
+    return s + ' → ' + fmtDue(t.due) + startedClass;
+  }
+  return fmtDue(t.due);
+}
+function myTodos() { return todos.filter(t => t.memberId === me); }
+
+// ─────────────────────────────────────────────
+// PRIORITY / FILTER / COMMENTS STATE
+// ─────────────────────────────────────────────
+let jobFilter = 'all';            // 'all' | jobId | 'none'
+let openComments = new Set();     // task ids with comments panel open
+const PRI_ORDER = { urgent: 0, high: 1, medium: 2, low: 3 };
+const PRI_LABEL = { low: 'Low', medium: 'Medium', high: 'High', urgent: 'Urgent' };
+const PRI_NEXT = { low: 'medium', medium: 'high', high: 'urgent', urgent: 'low' };
+
+function setJobFilter(f) { jobFilter = f; render(); }
+
+function filteredTodos() {
+  const mine = myTodos();
+  if (jobFilter === 'all') return mine;
+  if (jobFilter === 'none') return mine.filter(t => !t.jobId);
+  return mine.filter(t => t.jobId === jobFilter);
+}
+
+function fmtCommentTime(iso) {
+  const d = new Date(iso);
+  const dd = daysFromToday(iso.slice(0,10));
+  const time = d.toLocaleTimeString('en-ZA', { hour:'2-digit', minute:'2-digit' });
+  if (dd === 0) return 'Today ' + time;
+  if (dd === -1) return 'Yesterday ' + time;
+  return d.toLocaleDateString('en-ZA', { day:'numeric', month:'short' }) + ' ' + time;
+}
+
+// ─────────────────────────────────────────────
+// RENDER
+// ─────────────────────────────────────────────
+function taskHTML(t) {
+  const dd = daysFromToday(t.due);
+  const dueClass = t.done ? '' : dd !== null && dd < 0 ? 'overdue' : dd === 0 ? 'today' : '';
+  const job = jobList.find(j => j.id === t.jobId);
+  const statusChip = t.done
+    ? '<button class="chip chip-done" onclick="cycleStatus(' + t.id + ')">Done</button>'
+    : t.progress > 0
+      ? '<button class="chip chip-progress" onclick="cycleStatus(' + t.id + ')">In progress</button>'
+      : '<button class="chip chip-todo" onclick="cycleStatus(' + t.id + ')">To do</button>';
+
+  const pri = t.priority || 'medium';
+  const priChip = `<button class="chip chip-pri pri-${pri}" onclick="cyclePriority(${t.id})" title="Click to change priority">${pri === 'urgent' ? '🔥 ' : ''}${PRI_LABEL[pri]}</button>`;
+
+  const comments = t.comments || [];
+  const cmtOpen = openComments.has(t.id);
+  const cmtBtn = `<button class="comment-btn" onclick="toggleComments(${t.id})" title="Comments / reminders">💬${comments.length ? `<span class="cmt-count">${comments.length}</span>` : ''}</button>`;
+
+  const cmtPanel = cmtOpen ? `<div class="comments-panel">
+    ${comments.length
+      ? comments.map((c, ci) => `<div class="comment-item"><span>${c.text}</span><span class="comment-time">${fmtCommentTime(c.at)}</span></div>`).join('')
+      : '<div style="font-size:11px;color:var(--muted);font-style:italic">No comments yet — leave yourself a note on where you\'re at.</div>'}
+    <div class="comment-add">
+      <input type="text" id="cmt-${t.id}" placeholder="e.g. Waiting on client feedback, picked up again Monday..." onkeydown="if(event.key==='Enter')addComment(${t.id})">
+      <button onclick="addComment(${t.id})">Add</button>
+    </div>
+  </div>` : '';
+
+  return `<div class="task ${t.done ? 'done' : ''}">
+    <div class="task-top">
+      <div class="task-check" onclick="toggleDone(${t.id})">${t.done ? '✓' : ''}</div>
+      <div class="task-body">
+        <input class="task-title" value="${(t.title||'').replace(/"/g,'&quot;')}" onchange="editTitle(${t.id}, this.value)">
+        <div class="task-meta">
+          ${statusChip}
+          ${priChip}
+          ${t.due ? `<span class="chip chip-due ${dueClass}">📅 ${fmtDueRange(t)}</span>` : ''}
+          ${job ? `<span class="chip chip-job">${job.id}</span>` : ''}
+          ${cmtBtn}
+        </div>
+        ${!t.done ? `<div class="progress-row">
+          <input type="range" class="progress-slider" min="0" max="100" step="5" value="${t.progress||0}" oninput="setProgress(${t.id}, this.value)">
+          <span class="progress-pct">${t.progress||0}%</span>
+        </div>` : ''}
+        ${cmtPanel}
+      </div>
+      <button class="task-delete" onclick="deleteTask(${t.id})">×</button>
+    </div>
+  </div>`;
+}
+
+function renderJobFilter() {
+  const all = myTodos().filter(t => !t.done);
+  const visible = jobList.filter(j => !j.assignedTo || j.assignedTo.length === 0 || j.assignedTo.includes(me));
+  const counts = {};
+  all.forEach(t => { const k = t.jobId || 'none'; counts[k] = (counts[k]||0) + 1; });
+
+  let pills = `<button class="jf-pill ${jobFilter==='all'?'active':''}" onclick="setJobFilter('all')">All<span class="jf-count">${all.length}</span></button>`;
+  visible.forEach(j => {
+    if (counts[j.id] || jobFilter === j.id) {
+      pills += `<button class="jf-pill ${jobFilter===j.id?'active':''}" onclick="setJobFilter('${j.id}')">${j.id}<span class="jf-count">${counts[j.id]||0}</span></button>`;
+    }
+  });
+  if (counts['none'] || jobFilter === 'none') {
+    pills += `<button class="jf-pill ${jobFilter==='none'?'active':''}" onclick="setJobFilter('none')">No job<span class="jf-count">${counts['none']||0}</span></button>`;
+  }
+  document.getElementById('jobFilterBar').innerHTML = pills;
+}
+
+function render() {
+  renderJobFilter();
+  const mine = filteredTodos();
+  const open = mine.filter(t => !t.done);
+  const done = mine.filter(t => t.done);
+
+  // Stats
+  const overdue = open.filter(t => { const d = daysFromToday(t.due); return d !== null && d < 0; });
+  const dueWeek = open.filter(t => { const d = daysFromToday(t.due); return d !== null && d >= 0 && d <= 7; });
+  const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
+  const doneWeek = done.filter(t => t.doneAt && new Date(t.doneAt) >= weekAgo);
+
+  document.getElementById('stOpen').textContent = open.length;
+  document.getElementById('stOverdue').textContent = overdue.length;
+  document.getElementById('stWeek').textContent = dueWeek.length;
+  document.getElementById('stDone').textContent = doneWeek.length;
+
+  // Standing line
+  const standing = overdue.length
+    ? `⚠️ ${overdue.length} overdue — start there`
+    : dueWeek.length
+      ? `${dueWeek.length} due in the next 7 days — on top of it`
+      : open.length
+        ? `${open.length} open, nothing urgent — all clear`
+        : `Nothing open — clean slate ✨`;
+  document.getElementById('standing').textContent = standing;
+
+  // Job select (assigned jobs only, like My Time)
+  const jSel = document.getElementById('newJob');
+  const cur = jSel.value;
+  const visible = jobList.filter(j => !j.assignedTo || j.assignedTo.length === 0 || j.assignedTo.includes(me));
+  jSel.innerHTML = '<option value="">—</option>' +
+    visible.map(j => `<option value="${j.id}"${j.id===cur?' selected':''}>${j.id}</option>`).join('');
+
+  // OPEN VIEW — grouped: Overdue / Today / This week / Later / No date
+  const groups = [
+    { label: 'Overdue', cls: 'overdue', filter: t => { const d = daysFromToday(t.due); return d !== null && d < 0; } },
+    { label: 'Today', cls: '', filter: t => daysFromToday(t.due) === 0 },
+    { label: 'This week', cls: '', filter: t => { const d = daysFromToday(t.due); return d !== null && d >= 1 && d <= 7; } },
+    { label: 'Later', cls: '', filter: t => { const d = daysFromToday(t.due); return d !== null && d > 7; } },
+    { label: 'No date', cls: '', filter: t => !t.due },
+  ];
+  let openHtml = '';
+  groups.forEach(g => {
+    const items = open.filter(g.filter).sort((a,b) =>
+      (PRI_ORDER[a.priority||'medium'] - PRI_ORDER[b.priority||'medium']) ||
+      (a.due||'9999').localeCompare(b.due||'9999'));
+    if (items.length) {
+      openHtml += `<div class="group-label ${g.cls}">${g.label} <span class="count">${items.length}</span></div>`;
+      openHtml += items.map(taskHTML).join('');
+    }
+  });
+  document.getElementById('viewOpen').innerHTML = openHtml || '<div class="empty-state">No open to-dos. Add one above 👆</div>';
+
+  // TIMELINE VIEW — open tasks with dates, grouped per day chronologically
+  const dated = open.filter(t => t.due).sort((a,b) => a.due.localeCompare(b.due));
+  const byDay = {};
+  dated.forEach(t => { (byDay[t.due] = byDay[t.due] || []).push(t); });
+  let tlHtml = '';
+  Object.keys(byDay).sort().forEach(day => {
+    const dd = daysFromToday(day);
+    const label = dd < 0 ? fmtDue(day) :
+      new Date(day).toLocaleDateString('en-ZA', { weekday:'long', day:'numeric', month:'long' }) + (dd === 0 ? ' · today' : dd === 1 ? ' · tomorrow' : '');
+    tlHtml += `<div class="tl-day">
+      <div class="tl-day-label ${dd < 0 ? 'overdue' : ''}">${label}<div class="line"></div></div>
+      ${byDay[day].map(taskHTML).join('')}
+    </div>`;
+  });
+  document.getElementById('viewTimeline').innerHTML = tlHtml || '<div class="empty-state">No dated to-dos yet — add due dates to see your timeline.</div>';
+
+  // DONE VIEW
+  const doneSorted = [...done].sort((a,b) => (b.doneAt||'').localeCompare(a.doneAt||''));
+  document.getElementById('viewDoneV').innerHTML = doneSorted.length
+    ? doneSorted.map(taskHTML).join('')
+    : '<div class="empty-state">Nothing completed yet — it\'ll feel good when there is.</div>';
+}
+
+// ─────────────────────────────────────────────
+// ACTIONS
+// ─────────────────────────────────────────────
+function addTask() {
+  const title = document.getElementById('newTask').value.trim();
+  if (!title) { showToast('Type a to-do first'); return; }
+  const nextId = todos.length ? Math.max(...todos.map(t=>t.id)) + 1 : 1;
+  let d1 = document.getElementById('newDue').value || null;
+  let d2 = document.getElementById('newDueEnd').value || null;
+  if (d2 && !d1) { d1 = d2; d2 = null; }            // only end filled → treat as single day
+  if (d1 && d2 && d2 < d1) { const tmp = d1; d1 = d2; d2 = tmp; }  // swap if reversed
+  todos.push({
+    id: nextId,
+    memberId: me,
+    title,
+    jobId: document.getElementById('newJob').value || null,
+    start: d2 ? d1 : null,        // range start (only set when it's a range)
+    due: d2 || d1,                // the deadline — end of range, or the single day
+    priority: document.getElementById('newPriority').value || 'medium',
+    comments: [],
+    progress: 0,
+    done: false,
+    doneAt: null,
+    createdAt: new Date().toISOString()
+  });
+  persist();
+  document.getElementById('newTask').value = '';
+  document.getElementById('newDue').value = '';
+  document.getElementById('newDueEnd').value = '';
+  document.getElementById('newJob').value = '';
+  document.getElementById('newPriority').value = 'medium';
+  render();
+  showToast('Added');
+}
+
+function cyclePriority(id) {
+  const t = findMine(id); if (!t) return;
+  t.priority = PRI_NEXT[t.priority || 'medium'];
+  persist(); render();
+}
+
+function toggleComments(id) {
+  if (openComments.has(id)) openComments.delete(id);
+  else openComments.add(id);
+  render();
+  if (openComments.has(id)) {
+    const inp = document.getElementById('cmt-' + id);
+    if (inp) inp.focus();
+  }
+}
+
+function addComment(id) {
+  const t = findMine(id); if (!t) return;
+  const inp = document.getElementById('cmt-' + id);
+  const text = (inp ? inp.value : '').trim();
+  if (!text) { showToast('Type a comment first'); return; }
+  if (!t.comments) t.comments = [];
+  t.comments.push({ text, at: new Date().toISOString() });
+  persist(); render();
+  const again = document.getElementById('cmt-' + id);
+  if (again) again.focus();
+}
+
+function findMine(id) {
+  const t = todos.find(t => t.id === id);
+  return (t && t.memberId === me) ? t : null;
+}
+
+function toggleDone(id) {
+  const t = findMine(id); if (!t) return;
+  t.done = !t.done;
+  t.doneAt = t.done ? new Date().toISOString() : null;
+  if (t.done) t.progress = 100;
+  persist(); render();
+}
+
+function cycleStatus(id) {
+  const t = findMine(id); if (!t) return;
+  if (t.done) { t.done = false; t.doneAt = null; t.progress = 0; }
+  else if (t.progress > 0) { t.done = true; t.doneAt = new Date().toISOString(); t.progress = 100; }
+  else { t.progress = 25; }
+  persist(); render();
+}
+
+function setProgress(id, val) {
+  const t = findMine(id); if (!t) return;
+  t.progress = parseInt(val);
+  if (t.progress === 100) { t.done = true; t.doneAt = new Date().toISOString(); }
+  persist();
+  // light update: re-render after slide settles
+  clearTimeout(window._progTimer);
+  window._progTimer = setTimeout(render, 350);
+}
+
+function editTitle(id, val) {
+  const t = findMine(id); if (!t) return;
+  t.title = val.trim() || t.title;
+  persist();
+}
+
+function deleteTask(id) {
+  const t = findMine(id); if (!t) return;
+  todos = todos.filter(x => x.id !== id);
+  persist(); render();
+  showToast('Removed');
+}
+
+function switchView(view) {
+  document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  const cap = view.charAt(0).toUpperCase() + view.slice(1);
+  document.getElementById('view' + cap).classList.add('active');
+  document.getElementById('tab' + cap).classList.add('active');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// INIT
+if (Mama.Session.memberValid()) { me = Mama.Session.member(); storeSet(STORE_ME, me); }
+else { me = null; }
+renderIdentityGate();
+if (me && team.find(t=>t.id===me)) enterApp();
+</script>
+</body>
+</html>

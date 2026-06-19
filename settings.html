@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex, nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings — Mama Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --yellow: #FFC800;
+    --yellow-light: #FFF3B0;
+    --yellow-dark: #E6B400;
+    --yellow-text: #8a6c00;
+    --black: #0e0e0e;
+    --white: #ffffff;
+    --off: #fafaf8;
+    --mid: #f0efe9;
+    --border: #e2e0d8;
+    --muted: #8a8880;
+    --text: #1a1a1a;
+    --text-2: #4a4845;
+    --success: #2e7d52;
+    --success-bg: #eaf4ee;
+    --danger: #c0392b;
+    --danger-bg: #fdecea;
+    --warn: #b07d10;
+    --warn-bg: #fdf4e0;
+    --serif: 'Playfair Display', Georgia, serif;
+    --sans: 'Inter', system-ui, sans-serif;
+    --radius: 8px;
+    --radius-lg: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--sans); background: var(--off); color: var(--text); min-height: 100vh; font-size: 14px; line-height: 1.6; }
+  .topbar {
+    background: var(--black);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 28px; height: 54px;
+    position: sticky; top: 0; z-index: 200;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .logo-mark { width: 32px; height: 32px; background: var(--yellow); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .logo-mark svg { width: 15px; height: 13px; }
+  .logo-word { font-family: var(--serif); font-size: 17px; font-weight: 700; color: var(--white); letter-spacing: 0.04em; }
+  .topbar-tool { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--yellow); background: rgba(255,200,0,0.12); padding: 4px 12px; border-radius: 20px; }
+  .topbar-nav { display: flex; gap: 4px; }
+  .topbar-nav a { color: rgba(255,255,255,0.4); text-decoration: none; font-size: 12px; font-weight: 500; padding: 5px 12px; border-radius: 20px; transition: all 0.15s; }
+  .topbar-nav a:hover { color: white; background: rgba(255,255,255,0.08); }
+  .topbar-nav a.active { color: var(--yellow); }
+
+  /* PIN GATE */
+  .gate {
+    max-width: 380px;
+    margin: 90px auto;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 40px;
+    text-align: center;
+  }
+  .gate-mark { width: 56px; height: 56px; background: var(--yellow); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; }
+  .gate-mark svg { width: 26px; height: 22px; }
+  .gate h1 { font-family: var(--serif); font-size: 22px; margin-bottom: 6px; }
+  .gate p { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+  .gate input {
+    width: 100%; text-align: center; font-size: 16px; letter-spacing: 0.3em;
+    background: var(--off); border: 1px solid var(--border);
+    border-radius: 8px; padding: 11px; outline: none;
+    font-family: var(--sans); margin-bottom: 12px;
+  }
+  .gate input:focus { border-color: var(--yellow); }
+
+  .container { max-width: 760px; margin: 0 auto; padding: 28px 24px 100px; display: none; }
+  .main-title { font-family: var(--serif); font-size: 26px; font-weight: 700; margin-bottom: 2px; }
+  .main-sub { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .card-title { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+
+  label { display: block; font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 5px; }
+  input[type=text], input[type=password] {
+    width: 100%; background: var(--off);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 9px 12px;
+    font-family: var(--sans); font-size: 13px;
+    outline: none; transition: border-color 0.15s;
+  }
+  input:focus { border-color: var(--yellow); background: white; }
+  .field { margin-bottom: 14px; }
+  .field-note { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  /* STATUS ROWS */
+  .status-row {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--mid);
+  }
+  .status-row:last-child { border-bottom: none; }
+  .status-icon {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .status-icon.ok { background: var(--success-bg); color: var(--success); }
+  .status-icon.pending { background: var(--warn-bg); color: var(--warn); }
+  .status-icon.off { background: var(--mid); color: var(--muted); }
+  .status-title { font-size: 13px; font-weight: 600; }
+  .status-desc { font-size: 12px; color: var(--text-2); }
+
+  /* STORAGE TABLE */
+  .store-row {
+    display: grid;
+    grid-template-columns: 1fr 90px 90px;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--mid);
+    font-size: 12px;
+  }
+  .store-row:last-child { border-bottom: none; }
+  .store-row.head { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
+  .store-key { font-family: monospace; font-size: 11px; color: var(--text-2); }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+    padding: 10px 18px;
+    border-radius: var(--radius);
+    font-family: var(--sans);
+    font-size: 12px; font-weight: 600;
+    cursor: pointer; border: none;
+    transition: all 0.15s;
+  }
+  .btn-yellow { background: var(--yellow); color: var(--black); }
+  .btn-yellow:hover { background: var(--yellow-dark); }
+  .btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
+  .btn-outline:hover { border-color: var(--black); }
+  .btn-danger { background: transparent; border: 1.5px solid var(--danger); color: var(--danger); }
+  .btn-danger:hover { background: var(--danger-bg); }
+
+  .info-box {
+    background: var(--off);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    font-size: 12px;
+    color: var(--text-2);
+    line-height: 1.7;
+    margin-top: 12px;
+  }
+  .info-box ol { margin-left: 18px; }
+  .info-box code { background: var(--mid); padding: 1px 6px; border-radius: 4px; font-size: 11px; }
+
+  .api-status {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 14px;
+    border-radius: var(--radius);
+    font-size: 12px; font-weight: 500;
+    margin-bottom: 18px;
+  }
+  .api-status.disconnected { background: var(--mid); color: var(--muted); }
+  .api-status.connected { background: var(--success-bg); color: var(--success); }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+
+  .toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--black); color: white;
+    padding: 11px 18px; border-radius: var(--radius);
+    font-size: 13px; font-weight: 500;
+    opacity: 0; transform: translateY(8px);
+    transition: all 0.25s; z-index: 999; pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+</style>
+  <script src="mama-shared.js"></script>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html" class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 15 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 0 L7.5 7 L15 0 L15 13 L0 13 Z" fill="#0e0e0e"/>
+      </svg>
+    </div>
+    <span class="logo-word">mama</span>
+  </a>
+  <span class="topbar-tool">Settings</span>
+  <nav class="topbar-nav">
+    <a href="index.html">Hub</a>
+    <a href="job-hub.html">Jobs</a>
+    <a href="quote-builder.html">Quotes</a>
+    <a href="brief-builder.html">Briefs</a>
+    <a href="my-time.html">My Time</a>
+    <a href="my-todos.html">To-Dos</a>
+    <a href="project-reports.html">Reports</a>
+    <a href="time-tracker.html">Admin</a>
+    <a href="settings.html" class="active">Settings</a>
+  </nav>
+</div>
+
+<!-- PIN GATE -->
+<div class="gate" id="gate">
+  <div class="gate-mark">
+    <svg viewBox="0 0 15 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 0 L7.5 7 L15 0 L15 13 L0 13 Z" fill="#0e0e0e"/>
+    </svg>
+  </div>
+  <h1>Hub settings</h1>
+  <p>APIs, storage, and integration configuration. Enter the admin PIN.</p>
+  <input type="password" id="gatePin" placeholder="PIN" onkeydown="if(event.key==='Enter')checkPin()">
+  <button class="btn btn-yellow" style="width:100%" onclick="checkPin()">Open settings</button>
+</div>
+
+<!-- MAIN -->
+<div class="container" id="main">
+  <div class="main-title">Settings</div>
+  <div class="main-sub">Everything the hub needs to go from local tool to fully integrated platform.</div>
+
+  <!-- INTEGRATION STATUS -->
+  <div class="card">
+    <div class="card-title">Integration status</div>
+    <div id="statusList"></div>
+  </div>
+
+  <!-- GOOGLE API -->
+  <div class="card">
+    <div class="card-title">Google API credentials</div>
+    <div class="api-status disconnected" id="apiStatus">
+      <div class="status-dot"></div>
+      <span id="apiStatusText">Not configured</span>
+    </div>
+    <div class="field">
+      <label>Google API key</label>
+      <input type="text" id="sApiKey" placeholder="AIzaSy...">
+    </div>
+    <div class="field">
+      <label>OAuth 2.0 Client ID</label>
+      <input type="text" id="sClientId" placeholder="xxxxxxx.apps.googleusercontent.com">
+    </div>
+    <div class="field">
+      <label>Google Drive folder ID (exports destination)</label>
+      <input type="text" id="sDriveFolder" placeholder="1IkvW4HGv2w_Ro2RSYy0Ii52CfhG_SQUO">
+      <div class="field-note">The long ID in your Drive folder's URL after /folders/</div>
+    </div>
+    <div class="field">
+      <label>Google Workspace domain (for team calendars)</label>
+      <input type="text" id="sCalDomain" placeholder="e.g. mama.agency">
+    </div>
+    <button class="btn btn-yellow" onclick="saveSettings()">Save credentials</button>
+
+    <div class="info-box">
+      <strong>How to get these:</strong>
+      <ol>
+        <li>Go to <code>console.cloud.google.com</code> and create a project (e.g. "Mama Hub")</li>
+        <li>APIs &amp; Services → Library → enable <strong>Google Drive API</strong> and <strong>Google Calendar API</strong></li>
+        <li>APIs &amp; Services → Credentials → create an <strong>API key</strong> and an <strong>OAuth 2.0 Client ID</strong> (Web application)</li>
+        <li>Under the OAuth client's "Authorised JavaScript origins", add your hub's URL (e.g. <code>https://hub.mama.agency</code>) — this is why the hub must be hosted first</li>
+        <li>Paste both values above and save</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- STORAGE -->
+  <div class="card">
+    <div class="card-title">Where your data sits</div>
+    <div class="status-row" style="border-bottom:none; padding-top:0">
+      <div class="status-icon pending">●</div>
+      <div>
+        <div class="status-title">Currently: this browser's local storage</div>
+        <div class="status-desc">All hub data (time entries, to-dos, briefs, reports, quotes, jobs) lives in <strong>this device, this browser</strong>. It survives refreshes and restarts, but it is not shared between devices or people, and clearing browser data erases it. The cloud step below fixes all of that.</div>
+      </div>
+    </div>
+
+    <div class="store-row head">
+      <div>Data store</div>
+      <div style="text-align:right">Items</div>
+      <div style="text-align:right">Size</div>
+    </div>
+    <div id="storeTable"></div>
+
+    <div style="display:flex; gap:8px; margin-top:16px; flex-wrap:wrap">
+      <button class="btn btn-yellow" onclick="exportBackup()">⬇ Download full backup (JSON)</button>
+      <button class="btn btn-outline" onclick="document.getElementById('importFile').click()">⬆ Restore from backup</button>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importBackup(this)">
+      <button class="btn btn-danger" onclick="clearAllData()">Erase all hub data</button>
+    </div>
+    <div class="field-note" style="margin-top:8px">Tip: download a backup before any big change, and use backup/restore to move data between machines until cloud sync is live.</div>
+  </div>
+
+  <!-- CLOUD ROADMAP -->
+  <div class="card">
+    <div class="card-title">Path to full integration (cloud storage &amp; sync)</div>
+    <div class="status-row">
+      <div class="status-icon" id="step1icon">1</div>
+      <div>
+        <div class="status-title">Host the hub on your domain</div>
+        <div class="status-desc">Push these HTML files to GitHub Pages or Netlify and point your domain (e.g. <code style="background:var(--mid);padding:1px 6px;border-radius:4px;font-size:11px">hub.mama.agency</code>) at it. This unlocks Google OAuth and makes the hub reachable by the whole team.</div>
+      </div>
+    </div>
+    <div class="status-row">
+      <div class="status-icon" id="step2icon">2</div>
+      <div>
+        <div class="status-title">Create the Google Cloud project &amp; paste credentials above</div>
+        <div class="status-desc">Follow the steps in the Google API card. Once the OAuth origin matches your hosted URL, the hub can talk to Google on each person's behalf.</div>
+      </div>
+    </div>
+    <div class="status-row">
+      <div class="status-icon" id="step3icon">3</div>
+      <div>
+        <div class="status-title">Switch storage from browser to Google</div>
+        <div class="status-desc">Every tool reads/writes through one small storage layer. Swapping that layer to Google Drive (a JSON file per store) or Google Sheets gives real multi-device, multi-person sync — briefs export directly into client folders, meetings pull from calendars, and timesheets become company-wide. No tool needs rebuilding.</div>
+      </div>
+    </div>
+    <div class="status-row">
+      <div class="status-icon" id="step4icon">4</div>
+      <div>
+        <div class="status-title">Replace PINs with Google sign-in</div>
+        <div class="status-desc">Once hosted with OAuth, each person signs in with their Mama Google account. That gives true per-person privacy (to-dos, timesheets) and role-based access (only the COO opens Admin) — replacing the current PIN/password deterrents, which are not real security.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACCESS -->
+  <div class="card">
+    <div class="card-title">Access &amp; passwords (current setup)</div>
+    <div class="store-row head"><div>What</div><div style="text-align:right" colspan="2">Where it's set</div><div></div></div>
+    <div class="store-row"><div>Settings &amp; Admin dashboard PIN: <strong>2026</strong></div><div style="text-align:right; grid-column: span 2" class="store-key">settings.html / time-tracker.html</div></div>
+    <div class="store-row"><div>Employee password (My Time, My To-Dos): <strong>Smarties716!</strong></div><div style="text-align:right; grid-column: span 2" class="store-key">my-time.html / my-todos.html</div></div>
+    <div class="field-note" style="margin-top:10px">To change a PIN or password, open the file and edit the constant near the top of the script (<code style="background:var(--mid);padding:1px 5px;border-radius:4px;font-size:10px">ADMIN_PIN</code> / <code style="background:var(--mid);padding:1px 5px;border-radius:4px;font-size:10px">DEFAULT_PASSWORD</code>). These are visible in page source — fine for keeping colleagues honest, replaced properly by Google sign-in at step 4.</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─────────────────────────────────────────────
+// PIN GATE (same PIN as Admin dashboard)
+// ─────────────────────────────────────────────
+const ADMIN_PIN = '2026';
+const STORE_SETTINGS = 'mama-settings';
+
+function checkPin() {
+  if (document.getElementById('gatePin').value === ADMIN_PIN) {
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('main').style.display = 'block';
+    Mama.Session.setAdmin();
+    init();
+  } else {
+    showToast('Incorrect PIN');
+    document.getElementById('gatePin').value = '';
+  }
+}
+try {
+  if (Mama.Session.adminValid()) {
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('main').style.display = 'block';
+    setTimeout(init, 0);
+  }
+} catch(e) {}
+
+// ─────────────────────────────────────────────
+// SETTINGS STORE
+// ─────────────────────────────────────────────
+function getSettings() {
+  try { return JSON.parse(localStorage.getItem(STORE_SETTINGS) || '{}'); }
+  catch(e) { return {}; }
+}
+
+function saveSettings() {
+  const s = {
+    apiKey: document.getElementById('sApiKey').value.trim(),
+    clientId: document.getElementById('sClientId').value.trim(),
+    driveFolder: document.getElementById('sDriveFolder').value.trim(),
+    calDomain: document.getElementById('sCalDomain').value.trim(),
+    savedAt: new Date().toISOString()
+  };
+  try {
+    localStorage.setItem(STORE_SETTINGS, JSON.stringify(s));
+    showToast('Settings saved');
+  } catch(e) {
+    showToast('Could not save — storage unavailable');
+  }
+  refreshStatus();
+}
+
+function loadSettingsForm() {
+  const s = getSettings();
+  document.getElementById('sApiKey').value = s.apiKey || '';
+  document.getElementById('sClientId').value = s.clientId || '';
+  document.getElementById('sDriveFolder').value = s.driveFolder || '';
+  document.getElementById('sCalDomain').value = s.calDomain || '';
+}
+
+// ─────────────────────────────────────────────
+// STATUS
+// ─────────────────────────────────────────────
+function refreshStatus() {
+  const s = getSettings();
+  const hosted = location.protocol === 'https:' || location.protocol === 'http:';
+  const hasCreds = !!(s.apiKey && s.clientId);
+
+  // API status banner
+  const banner = document.getElementById('apiStatus');
+  const txt = document.getElementById('apiStatusText');
+  if (hasCreds) {
+    banner.className = 'api-status connected';
+    txt.textContent = 'Credentials saved' + (hosted ? ' — ready to activate' : ' — activates once hosted on your domain');
+  } else {
+    banner.className = 'api-status disconnected';
+    txt.textContent = 'Not configured';
+  }
+
+  // Integration checklist
+  const items = [
+    {
+      ok: hosted, pendingOk: false,
+      title: hosted ? 'Hub is running from a web server' : 'Hub is running as local files',
+      desc: hosted
+        ? 'Served over ' + location.protocol.replace(':','').toUpperCase() + ' from ' + (location.host || 'this host') + '. Google OAuth can be configured for this origin.'
+        : 'Currently opened from disk (file://). Tools work, data persists in this browser, but Google integration needs proper hosting first.'
+    },
+    {
+      ok: hasCreds, pendingOk: false,
+      title: hasCreds ? 'Google credentials configured' : 'Google credentials not yet added',
+      desc: hasCreds ? 'API key and OAuth Client ID are stored and shared with all hub tools.' : 'Add your API key and OAuth Client ID in the card below.'
+    },
+    {
+      ok: !!s.driveFolder, pendingOk: false,
+      title: s.driveFolder ? 'Drive export folder set' : 'Drive export folder not set',
+      desc: s.driveFolder ? 'Exports will target folder ' + s.driveFolder.slice(0,18) + '…' : 'Set the Drive folder where briefs, reports and quotes should land.'
+    },
+    {
+      ok: false, pendingOk: true,
+      title: 'Cloud storage & sync',
+      desc: 'Data currently lives in this browser only. Becomes multi-device/multi-person once steps 1–2 are done and the storage layer is switched to Google.'
+    },
+  ];
+
+  document.getElementById('statusList').innerHTML = items.map(i => `
+    <div class="status-row">
+      <div class="status-icon ${i.ok ? 'ok' : i.pendingOk ? 'pending' : 'off'}">${i.ok ? '✓' : i.pendingOk ? '…' : '○'}</div>
+      <div>
+        <div class="status-title">${i.title}</div>
+        <div class="status-desc">${i.desc}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ─────────────────────────────────────────────
+// STORAGE TABLE / BACKUP
+// ─────────────────────────────────────────────
+const STORES = [
+  { key: 'mama-time-entries', label: 'Time entries' },
+  { key: 'mama-time-team', label: 'Team members' },
+  { key: 'mama-jobs', label: 'Jobs & assignments' },
+  { key: 'mama-todos', label: 'To-dos (all users)' },
+  { key: 'mama-briefs', label: 'Generated briefs' },
+  { key: 'mama-reports', label: 'Saved reports' },
+  { key: 'mama-quotes', label: 'Saved quotes' },
+  { key: 'mama-settings', label: 'Hub settings' },
+];
+
+function fmtBytes(n) {
+  if (n < 1024) return n + ' B';
+  return (n/1024).toFixed(1) + ' KB';
+}
+
+function renderStoreTable() {
+  document.getElementById('storeTable').innerHTML = STORES.map(s => {
+    let raw = null;
+    try { raw = localStorage.getItem(s.key); } catch(e) {}
+    let count = '—', size = '—';
+    if (raw) {
+      size = fmtBytes(raw.length);
+      try {
+        const parsed = JSON.parse(raw);
+        count = Array.isArray(parsed) ? parsed.length : Object.keys(parsed).length;
+      } catch(e) { count = '?'; }
+    }
+    return `<div class="store-row">
+      <div><strong>${s.label}</strong><br><span class="store-key">${s.key}</span></div>
+      <div style="text-align:right">${count}</div>
+      <div style="text-align:right">${size}</div>
+    </div>`;
+  }).join('');
+}
+
+function exportBackup() {
+  const backup = { exportedAt: new Date().toISOString(), hub: 'mama', data: {} };
+  STORES.forEach(s => {
+    try {
+      const raw = localStorage.getItem(s.key);
+      if (raw) backup.data[s.key] = JSON.parse(raw);
+    } catch(e) {}
+  });
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'mama-hub-backup-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  showToast('Backup downloaded');
+}
+
+function importBackup(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const backup = JSON.parse(reader.result);
+      if (!backup.data) throw new Error('Not a Mama Hub backup');
+      if (!confirm('Restore this backup? It will overwrite current hub data with the backup from ' + (backup.exportedAt || 'unknown date') + '.')) return;
+      Object.keys(backup.data).forEach(k => {
+        if (STORES.some(s => s.key === k)) {
+          localStorage.setItem(k, JSON.stringify(backup.data[k]));
+        }
+      });
+      renderStoreTable();
+      refreshStatus();
+      loadSettingsForm();
+      showToast('Backup restored');
+    } catch(e) {
+      showToast('Could not read that backup file');
+    }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+function clearAllData() {
+  if (!confirm('Erase ALL hub data on this browser? Time entries, to-dos, briefs, reports, quotes and settings will be permanently deleted here.')) return;
+  if (!confirm('Last check — have you downloaded a backup? This cannot be undone.')) return;
+  STORES.forEach(s => { try { localStorage.removeItem(s.key); } catch(e) {} });
+  renderStoreTable();
+  refreshStatus();
+  loadSettingsForm();
+  showToast('All hub data erased on this browser');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+function init() {
+  loadSettingsForm();
+  refreshStatus();
+  renderStoreTable();
+}
+</script>
+</body>
+</html>

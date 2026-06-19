@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex, nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mama Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --yellow: #FFC800;
+    --yellow-light: #FFF3B0;
+    --yellow-dark: #E6B400;
+    --yellow-text: #8a6c00;
+    --black: #0e0e0e;
+    --white: #ffffff;
+    --off: #fafaf8;
+    --mid: #f0efe9;
+    --border: #e2e0d8;
+    --muted: #8a8880;
+    --text: #1a1a1a;
+    --text-2: #4a4845;
+    --serif: 'Playfair Display', Georgia, serif;
+    --sans: 'Inter', system-ui, sans-serif;
+    --radius: 8px;
+    --radius-lg: 16px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--sans);
+    background: var(--off);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* TOPBAR */
+  .topbar {
+    background: var(--black);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    height: 54px;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .logo-mark {
+    width: 32px; height: 32px;
+    background: var(--yellow);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo-mark svg { width: 15px; height: 13px; }
+  .logo-word {
+    font-family: var(--serif);
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: 0.04em;
+  }
+  .topbar-nav { display: flex; gap: 4px; }
+  .topbar-nav a {
+    color: rgba(255,255,255,0.4);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 12px;
+    border-radius: 20px;
+    transition: all 0.15s;
+  }
+  .topbar-nav a:hover { color: white; background: rgba(255,255,255,0.08); }
+  .topbar-nav a.active { color: var(--yellow); }
+
+  /* HERO */
+  .hero {
+    background: var(--black);
+    padding: 64px 28px 80px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-mark {
+    width: 72px; height: 72px;
+    background: var(--yellow);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 24px;
+  }
+  .hero-mark svg { width: 34px; height: 30px; }
+  .hero h1 {
+    font-family: var(--serif);
+    font-size: 42px;
+    font-weight: 800;
+    color: var(--white);
+    margin-bottom: 10px;
+    letter-spacing: 0.01em;
+  }
+  .hero h1 span { color: var(--yellow); }
+  .hero p {
+    font-size: 15px;
+    color: rgba(255,255,255,0.55);
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* TOOLS GRID */
+  .container {
+    max-width: 980px;
+    margin: -44px auto 0;
+    padding: 0 24px 80px;
+    position: relative;
+    z-index: 10;
+  }
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 18px;
+  }
+  .tool-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+  .tool-card:hover {
+    border-color: var(--yellow);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(14,14,14,0.08);
+  }
+  .tool-card.soon { opacity: 0.65; cursor: default; }
+  .tool-card.soon:hover { border-color: var(--border); transform: none; box-shadow: none; }
+  .tool-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: var(--yellow-light);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    margin-bottom: 18px;
+  }
+  .tool-name {
+    font-family: var(--serif);
+    font-size: 19px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--black);
+  }
+  .tool-desc {
+    font-size: 13px;
+    color: var(--text-2);
+    flex: 1;
+    margin-bottom: 18px;
+  }
+  .tool-cta {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--yellow-text);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .tool-card:hover .tool-cta { color: var(--black); }
+  .soon-badge {
+    position: absolute;
+    top: 18px; right: 18px;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: var(--mid);
+    color: var(--muted);
+    padding: 3px 9px;
+    border-radius: 10px;
+  }
+  .live-badge {
+    position: absolute;
+    top: 18px; right: 18px;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: #eaf4ee;
+    color: #2e7d52;
+    padding: 3px 9px;
+    border-radius: 10px;
+  }
+
+  /* QUICK SECTION */
+  .section-heading {
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 700;
+    margin: 56px 0 18px;
+    color: var(--black);
+  }
+  .quick-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+  }
+  .quick-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.15s;
+  }
+  .quick-card:hover { border-color: var(--yellow); }
+  .quick-icon {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--black);
+    color: var(--yellow);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+  .quick-label { font-size: 13px; font-weight: 600; }
+  .quick-sub { font-size: 11px; color: var(--muted); }
+
+  /* FOOTER */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 24px 28px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .footer span { color: var(--yellow-text); font-weight: 600; }
+</style>
+  <script src="mama-shared.js"></script>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html" class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 15 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 0 L7.5 7 L15 0 L15 13 L0 13 Z" fill="#0e0e0e"/>
+      </svg>
+    </div>
+    <span class="logo-word">mama</span>
+  </a>
+  <nav class="topbar-nav">
+    <a href="index.html" class="active">Hub</a>
+    <a href="job-hub.html">Jobs</a>
+    <a href="quote-builder.html">Quotes</a>
+    <a href="brief-builder.html">Briefs</a>
+    <a href="my-time.html">My Time</a>
+    <a href="my-todos.html">To-Dos</a>
+    <a href="project-reports.html">Reports</a>
+    <a href="time-tracker.html">Admin</a>
+    <a href="settings.html">Settings</a>
+  </nav>
+</div>
+
+<div class="hero">
+  <div class="hero-mark">
+    <svg viewBox="0 0 15 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 0 L7.5 7 L15 0 L15 13 L0 13 Z" fill="#0e0e0e"/>
+    </svg>
+  </div>
+  <h1>The <span>Mama</span> Hub</h1>
+  <p>Every tool the team needs — briefs, time, reporting, and client work — in one place, connected to our Google workspace.</p>
+</div>
+
+<div class="container">
+  <div class="tools-grid">
+
+    <a href="brief-builder.html" class="tool-card">
+      <span class="live-badge">Live</span>
+      <div class="tool-icon">✍️</div>
+      <div class="tool-name">Brief Builder</div>
+      <div class="tool-desc">Build a complete studio brief in minutes. Select the job, pick the offerings, answer the questions, and generate a formatted brief ready for Drive.</div>
+      <div class="tool-cta">Open brief builder →</div>
+    </a>
+
+    <a href="my-time.html" class="tool-card">
+      <span class="live-badge">Live</span>
+      <div class="tool-icon">⏱</div>
+      <div class="tool-name">My Time</div>
+      <div class="tool-desc">Your personal timesheet — log hours per job, tag meetings, and see your own week. Only you see your view.</div>
+      <div class="tool-cta">Log my time →</div>
+    </a>
+
+    <a href="time-tracker.html" class="tool-card">
+      <span class="live-badge">Live</span>
+      <div class="tool-icon">🔑</div>
+      <div class="tool-name">Time — Admin</div>
+      <div class="tool-desc">Management dashboard: the whole team's hours, meetings load, and capacity per job. PIN-protected, built to replace Streamtime.</div>
+      <div class="tool-cta">Open admin dashboard →</div>
+    </a>
+
+    <a href="quote-builder.html" class="tool-card">
+      <span class="live-badge">Live</span>
+      <div class="tool-icon">💰</div>
+      <div class="tool-name">Quotes</div>
+      <div class="tool-desc">Cost a job from the element catalogue, apply markup and discounts, and generate a client-ready quote with VAT — all editable.</div>
+      <div class="tool-cta">Open quote builder →</div>
+    </a>
+
+    <a href="project-reports.html" class="tool-card">
+      <span class="live-badge">Live</span>
+      <div class="tool-icon">📊</div>
+      <div class="tool-name">Project Reports</div>
+      <div class="tool-desc">Status updates, milestones, and deliverables per job — exportable as client-ready reports.</div>
+      <div class="tool-cta">Open project reports →</div>
+    </a>
+
+    <a href="job-hub.html" class="tool-card">
+      <span class="live-badge">Live</span>
+      <div class="tool-icon">🗂</div>
+      <div class="tool-name">Job Hub</div>
+      <div class="tool-desc">One home per client — every brief, report, timesheet and asset for SAFW, Gan Tamar, Better Angels and more, linked to its Drive folder.</div>
+      <div class="tool-cta">Open job hub →</div>
+    </a>
+
+    <a href="my-todos.html" class="tool-card">
+      <span class="live-badge">Live</span>
+      <div class="tool-icon">✅</div>
+      <div class="tool-name">My To-Dos</div>
+      <div class="tool-desc">Your private task list — add to-dos, track progress, set due dates, and see exactly where you stand. Password-protected, visible only to you.</div>
+      <div class="tool-cta">Open my to-dos →</div>
+    </a>
+
+    <a href="settings.html" class="tool-card">
+      <span class="live-badge">Live</span>
+      <div class="tool-icon">⚙️</div>
+      <div class="tool-name">Settings</div>
+      <div class="tool-desc">Google API credentials, where your data sits, backups, and the roadmap to full cloud integration. PIN-protected.</div>
+      <div class="tool-cta">Open settings →</div>
+    </a>
+
+  </div>
+
+  <div class="section-heading">Quick links</div>
+  <div class="quick-grid">
+    <a href="https://drive.google.com/drive/folders/1IkvW4HGv2w_Ro2RSYy0Ii52CfhG_SQUO" target="_blank" class="quick-card">
+      <div class="quick-icon">☁</div>
+      <div>
+        <div class="quick-label">Google Drive</div>
+        <div class="quick-sub">Briefs &amp; exports folder</div>
+      </div>
+    </a>
+    <a href="https://calendar.google.com" target="_blank" class="quick-card">
+      <div class="quick-icon">📅</div>
+      <div>
+        <div class="quick-label">Calendar</div>
+        <div class="quick-sub">Team meetings</div>
+      </div>
+    </a>
+    <a href="https://mail.google.com" target="_blank" class="quick-card">
+      <div class="quick-icon">✉</div>
+      <div>
+        <div class="quick-label">Gmail</div>
+        <div class="quick-sub">Client comms</div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<div class="footer">
+  <span>mama</span> hub · internal tools · built by the AI team
+</div>
+
+</body>
+</html>

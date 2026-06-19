@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex, nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job Hub — Mama Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --yellow: #FFC800;
+    --yellow-light: #FFF3B0;
+    --yellow-dark: #E6B400;
+    --yellow-text: #8a6c00;
+    --black: #0e0e0e;
+    --white: #ffffff;
+    --off: #fafaf8;
+    --mid: #f0efe9;
+    --border: #e2e0d8;
+    --muted: #8a8880;
+    --text: #1a1a1a;
+    --text-2: #4a4845;
+    --success: #2e7d52;
+    --success-bg: #eaf4ee;
+    --danger: #c0392b;
+    --danger-bg: #fdecea;
+    --warn: #b07d10;
+    --warn-bg: #fdf4e0;
+    --meeting: #7b5cb8;
+    --serif: 'Playfair Display', Georgia, serif;
+    --sans: 'Inter', system-ui, sans-serif;
+    --radius: 8px;
+    --radius-lg: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--sans);
+    background: var(--off);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* TOPBAR */
+  .topbar {
+    background: var(--black);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    height: 54px;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .logo-mark {
+    width: 32px; height: 32px;
+    background: var(--yellow);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo-mark svg { width: 15px; height: 13px; }
+  .logo-word { font-family: var(--serif); font-size: 17px; font-weight: 700; color: var(--white); letter-spacing: 0.04em; }
+  .topbar-tool {
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--yellow);
+    background: rgba(255,200,0,0.12);
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+  .topbar-nav { display: flex; gap: 4px; }
+  .topbar-nav a {
+    color: rgba(255,255,255,0.4);
+    text-decoration: none;
+    font-size: 12px; font-weight: 500;
+    padding: 5px 12px;
+    border-radius: 20px;
+    transition: all 0.15s;
+  }
+  .topbar-nav a:hover { color: white; background: rgba(255,255,255,0.08); }
+  .topbar-nav a.active { color: var(--yellow); }
+
+  .container { max-width: 920px; margin: 0 auto; padding: 28px 24px 100px; }
+  .main-header { margin-bottom: 24px; }
+  .main-title { font-family: var(--serif); font-size: 26px; font-weight: 700; color: var(--black); margin-bottom: 2px; }
+  .main-sub { font-size: 13px; color: var(--muted); }
+
+  /* JOB CARDS GRID */
+  .jobs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+  .job-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .job-card:hover { border-color: var(--yellow); transform: translateY(-2px); box-shadow: 0 10px 28px rgba(14,14,14,0.07); }
+  .job-card-id {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .job-card-name { font-family: var(--serif); font-size: 19px; font-weight: 700; margin-bottom: 14px; }
+  .job-card-stats { display: flex; gap: 16px; }
+  .jc-stat-num { font-size: 16px; font-weight: 700; line-height: 1.2; }
+  .jc-stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+
+  /* DETAIL VIEW */
+  .detail { display: none; }
+  .detail.open { display: block; }
+  .list-view.closed { display: none; }
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    background: none; border: none;
+    cursor: pointer;
+    font-family: var(--sans);
+    margin-bottom: 16px;
+    padding: 0;
+  }
+  .back-link:hover { color: var(--text); }
+
+  .detail-head {
+    background: var(--black);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    color: white;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .dh-id { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; color: var(--yellow); margin-bottom: 4px; }
+  .dh-name { font-family: var(--serif); font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+  .dh-bio { font-size: 13px; color: rgba(255,255,255,0.6); max-width: 480px; }
+  .dh-links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .dh-link {
+    font-size: 11px; font-weight: 600;
+    padding: 4px 11px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 14px;
+    text-decoration: none;
+    color: rgba(255,255,255,0.75);
+    transition: all 0.15s;
+  }
+  .dh-link:hover { background: var(--yellow); color: var(--black); }
+  .dh-stats { display: flex; flex-direction: column; gap: 12px; text-align: right; flex-shrink: 0; }
+  .dh-stat-num { font-family: var(--serif); font-size: 24px; font-weight: 700; color: var(--yellow); line-height: 1; }
+  .dh-stat-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.4); }
+
+  /* SECTIONS */
+  .section-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-title { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+  .section-action {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--yellow-text);
+    text-decoration: none;
+  }
+  .section-action:hover { color: var(--black); }
+  .doc-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 20px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.1s;
+  }
+  .doc-row:hover { background: var(--off); }
+  .doc-row:last-child { border-bottom: none; }
+  .doc-title { font-size: 13px; font-weight: 600; }
+  .doc-meta { font-size: 11px; color: var(--muted); }
+  .chip {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 10px;
+    font-size: 10px; font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .chip-green { background: var(--success-bg); color: var(--success); }
+  .chip-amber { background: var(--warn-bg); color: var(--warn); }
+  .chip-red { background: var(--danger-bg); color: var(--danger); }
+  .chip-yellow { background: var(--yellow-light); color: var(--yellow-text); }
+  .empty-row { padding: 18px 20px; font-size: 12px; color: var(--muted); font-style: italic; }
+
+  /* TIME SUMMARY */
+  .bar-row {
+    display: grid;
+    grid-template-columns: 110px 1fr 60px;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .bar-row:last-child { border-bottom: none; }
+  .bar-label { font-size: 12px; font-weight: 500; }
+  .bar-track { height: 8px; background: var(--mid); border-radius: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; background: var(--yellow); }
+  .bar-val { font-size: 12px; font-weight: 700; text-align: right; }
+
+  /* DOC VIEWER MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(14,14,14,0.55);
+    z-index: 500;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 20px;
+    overflow-y: auto;
+  }
+  .modal-overlay.open { display: flex; }
+  .doc-modal {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 760px;
+    padding: 40px 44px;
+    position: relative;
+  }
+  .modal-close {
+    position: absolute;
+    top: 16px; right: 16px;
+    width: 32px; height: 32px;
+    border: none;
+    background: var(--mid);
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 15px;
+    transition: all 0.15s;
+  }
+  .modal-close:hover { background: var(--yellow); }
+
+  /* Embedded doc styles (briefs + reports render with these) */
+  .doc-modal h1 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .doc-modal h2 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.09em; font-weight: 700; color: var(--yellow-text); margin: 24px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--mid); font-family: var(--sans); }
+  .doc-modal h3 { font-size: 13px; font-weight: 600; margin: 14px 0 4px; }
+  .doc-modal p { font-size: 13px; color: var(--text-2); margin-bottom: 8px; line-height: 1.7; }
+  .doc-modal .brief-meta, .doc-modal .rp-meta { font-size: 12px; color: var(--muted); margin-bottom: 20px; }
+  .doc-modal .q { font-size: 12px; color: var(--muted); margin-bottom: 2px; margin-top: 8px; }
+  .doc-modal .answer { font-size: 13px; margin-bottom: 8px; }
+  .doc-modal .link-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; background: var(--off); padding: 3px 10px; border-radius: 12px; color: var(--yellow-text); text-decoration: none; margin: 2px; }
+  .doc-modal .rp-head { display: flex; align-items: flex-start; justify-content: space-between; padding-bottom: 20px; border-bottom: 2px solid var(--black); margin-bottom: 24px; }
+  .doc-modal .rp-title { font-family: var(--serif); font-size: 24px; font-weight: 700; margin-bottom: 2px; }
+  .doc-modal .rp-mark { width: 40px; height: 40px; background: var(--yellow); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .doc-modal .rp-mark svg { width: 18px; height: 16px; }
+  .doc-modal .rp-status-banner { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .doc-modal .rp-status-banner.green { background: var(--success-bg); color: var(--success); }
+  .doc-modal .rp-status-banner.amber { background: var(--warn-bg); color: var(--warn); }
+  .doc-modal .rp-status-banner.red { background: var(--danger-bg); color: var(--danger); }
+  .doc-modal .rp-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .doc-modal .rp-table th { text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); padding: 8px 10px; border-bottom: 1px solid var(--border); }
+  .doc-modal .rp-table td { padding: 9px 10px; border-bottom: 1px solid var(--mid); }
+
+  .toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--black);
+    color: white;
+    padding: 11px 18px;
+    border-radius: var(--radius);
+    font-size: 13px; font-weight: 500;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all 0.25s;
+    z-index: 999;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+</style>
+  <script src="mama-shared.js"></script>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html" class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 15 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 0 L7.5 7 L15 0 L15 13 L0 13 Z" fill="#0e0e0e"/>
+      </svg>
+    </div>
+    <span class="logo-word">mama</span>
+  </a>
+  <span class="topbar-tool">Job Hub</span>
+  <nav class="topbar-nav">
+    <a href="index.html">Hub</a>
+    <a href="job-hub.html" class="active">Jobs</a>
+    <a href="quote-builder.html">Quotes</a>
+    <a href="brief-builder.html">Briefs</a>
+    <a href="my-time.html">My Time</a>
+    <a href="my-todos.html">To-Dos</a>
+    <a href="project-reports.html">Reports</a>
+    <a href="time-tracker.html">Admin</a>
+    <a href="settings.html">Settings</a>
+  </nav>
+</div>
+
+<div class="container">
+
+  <!-- LIST VIEW -->
+  <div class="list-view" id="listView">
+    <div class="main-header">
+      <div class="main-title">Job Hub</div>
+      <div class="main-sub">One home per client — every brief, report, and hour in one place.</div>
+    </div>
+    <div class="jobs-grid" id="jobsGrid"></div>
+  </div>
+
+  <!-- DETAIL VIEW -->
+  <div class="detail" id="detailView">
+    <button class="back-link" onclick="closeJob()">← All jobs</button>
+    <div class="detail-head" id="detailHead"></div>
+
+    <div class="section-card">
+      <div class="section-head">
+        <span class="section-title">Briefs</span>
+        <a class="section-action" href="brief-builder.html">+ New brief</a>
+      </div>
+      <div id="briefsList"></div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-head">
+        <span class="section-title">Status reports</span>
+        <a class="section-action" href="project-reports.html">+ New report</a>
+      </div>
+      <div id="reportsList"></div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-head">
+        <span class="section-title">Time on this job</span>
+        <a class="section-action" href="my-time.html">+ Log time</a>
+      </div>
+      <div id="timeList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- DOC VIEWER -->
+<div class="modal-overlay" id="docModal" onclick="if(event.target===this)closeDoc()">
+  <div class="doc-modal">
+    <button class="modal-close" onclick="closeDoc()">×</button>
+    <div id="docContent"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─────────────────────────────────────────────
+// SHARED STORAGE (same keys as the other tools)
+// ─────────────────────────────────────────────
+const STORE_ENTRIES = 'mama-time-entries';
+const STORE_TEAM = 'mama-time-team';
+const STORE_BRIEFS = 'mama-briefs';
+const STORE_REPORTS = 'mama-reports';
+
+let memStore = {};
+function storeGet(key) {
+  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : null; }
+  catch(e) { return memStore[key] || null; }
+}
+
+const defaultTeam = [
+  { id: 1, name: 'Cassidy', role: 'Strategist', initials: 'CA' },
+  { id: 2, name: 'Max', role: 'Account Manager', initials: 'MX' },
+  { id: 3, name: 'Ally', role: 'Strategist', initials: 'AL' },
+  { id: 4, name: 'Alexa', role: 'COO', initials: 'AX' },
+];
+
+const jobs = [
+  {
+    id: 'SAFW001', name: 'SA Fashion Week',
+    bio: 'SA Fashion Week is the premier platform for South African fashion talent, staging bi-annual collections and connecting local designers with industry, press, and consumers.',
+    links: [
+      { label: 'Instagram', url: 'https://www.instagram.com/safashionweek/' },
+      { label: 'Website', url: 'https://www.safashionweek.co.za/' },
+      { label: 'YouTube', url: 'https://www.youtube.com/user/SAFashionWeek' },
+      { label: 'TikTok', url: 'https://www.tiktok.com/@safashionweek' },
+    ],
+    // Brief-builder job keys that map to this job
+    briefKeys: ['safw'],
+  },
+  {
+    id: 'SHA001', name: 'Share Agency',
+    bio: 'Share Agency is a creative and digital agency delivering brand strategy, content, and client-facing creative work.',
+    links: [],
+    briefKeys: ['share-agency'],
+  },
+  {
+    id: 'GAN001', name: 'Gan Tamar',
+    bio: 'Client bio to be added — edit this in job-hub.html.',
+    links: [],
+    briefKeys: ['gan-tamar'],
+  },
+  {
+    id: 'BAN001', name: 'Better Angels',
+    bio: 'Client bio to be added — edit this in job-hub.html.',
+    links: [],
+    briefKeys: ['better-angels'],
+  },
+  {
+    id: 'INT001', name: 'Internal / Admin',
+    bio: 'Internal Mama work — admin, ops, team meetings, and hub development.',
+    links: [],
+    briefKeys: ['internal'],
+  },
+];
+
+const DRIVE_URL = 'https://drive.google.com/drive/folders/1IkvW4HGv2w_Ro2RSYy0Ii52CfhG_SQUO';
+
+let team = storeGet(STORE_TEAM) || defaultTeam;
+let entries = storeGet(STORE_ENTRIES) || [];
+let briefs = storeGet(STORE_BRIEFS) || [];
+let reports = storeGet(STORE_REPORTS) || [];
+let currentJob = null;
+
+// Live refresh when other tools save data
+window.addEventListener('storage', () => {
+  team = storeGet(STORE_TEAM) || defaultTeam;
+  entries = storeGet(STORE_ENTRIES) || [];
+  briefs = storeGet(STORE_BRIEFS) || [];
+  reports = storeGet(STORE_REPORTS) || [];
+  renderList();
+  if (currentJob) openJob(currentJob, true);
+});
+
+// ─────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────
+function jobBriefs(job) {
+  return briefs.filter(b => job.briefKeys.includes(b.jobKey) || b.jobId === job.id || (b.jobNum||'').toUpperCase().startsWith(job.id.slice(0,3)));
+}
+function jobReports(job) {
+  return reports.filter(r => r.jobId === job.id);
+}
+function jobHours(job) {
+  return entries.filter(e => e.jobId === job.id).reduce((s,e)=>s+e.hours,0);
+}
+function fmtD(dstr) {
+  if (!dstr) return '—';
+  return new Date(dstr).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'});
+}
+
+// ─────────────────────────────────────────────
+// LIST VIEW
+// ─────────────────────────────────────────────
+function renderList() {
+  document.getElementById('jobsGrid').innerHTML = jobs.map((j, i) => `
+    <div class="job-card" onclick="openJob(${i})">
+      <div class="job-card-id">${j.id}</div>
+      <div class="job-card-name">${j.name}</div>
+      <div class="job-card-stats">
+        <div><div class="jc-stat-num">${jobHours(j)}h</div><div class="jc-stat-label">Logged</div></div>
+        <div><div class="jc-stat-num">${jobBriefs(j).length}</div><div class="jc-stat-label">Briefs</div></div>
+        <div><div class="jc-stat-num">${jobReports(j).length}</div><div class="jc-stat-label">Reports</div></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ─────────────────────────────────────────────
+// DETAIL VIEW
+// ─────────────────────────────────────────────
+function openJob(i, keepScroll) {
+  currentJob = i;
+  const j = jobs[i];
+
+  document.getElementById('listView').classList.add('closed');
+  document.getElementById('detailView').classList.add('open');
+
+  const hours = jobHours(j);
+  const jb = jobBriefs(j);
+  const jr = jobReports(j);
+
+  document.getElementById('detailHead').innerHTML = `
+    <div>
+      <div class="dh-id">${j.id}</div>
+      <div class="dh-name">${j.name}</div>
+      <div class="dh-bio">${j.bio}</div>
+      <div class="dh-links">
+        ${j.links.map(l => `<a class="dh-link" href="${l.url}" target="_blank">↗ ${l.label}</a>`).join('')}
+        <a class="dh-link" href="${DRIVE_URL}" target="_blank">☁ Drive folder</a>
+      </div>
+    </div>
+    <div class="dh-stats">
+      <div><div class="dh-stat-num">${hours}h</div><div class="dh-stat-label">Total logged</div></div>
+      <div><div class="dh-stat-num">${jb.length + jr.length}</div><div class="dh-stat-label">Documents</div></div>
+    </div>
+  `;
+
+  // Briefs
+  document.getElementById('briefsList').innerHTML = jb.length
+    ? jb.map((b, bi) => `
+        <div class="doc-row" onclick="viewBrief(${briefs.indexOf(b)})">
+          <div>
+            <div class="doc-title">${b.campaign || 'Untitled brief'}</div>
+            <div class="doc-meta">${b.jobNum || ''} · ${fmtD(b.date)} · AE: ${b.ae || '—'}</div>
+          </div>
+          <span class="chip chip-yellow">Brief</span>
+          <span style="font-size:12px;color:var(--muted)">›</span>
+        </div>`).join('')
+    : '<div class="empty-row">No briefs yet for this job. Generate one in the Brief Builder and it lands here automatically.</div>';
+
+  // Reports
+  const ragChip = { green:'chip-green', amber:'chip-amber', red:'chip-red' };
+  const ragLabel = { green:'On track', amber:'At risk', red:'Off track' };
+  document.getElementById('reportsList').innerHTML = jr.length
+    ? jr.map(r => `
+        <div class="doc-row" onclick="viewReport(${reports.indexOf(r)})">
+          <div>
+            <div class="doc-title">${r.period || 'Status report'}</div>
+            <div class="doc-meta">${fmtD(r.date)} · ${r.author || '—'}</div>
+          </div>
+          <span class="chip ${ragChip[r.rag] || 'chip-yellow'}">${ragLabel[r.rag] || 'Report'}</span>
+          <span style="font-size:12px;color:var(--muted)">›</span>
+        </div>`).join('')
+    : '<div class="empty-row">No saved reports for this job yet. Save one in Project Reports and it appears here.</div>';
+
+  // Time per member
+  const byMember = {};
+  entries.filter(e => e.jobId === j.id).forEach(e => {
+    byMember[e.memberId] = (byMember[e.memberId]||0) + e.hours;
+  });
+  const memberIds = Object.keys(byMember).map(Number);
+  const maxH = Math.max(...Object.values(byMember), 1);
+  document.getElementById('timeList').innerHTML = memberIds.length
+    ? memberIds.map(mid => {
+        const m = team.find(t=>t.id===mid);
+        const h = byMember[mid];
+        return `<div class="bar-row">
+          <div class="bar-label">${m ? m.name : 'Member '+mid}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${(h/maxH)*100}%"></div></div>
+          <div class="bar-val">${h}h</div>
+        </div>`;
+      }).join('')
+    : '<div class="empty-row">No time logged on this job yet.</div>';
+
+  if (!keepScroll) window.scrollTo(0,0);
+}
+
+function closeJob() {
+  currentJob = null;
+  document.getElementById('detailView').classList.remove('open');
+  document.getElementById('listView').classList.remove('closed');
+}
+
+// ─────────────────────────────────────────────
+// DOC VIEWER
+// ─────────────────────────────────────────────
+function viewBrief(i) {
+  const b = briefs[i];
+  if (!b) return;
+  document.getElementById('docContent').innerHTML = b.html;
+  document.getElementById('docModal').classList.add('open');
+}
+function viewReport(i) {
+  const r = reports[i];
+  if (!r) return;
+  document.getElementById('docContent').innerHTML = r.html;
+  document.getElementById('docModal').classList.add('open');
+}
+function closeDoc() {
+  document.getElementById('docModal').classList.remove('open');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+renderList();
+</script>
+</body>
+</html>
