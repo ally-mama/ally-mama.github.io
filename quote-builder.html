@@ -622,9 +622,11 @@ let lastQuote = null;
 
 function generateQuote() {
   if (!lines.length) { showToast('Add at least one line item'); return; }
+  const jobVal = document.getElementById('qJob').value;
+  if (!jobVal) { showToast('Select a job first'); return; }
+  if (!document.getElementById('qAuthor').value) { showToast('Select an author'); return; }
   const c = getCalc();
 
-  const jobVal = document.getElementById('qJob').value;
   const [jobId, jobName] = jobVal ? jobVal.split('|') : ['',''];
   const client = document.getElementById('qClient').value.trim() || jobName || 'Client';
   const qNum = document.getElementById('qNumber').value.trim() || 'Q-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random()*900)+100);
@@ -698,7 +700,15 @@ function generateQuote() {
   document.getElementById('quoteSection').scrollIntoView({ behavior: 'smooth' });
 
   lastQuote = { qNum, jobId, jobName, client, date, author, total: c.incl, excl: c.excl, html };
-  showToast('Quote generated');
+  try {
+    const quotes = JSON.parse(localStorage.getItem('mama-quotes') || '[]');
+    const existingIdx = quotes.findIndex(q => q.qNum === qNum);
+    if (existingIdx > -1) { quotes[existingIdx] = { ...lastQuote, savedAt: new Date().toISOString() }; }
+    else { quotes.unshift({ ...lastQuote, savedAt: new Date().toISOString() }); }
+    localStorage.setItem('mama-quotes', JSON.stringify(quotes));
+  } catch(e) {}
+  if (window.Mama) Mama.Guard.clear();
+  showToast('Quote generated and saved to Job Hub ✓');
 }
 
 // ─────────────────────────────────────────────
