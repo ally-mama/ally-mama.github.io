@@ -4,7 +4,7 @@
   <meta name="robots" content="noindex, nofollow">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Brief Builder — Mama Hub</title>
+<title>Brief Builder â Mama Hub</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -492,13 +492,13 @@
       <div class="field">
         <label>Select a job <span class="req">*</span></label>
         <select id="jobSelect" onchange="onJobSelect()">
-          <option value="">— Choose existing job —</option>
+          <option value="">â Choose existing job â</option>
           <option value="safw">SA Fashion Week</option>
           <option value="share-agency">Share Agency</option>
           <option value="gan-tamar">Gan Tamar</option>
           <option value="better-angels">Better Angels</option>
         </select>
-        <span class="add-job-trigger" onclick="toggleAddJob()">+ This job isn't listed — add it now</span>
+        <span class="add-job-trigger" onclick="toggleAddJob()">+ This job isn't listed â add it now</span>
       </div>
 
       <!-- ADD NEW JOB INLINE -->
@@ -553,11 +553,23 @@
       <div class="field-row">
         <div class="field">
           <label>Account executive <span class="req">*</span></label>
-          <input type="text" id="accountExec" placeholder="Full name">
+          <select id="accountExec" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--off);color:var(--text);font-family:var(--sans);font-size:13px">
+            <option value="">— Select AE —</option>
+            <option>Ally</option>
+            <option>Cassidy</option>
+            <option>Alexa</option>
+            <option>Max</option>
+          </select>
         </div>
         <div class="field">
           <label>Relationship manager <span class="req">*</span></label>
-          <input type="text" id="relManager" placeholder="Full name">
+          <select id="relManager" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--off);color:var(--text);font-family:var(--sans);font-size:13px">
+            <option value="">— Select RM —</option>
+            <option>Ally</option>
+            <option>Cassidy</option>
+            <option>Alexa</option>
+            <option>Max</option>
+          </select>
         </div>
       </div>
       <div class="field">
@@ -615,67 +627,67 @@
       <div class="card-title">Design</div>
       <div class="offering-list" id="designOfferings">
         <div class="offering-item" onclick="toggleOffering(this,'carousels-form')">
-          <div class="offering-check">✓</div>
+          <div class="offering-check">â</div>
           <span class="offering-label">Carousels &amp; statics</span>
-          <span class="offering-sub">1080 × 1350</span>
+          <span class="offering-sub">1080 Ã 1350</span>
         </div>
         <div class="offering-item" onclick="toggleOffering(this,'mediakit-form')">
-          <div class="offering-check">✓</div>
+          <div class="offering-check">â</div>
           <span class="offering-label">Media kit</span>
           <span class="offering-sub">A4</span>
         </div>
         <div class="offering-item" onclick="toggleOffering(this,'stickers-form')">
-          <div class="offering-check">✓</div>
+          <div class="offering-check">â</div>
           <span class="offering-label">Sticker design</span>
-          <span class="offering-sub">500 × 500</span>
+          <span class="offering-sub">500 Ã 500</span>
         </div>
         <div class="offering-item" onclick="toggleOffering(this,'illustrations-form')">
-          <div class="offering-check">✓</div>
+          <div class="offering-check">â</div>
           <span class="offering-label">Illustrations</span>
           <span class="offering-sub">TBC</span>
         </div>
         <div class="offering-item" onclick="toggleOffering(this,'reelcovers-form')">
-          <div class="offering-check">✓</div>
+          <div class="offering-check">â</div>
           <span class="offering-label">Reel covers</span>
-          <span class="offering-sub">1080 × 1920</span>
+          <span class="offering-sub">1080 Ã 1920</span>
         </div>
         <div class="offering-item" onclick="toggleOffering(this,'highlights-form')">
-          <div class="offering-check">✓</div>
+          <div class="offering-check">â</div>
           <span class="offering-label">Highlight buttons</span>
-          <span class="offering-sub">1500 × 500</span>
+          <span class="offering-sub">1500 Ã 500</span>
         </div>
         <div class="offering-item" onclick="toggleOffering(this,'thumbnails-form')">
-          <div class="offering-check">✓</div>
+          <div class="offering-check">â</div>
           <span class="offering-label">YouTube thumbnails</span>
-          <span class="offering-sub">1280 × 720</span>
+          <span class="offering-sub">1280 Ã 720</span>
         </div>
         <div class="offering-item" onclick="toggleOffering(this,'profilepic-form')">
-          <div class="offering-check">✓</div>
+          <div class="offering-check">â</div>
           <span class="offering-label">Profile pictures</span>
-          <span class="offering-sub">500 × 500</span>
+          <span class="offering-sub">500 Ã 500</span>
         </div>
         <div class="offering-item" onclick="toggleOffering(this,'banners-form')">
-          <div class="offering-check">✓</div>
+          <div class="offering-check">â</div>
           <span class="offering-label">Banners</span>
           <span class="offering-sub">TBC by platform</span>
         </div>
         <div class="offering-item" onclick="toggleOffering(this,'posters-form')">
-          <div class="offering-check">✓</div>
+          <div class="offering-check">â</div>
           <span class="offering-label">Posters</span>
           <span class="offering-sub">Various</span>
         </div>
         <div class="offering-item" onclick="toggleOffering(this,'logo-form')">
-          <div class="offering-check">✓</div>
+          <div class="offering-check">â</div>
           <span class="offering-label">Logo</span>
           <span class="offering-sub">Vector</span>
         </div>
         <div class="offering-item" onclick="toggleOffering(this,'digitalscreen-form')">
-          <div class="offering-check">✓</div>
+          <div class="offering-check">â</div>
           <span class="offering-label">Digital screen advert</span>
           <span class="offering-sub">Various</span>
         </div>
         <div class="offering-item" onclick="toggleOffering(this,'vinyl-form')">
-          <div class="offering-check">✓</div>
+          <div class="offering-check">â</div>
           <span class="offering-label">Vinyls</span>
           <span class="offering-sub">Custom</span>
         </div>
@@ -683,8 +695,8 @@
 
       <!-- CAROUSELS SUBFORM -->
       <div class="subform" id="carousels-form">
-        <div class="dim-badge">1080 × 1350</div>
-        <div class="card-title">Carousels &amp; statics — questions</div>
+        <div class="dim-badge">1080 Ã 1350</div>
+        <div class="card-title">Carousels &amp; statics â questions</div>
         <div class="field"><label>Context of carousel <span class="req">*</span></label><textarea id="c_context" placeholder="What is this carousel about?"></textarea></div>
         <div class="field"><label>Are you supplying copy for the carousel? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Yes</div><div class="yn-btn no" onclick="toggleYN(this)">No</div></div></div>
         <div class="field"><label>Do you want your handle on each slide? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Yes</div><div class="yn-btn no" onclick="toggleYN(this)">No</div></div></div>
@@ -692,7 +704,7 @@
         <div class="field"><label>If not, what specific images do you want? <span class="req">*</span></label><textarea id="c_images" placeholder="Describe the images needed..."></textarea></div>
         <div class="field"><label>Is there a call to action &amp; cover slide? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Yes</div><div class="yn-btn no" onclick="toggleYN(this)">No</div></div></div>
         <div class="field"><label>Is there a specific cover slide you want to use? <span class="req">*</span></label><textarea id="c_cover" placeholder="Describe or link the cover slide..."></textarea></div>
-        <div class="field"><label>References — what about the reference do you like? <span class="req">*</span></label><textarea id="c_refs" placeholder="Link references and describe what you like..."></textarea></div>
+        <div class="field"><label>References â what about the reference do you like? <span class="req">*</span></label><textarea id="c_refs" placeholder="Link references and describe what you like..."></textarea></div>
         <div class="field"><label>Is post caption needed? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Yes</div><div class="yn-btn no" onclick="toggleYN(this)">No</div></div></div>
         <div class="field"><label>Do you want it built into your Canva? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Yes</div><div class="yn-btn no" onclick="toggleYN(this)">No</div></div></div>
       </div>
@@ -700,9 +712,9 @@
       <!-- MEDIA KIT SUBFORM -->
       <div class="subform" id="mediakit-form">
         <div class="dim-badge">A4</div>
-        <div class="card-title">Media kit — questions</div>
+        <div class="card-title">Media kit â questions</div>
         <div class="section-label">Copy &amp; strategy</div>
-        <div class="field"><label>Do you have a bio? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Yes — proofread it</div><div class="yn-btn no" onclick="toggleYN(this)">No — write one</div></div></div>
+        <div class="field"><label>Do you have a bio? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Yes â proofread it</div><div class="yn-btn no" onclick="toggleYN(this)">No â write one</div></div></div>
         <div class="field"><label>Do you want 1 or 2 pages? <span class="req">*</span></label><div class="options-group"><div class="opt-btn" onclick="toggleOpt(this)">1 page</div><div class="opt-btn" onclick="toggleOpt(this)">2 pages</div></div></div>
         <div class="field"><label>What is the media kit going to be used for? <span class="req">*</span></label><textarea id="mk_use" placeholder="Brand partnerships, press, etc."></textarea></div>
         <div class="field"><label>What is the tone of the media kit? <span class="req">*</span></label><textarea id="mk_tone" placeholder="e.g. Professional, playful, editorial..."></textarea></div>
@@ -711,13 +723,13 @@
         <div class="section-label">Design</div>
         <div class="field"><label>Has a headshot been supplied? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Yes</div><div class="yn-btn no" onclick="toggleYN(this)">No</div></div></div>
         <div class="field"><label>Do you want 1 or 2 pages? <span class="req">*</span></label><div class="options-group"><div class="opt-btn" onclick="toggleOpt(this)">1 page</div><div class="opt-btn" onclick="toggleOpt(this)">2 pages</div></div></div>
-        <div class="field"><label>Supply 2–3 layouts you like and why <span class="req">*</span></label><textarea id="mk_layouts" placeholder="Link Pinterest boards or references and describe what you like..."></textarea></div>
+        <div class="field"><label>Supply 2â3 layouts you like and why <span class="req">*</span></label><textarea id="mk_layouts" placeholder="Link Pinterest boards or references and describe what you like..."></textarea></div>
       </div>
 
       <!-- STICKERS SUBFORM -->
       <div class="subform" id="stickers-form">
-        <div class="dim-badge">500 × 500</div>
-        <div class="card-title">Sticker design — questions</div>
+        <div class="dim-badge">500 Ã 500</div>
+        <div class="card-title">Sticker design â questions</div>
         <div class="field"><label>What are the stickers for? <span class="req">*</span></label><textarea id="st_for" placeholder="Platform, campaign, product launch..."></textarea></div>
         <div class="field"><label>How many stickers do you want? List them. <span class="req">*</span></label><textarea id="st_list" placeholder="e.g. 1. Logo sticker, 2. Campaign slogan, 3. Character..."></textarea></div>
         <div class="field"><label>References and why you like them <span class="req">*</span></label><textarea id="st_refs" placeholder="Link references and describe what you like..."></textarea></div>
@@ -726,7 +738,7 @@
       <!-- ILLUSTRATIONS SUBFORM -->
       <div class="subform" id="illustrations-form">
         <div class="dim-badge">TBC</div>
-        <div class="card-title">Illustrations — questions</div>
+        <div class="card-title">Illustrations â questions</div>
         <div class="field"><label>What are the illustrations for? <span class="req">*</span></label><textarea id="il_for" placeholder="Campaign, branding, editorial..."></textarea></div>
         <div class="field"><label>How many illustrations do you want? List them. <span class="req">*</span></label><textarea id="il_list" placeholder="e.g. 1. Portrait of founder, 2. Product illustration..."></textarea></div>
         <div class="field"><label>References and why you like them <span class="req">*</span></label><textarea id="il_refs" placeholder="Link references and describe what appeals to you..."></textarea></div>
@@ -734,18 +746,18 @@
 
       <!-- REEL COVERS SUBFORM -->
       <div class="subform" id="reelcovers-form">
-        <div class="dim-badge">1080 × 1920</div>
-        <div class="card-title">Reel covers — questions</div>
+        <div class="dim-badge">1080 Ã 1920</div>
+        <div class="card-title">Reel covers â questions</div>
         <div class="field"><label>What is the context? <span class="req">*</span></label><textarea id="rc_context" placeholder="What is this reel about?"></textarea></div>
-        <div class="field"><label>Do you have copy? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Yes</div><div class="yn-btn no" onclick="toggleYN(this)">No — need copy</div></div></div>
+        <div class="field"><label>Do you have copy? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Yes</div><div class="yn-btn no" onclick="toggleYN(this)">No â need copy</div></div></div>
         <div class="field"><label>What imagery do you want? <span class="req">*</span></label><textarea id="rc_imagery" placeholder="Describe the visual direction..."></textarea></div>
         <div class="field"><label>Which reel cover from your brand kit do you want to use? <span class="req">*</span></label><textarea id="rc_kit" placeholder="Specify or link brand kit..."></textarea></div>
       </div>
 
       <!-- HIGHLIGHT BUTTONS SUBFORM -->
       <div class="subform" id="highlights-form">
-        <div class="dim-badge">1500 × 500</div>
-        <div class="card-title">Highlight buttons — questions</div>
+        <div class="dim-badge">1500 Ã 500</div>
+        <div class="card-title">Highlight buttons â questions</div>
         <div class="field"><label>List the highlight buttons you want <span class="req">*</span></label><textarea id="hb_list" placeholder="e.g. Travel, Fashion, Food, Collabs..."></textarea></div>
         <div class="field"><label>What kind of design do you want? <span class="req">*</span></label><div class="options-group" id="hb_style"><div class="opt-btn" onclick="toggleOpt(this)">Icons</div><div class="opt-btn" onclick="toggleOpt(this)">Illustrations</div><div class="opt-btn" onclick="toggleOpt(this)">Imagery</div><div class="opt-btn" onclick="toggleOpt(this)">Textures</div><div class="opt-btn" onclick="toggleOpt(this)">Text</div></div></div>
         <div class="field"><label>References and what you like about them <span class="req">*</span></label><textarea id="hb_refs" placeholder="Link references and describe what you like..."></textarea></div>
@@ -753,8 +765,8 @@
 
       <!-- THUMBNAILS SUBFORM -->
       <div class="subform" id="thumbnails-form">
-        <div class="dim-badge">1280 × 720</div>
-        <div class="card-title">YouTube thumbnails — questions</div>
+        <div class="dim-badge">1280 Ã 720</div>
+        <div class="card-title">YouTube thumbnails â questions</div>
         <div class="field"><label>Context &amp; tone <span class="req">*</span></label><textarea id="yt_context" placeholder="What is the video about? What feeling should the thumbnail evoke?"></textarea></div>
         <div class="field"><label>Do you have copy or do you need it? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Have copy</div><div class="yn-btn no" onclick="toggleYN(this)">Need copy</div></div></div>
         <div class="field"><label>Supply headshots / images <span class="req">*</span></label><textarea id="yt_headshots" placeholder="Link Google Drive folder or describe what's available..."></textarea></div>
@@ -763,8 +775,8 @@
 
       <!-- PROFILE PIC SUBFORM -->
       <div class="subform" id="profilepic-form">
-        <div class="dim-badge">500 × 500</div>
-        <div class="card-title">Profile pictures — questions</div>
+        <div class="dim-badge">500 Ã 500</div>
+        <div class="card-title">Profile pictures â questions</div>
         <div class="field"><label>Platform <span class="req">*</span></label><div class="options-group" id="pp_platform"><div class="opt-btn" onclick="toggleOpt(this)">YouTube</div><div class="opt-btn" onclick="toggleOpt(this)">Facebook</div><div class="opt-btn" onclick="toggleOpt(this)">X</div><div class="opt-btn" onclick="toggleOpt(this)">TikTok</div><div class="opt-btn" onclick="toggleOpt(this)">Instagram</div></div></div>
         <div class="field"><label>Headshot or design? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Headshot</div><div class="yn-btn no" onclick="toggleYN(this)">Design (supply headshot)</div></div></div>
       </div>
@@ -772,7 +784,7 @@
       <!-- BANNERS SUBFORM -->
       <div class="subform" id="banners-form">
         <div class="dim-badge">TBC by platform</div>
-        <div class="card-title">Banners — questions</div>
+        <div class="card-title">Banners â questions</div>
         <div class="field"><label>Platform <span class="req">*</span></label><div class="options-group" id="bn_platform"><div class="opt-btn" onclick="toggleOpt(this)">YouTube</div><div class="opt-btn" onclick="toggleOpt(this)">Facebook</div><div class="opt-btn" onclick="toggleOpt(this)">X</div></div></div>
         <div class="field"><label>Do you want copy? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Yes</div><div class="yn-btn no" onclick="toggleYN(this)">No</div></div></div>
         <div class="field"><label>Are you supplying copy or do you need us to write it? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Supplying</div><div class="yn-btn no" onclick="toggleYN(this)">Write for me</div></div></div>
@@ -781,10 +793,10 @@
         <div class="field"><label>References and what you like about them <span class="req">*</span></label><textarea id="bn_refs" placeholder="Link references..."></textarea></div>
       </div>
 
-      <!-- POSTERS, LOGO, DIGITAL SCREEN, VINYL — minimal subforms -->
+      <!-- POSTERS, LOGO, DIGITAL SCREEN, VINYL â minimal subforms -->
       <div class="subform" id="posters-form">
         <div class="dim-badge">Various sizes</div>
-        <div class="card-title">Posters — questions</div>
+        <div class="card-title">Posters â questions</div>
         <div class="field"><label>What is the poster for? <span class="req">*</span></label><textarea placeholder="Event, campaign, awareness..."></textarea></div>
         <div class="field"><label>Required sizes / formats <span class="req">*</span></label><textarea placeholder="A3, A2, digital, print-ready..."></textarea></div>
         <div class="field"><label>Do you have copy or do you need it? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Have copy</div><div class="yn-btn no" onclick="toggleYN(this)">Need copy</div></div></div>
@@ -792,22 +804,22 @@
       </div>
       <div class="subform" id="logo-form">
         <div class="dim-badge">Vector</div>
-        <div class="card-title">Logo — questions</div>
+        <div class="card-title">Logo â questions</div>
         <div class="field"><label>New logo or refresh of existing? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">New logo</div><div class="yn-btn no" onclick="toggleYN(this)">Refresh existing</div></div></div>
         <div class="field"><label>Brand personality / direction <span class="req">*</span></label><textarea placeholder="Describe tone, feel, keywords..."></textarea></div>
         <div class="field"><label>References and what you like about them <span class="req">*</span></label><textarea placeholder="Link references..."></textarea></div>
       </div>
       <div class="subform" id="digitalscreen-form">
         <div class="dim-badge">Various</div>
-        <div class="card-title">Digital screen advert — questions</div>
+        <div class="card-title">Digital screen advert â questions</div>
         <div class="field"><label>Where will the advert be displayed? <span class="req">*</span></label><textarea placeholder="Billboard, in-store screen, website..."></textarea></div>
-        <div class="field"><label>Required dimensions <span class="req">*</span></label><textarea placeholder="e.g. 1920×1080, 300×250..."></textarea></div>
+        <div class="field"><label>Required dimensions <span class="req">*</span></label><textarea placeholder="e.g. 1920Ã1080, 300Ã250..."></textarea></div>
         <div class="field"><label>Do you have copy or do you need it? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Have copy</div><div class="yn-btn no" onclick="toggleYN(this)">Need copy</div></div></div>
         <div class="field"><label>References and what you like about them <span class="req">*</span></label><textarea placeholder="Link references..."></textarea></div>
       </div>
       <div class="subform" id="vinyl-form">
         <div class="dim-badge">Custom</div>
-        <div class="card-title">Vinyls — questions</div>
+        <div class="card-title">Vinyls â questions</div>
         <div class="field"><label>What is the vinyl for? <span class="req">*</span></label><textarea placeholder="Vehicle wrap, wall vinyl, window..."></textarea></div>
         <div class="field"><label>Dimensions / surface area <span class="req">*</span></label><textarea placeholder="Provide measurements or surface description..."></textarea></div>
         <div class="field"><label>References and what you like about them <span class="req">*</span></label><textarea placeholder="Link references..."></textarea></div>
@@ -819,14 +831,14 @@
       <div class="card-title">Video editing</div>
       <div class="offering-list">
         <div class="offering-item" onclick="toggleOffering(this,'video-form')">
-          <div class="offering-check">✓</div>
+          <div class="offering-check">â</div>
           <span class="offering-label">Video editing</span>
-          <span class="offering-sub">1080 × 1920</span>
+          <span class="offering-sub">1080 Ã 1920</span>
         </div>
       </div>
       <div class="subform" id="video-form">
-        <div class="dim-badge">1080 × 1920</div>
-        <div class="card-title">Video editing — questions</div>
+        <div class="dim-badge">1080 Ã 1920</div>
+        <div class="card-title">Video editing â questions</div>
         <div class="field"><label>Are you supplying b-roll? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">Yes</div><div class="yn-btn no" onclick="toggleYN(this)">No</div></div></div>
         <div class="field"><label>What b-roll do you want? <span class="req">*</span></label><textarea placeholder="Describe or list the b-roll footage needed..."></textarea></div>
         <div class="field"><label>What platforms is it going on? <span class="req">*</span></label><div class="options-group"><div class="opt-btn" onclick="toggleOpt(this)">Instagram</div><div class="opt-btn" onclick="toggleOpt(this)">TikTok</div><div class="opt-btn" onclick="toggleOpt(this)">YouTube</div><div class="opt-btn" onclick="toggleOpt(this)">Facebook</div><div class="opt-btn" onclick="toggleOpt(this)">X</div></div></div>
@@ -852,21 +864,21 @@
       <div class="card-title">Copywriting</div>
       <div class="offering-list">
         <div class="offering-item" onclick="toggleOffering(this,'copy-form')">
-          <div class="offering-check">✓</div>
+          <div class="offering-check">â</div>
           <span class="offering-label">Copywriting</span>
-          <span class="offering-sub">Script · Caption · IG bio</span>
+          <span class="offering-sub">Script Â· Caption Â· IG bio</span>
         </div>
       </div>
       <div class="subform" id="copy-form">
-        <div class="card-title">Copywriting — what do you need?</div>
+        <div class="card-title">Copywriting â what do you need?</div>
         <div class="offering-list" style="margin-bottom:16px">
-          <div class="offering-item" onclick="toggleOffering(this,'script-form')"><div class="offering-check">✓</div><span class="offering-label">Script</span></div>
-          <div class="offering-item" onclick="toggleOffering(this,'caption-form')"><div class="offering-check">✓</div><span class="offering-label">Caption</span></div>
-          <div class="offering-item" onclick="toggleOffering(this,'igbio-form')"><div class="offering-check">✓</div><span class="offering-label">Instagram bio</span><span class="offering-sub">150 chars</span></div>
+          <div class="offering-item" onclick="toggleOffering(this,'script-form')"><div class="offering-check">â</div><span class="offering-label">Script</span></div>
+          <div class="offering-item" onclick="toggleOffering(this,'caption-form')"><div class="offering-check">â</div><span class="offering-label">Caption</span></div>
+          <div class="offering-item" onclick="toggleOffering(this,'igbio-form')"><div class="offering-check">â</div><span class="offering-label">Instagram bio</span><span class="offering-sub">150 chars</span></div>
         </div>
         <div class="subform" id="script-form" style="margin-left:0">
-          <div class="card-title">Script — questions</div>
-          <div class="field"><label>Please give context on the script — what is the video/series about? <span class="req">*</span></label><textarea placeholder="Describe the concept, series, or episode..."></textarea></div>
+          <div class="card-title">Script â questions</div>
+          <div class="field"><label>Please give context on the script â what is the video/series about? <span class="req">*</span></label><textarea placeholder="Describe the concept, series, or episode..."></textarea></div>
           <div class="field"><label>Tell us your take on the script <span class="req">*</span></label><textarea placeholder="Your angle, what you want to say..."></textarea></div>
           <div class="field"><label>What is the POV you want to get across? <span class="req">*</span></label><textarea placeholder="First person, narrator, educational..."></textarea></div>
           <div class="field"><label>What is the tone of voice? <span class="req">*</span></label><textarea placeholder="e.g. Conversational, authoritative, funny..."></textarea></div>
@@ -874,14 +886,14 @@
           <div class="field"><label>How long should the video be? <span class="req">*</span></label><input type="text" placeholder="e.g. 60 seconds, 3 minutes..."></div>
         </div>
         <div class="subform" id="caption-form" style="margin-left:0">
-          <div class="card-title">Caption — questions</div>
+          <div class="card-title">Caption â questions</div>
           <div class="field"><label>Please give context of the post that you need a caption for <span class="req">*</span></label><textarea placeholder="What is the post about?"></textarea></div>
           <div class="field"><label>What is the tone of voice? <span class="req">*</span></label><textarea placeholder="e.g. Professional, fun, inspirational..."></textarea></div>
           <div class="field"><label>Do you want a specific call to action? <span class="req">*</span></label><textarea placeholder="e.g. Link in bio, comment below, tag a friend..."></textarea></div>
         </div>
         <div class="subform" id="igbio-form" style="margin-left:0">
           <div class="dim-badge">150 characters</div>
-          <div class="card-title">Instagram bio — questions</div>
+          <div class="card-title">Instagram bio â questions</div>
           <div class="field"><label>What are you trying to achieve with your IG bio? <span class="req">*</span></label><textarea placeholder="Awareness, conversions, credibility..."></textarea></div>
           <div class="field"><label>What is the most important point at first glance? <span class="req">*</span></label><textarea placeholder="The one thing people must know immediately..."></textarea></div>
           <div class="field"><label>What is your call to action? <span class="req">*</span></label><input type="text" placeholder="e.g. Link in bio for bookings, DM for collabs..."></div>
@@ -894,13 +906,13 @@
       <div class="card-title">Strategy &amp; ideation</div>
       <div class="offering-list">
         <div class="offering-item" onclick="toggleOffering(this,'ideation-form')">
-          <div class="offering-check">✓</div>
+          <div class="offering-check">â</div>
           <span class="offering-label">Strategy &amp; ideation</span>
           <span class="offering-sub">Content &amp; brainstorm</span>
         </div>
       </div>
       <div class="subform" id="ideation-form">
-        <div class="card-title">Ideation — questions</div>
+        <div class="card-title">Ideation â questions</div>
         <div class="field"><label>What are you ideating on? <span class="req">*</span></label><textarea placeholder="A new series, a product launch, a rebrand..."></textarea></div>
         <div class="field"><label>New content series or expand on current content? <span class="req">*</span></label><div class="yn-group"><div class="yn-btn yes" onclick="toggleYN(this)">New series</div><div class="yn-btn no" onclick="toggleYN(this)">Expand current</div></div></div>
         <div class="field"><label>How to expand on existing content? <span class="req">*</span></label><textarea placeholder="Formats, angles, spin-offs, repurposing..."></textarea></div>
@@ -935,9 +947,9 @@
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px">
         <div class="page-heading" style="margin-bottom:0">Generated brief</div>
         <div class="action-bar" style="margin-top:0">
-          <button class="btn btn-outline btn-sm" onclick="copyBrief()">📋 Copy to clipboard</button>
-          <button class="btn btn-outline btn-sm" onclick="downloadPDF()">⬇ Download PDF</button>
-          <button class="btn btn-accent btn-sm" onclick="openDriveUpload()">☁ Add to Google Drive</button>
+          <button class="btn btn-outline btn-sm" onclick="copyBrief()">ð Copy to clipboard</button>
+          <button class="btn btn-outline btn-sm" onclick="downloadPDF()">â¬ Download PDF</button>
+          <button class="btn btn-accent btn-sm" onclick="openDriveUpload()">â Add to Google Drive</button>
         </div>
       </div>
       <div class="brief-preview" id="briefPreview"></div>
@@ -949,13 +961,13 @@
 <!-- BOTTOM NAV -->
 <div class="bottom-nav">
   <div>
-    <button class="btn btn-ghost" id="btnBack" onclick="prevPage()" style="display:none">← Back</button>
+    <button class="btn btn-ghost" id="btnBack" onclick="prevPage()" style="display:none">â Back</button>
     <button class="btn btn-outline btn-sm" onclick="startNew()">Start new</button>
   </div>
   <div class="bottom-nav-right">
     <span style="font-size:12px; color:var(--muted)" id="pageIndicator">Page 1 of 3</span>
-    <button class="btn btn-primary" id="btnNext" onclick="nextPage()">Continue →</button>
-    <button class="btn btn-accent" id="btnGenerate" onclick="generateBrief()" style="display:none">Generate brief ✦</button>
+    <button class="btn btn-primary" id="btnNext" onclick="nextPage()">Continue â</button>
+    <button class="btn btn-accent" id="btnGenerate" onclick="generateBrief()" style="display:none">Generate brief â¦</button>
   </div>
 </div>
 
@@ -988,13 +1000,13 @@ const jobs = {
   },
   'gan-tamar': {
     name: 'Gan Tamar',
-    bio: 'Gan Tamar — add the client bio, positioning, and any standing brand notes here so every brief starts with shared context.',
+    bio: 'Gan Tamar â add the client bio, positioning, and any standing brand notes here so every brief starts with shared context.',
     links: [],
     studio: ''
   },
   'better-angels': {
     name: 'Better Angels',
-    bio: 'Better Angels — add the client bio, positioning, and any standing brand notes here so every brief starts with shared context.',
+    bio: 'Better Angels â add the client bio, positioning, and any standing brand notes here so every brief starts with shared context.',
     links: [],
     studio: ''
   }
@@ -1059,7 +1071,7 @@ function onJobSelect() {
     ).join('');
     const studioEl = document.getElementById('jobStudioLink');
     studioEl.innerHTML = job.studio
-      ? `<a class="social-link" href="${job.studio}" target="_blank">📁 Creator studio guide</a>`
+      ? `<a class="social-link" href="${job.studio}" target="_blank">ð Creator studio guide</a>`
       : '';
     card.classList.add('open');
   } else {
@@ -1121,7 +1133,7 @@ function toggleOffering(el, formId) {
   const check = el.querySelector('.offering-check');
   const form = document.getElementById(formId);
   if (el.classList.contains('selected')) {
-    check.textContent = '✓';
+    check.textContent = 'â';
     form.classList.add('open');
     form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   } else {
@@ -1136,7 +1148,7 @@ function toggleOffering(el, formId) {
 function buildSummary() {
   const jobKey = document.getElementById('jobSelect').value;
   const allJobs = {...jobs, ...userAddedJobs};
-  const jobName = jobKey && allJobs[jobKey] ? allJobs[jobKey].name : '—';
+  const jobName = jobKey && allJobs[jobKey] ? allJobs[jobKey].name : 'â';
 
   const selected = [];
   document.querySelectorAll('.offering-item.selected .offering-label').forEach(el => {
@@ -1147,9 +1159,9 @@ function buildSummary() {
   el.innerHTML = `
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
       <div><strong>Job:</strong> ${jobName}</div>
-      <div><strong>Number:</strong> ${document.getElementById('jobNumber').value || '—'}</div>
-      <div><strong>Campaign:</strong> ${document.getElementById('campaignName').value || '—'}</div>
-      <div><strong>AE:</strong> ${document.getElementById('accountExec').value || '—'}</div>
+      <div><strong>Number:</strong> ${document.getElementById('jobNumber').value || 'â'}</div>
+      <div><strong>Campaign:</strong> ${document.getElementById('campaignName').value || 'â'}</div>
+      <div><strong>AE:</strong> ${document.getElementById('accountExec').value || 'â'}</div>
     </div>
     <div style="margin-top:12px"><strong>Offerings selected:</strong> ${selected.length ? selected.join(', ') : 'None yet'}</div>
   `;
@@ -1177,29 +1189,29 @@ function generateBrief() {
 
   let html = `
     <h1>${campaign || jobName}</h1>
-    <div class="brief-meta">Job ${jobNum} &nbsp;·&nbsp; ${date} &nbsp;·&nbsp; AE: ${ae} &nbsp;·&nbsp; RM: ${rm}</div>
+    <div class="brief-meta">Job ${jobNum} &nbsp;Â·&nbsp; ${date} &nbsp;Â·&nbsp; AE: ${ae} &nbsp;Â·&nbsp; RM: ${rm}</div>
   `;
 
   // Internal approval
   const intApp = document.querySelector('#internalApproval .status-opt.selected');
   const cliApp = document.querySelector('#clientApproval .status-opt.selected');
   html += `<h2>Project keys</h2>`;
-  html += `<p><strong>Internal approval:</strong> ${intApp ? intApp.textContent : '—'}</p>`;
-  html += `<p><strong>Client approval:</strong> ${cliApp ? cliApp.textContent : '—'}</p>`;
-  html += `<p><strong>Platforms:</strong> ${platforms || '—'}</p>`;
+  html += `<p><strong>Internal approval:</strong> ${intApp ? intApp.textContent : 'â'}</p>`;
+  html += `<p><strong>Client approval:</strong> ${cliApp ? cliApp.textContent : 'â'}</p>`;
+  html += `<p><strong>Platforms:</strong> ${platforms || 'â'}</p>`;
 
   if (job) {
-    html += `<h2>Client — ${job.name}</h2>`;
+    html += `<h2>Client â ${job.name}</h2>`;
     if (job.bio) html += `<p>${job.bio}</p>`;
     if (job.links && job.links.length) {
-      html += job.links.map(l => `<a class="link-chip" href="${l.url}" target="_blank">↗ ${l.label}</a>`).join('');
+      html += job.links.map(l => `<a class="link-chip" href="${l.url}" target="_blank">â ${l.label}</a>`).join('');
     }
-    if (job.studio) html += `<br><a class="link-chip" href="${job.studio}" target="_blank">📁 Creator studio guide</a>`;
+    if (job.studio) html += `<br><a class="link-chip" href="${job.studio}" target="_blank">ð Creator studio guide</a>`;
   }
 
   if (selectedOfferings.length) {
     html += `<h2>Studio offerings</h2>`;
-    html += `<p>${selectedOfferings.join(' · ')}</p>`;
+    html += `<p>${selectedOfferings.join(' Â· ')}</p>`;
 
     // Pull all filled-in subform data
     document.querySelectorAll('.subform.open').forEach(sf => {
@@ -1235,12 +1247,20 @@ function generateBrief() {
     html += `<h2>Notes for studio</h2><p>${notes}</p>`;
   }
 
-  html += `<p style="margin-top:32px; font-size:11px; color:var(--muted)">Generated via Mama Hub · ${new Date().toLocaleDateString('en-ZA', {day:'numeric',month:'long',year:'numeric'})}</p>`;
+  html += `<p style="margin-top:32px; font-size:11px; color:var(--muted)">Generated via Mama Hub Â· ${new Date().toLocaleDateString('en-ZA', {day:'numeric',month:'long',year:'numeric'})}</p>`;
 
   document.getElementById('briefPreview').innerHTML = html;
   document.getElementById('generatedBriefSection').style.display = 'block';
   document.getElementById('generatedBriefSection').scrollIntoView({ behavior: 'smooth' });
-  showToast('Brief generated successfully');
+  // Save to mama-briefs so Job Hub picks it up automatically
+  try {
+    const briefs = JSON.parse(localStorage.getItem('mama-briefs') || '[]');
+    const record = { id: Date.now(), jobKey: jobKey||null, jobId: jobKey||null, jobNum, campaign: campaign||jobName, date, ae, rm, html, savedAt: new Date().toISOString() };
+    const existingIdx = briefs.findIndex(b => b.jobNum === jobNum && b.campaign === record.campaign && b.date === (date||new Date().toISOString().slice(0,10)));
+    if (existingIdx > -1) { briefs[existingIdx] = record; } else { briefs.push(record); }
+    localStorage.setItem('mama-briefs', JSON.stringify(briefs));
+  } catch(e) {}
+  showToast('Brief generated and saved to Job Hub ✓');
 }
 
 // ============================================================
@@ -1252,7 +1272,7 @@ function copyBrief() {
 }
 
 function downloadPDF() {
-  showToast('Preparing PDF download…');
+  showToast('Preparing PDF downloadâ¦');
   // Using print dialog as PDF export (works everywhere, no lib needed)
   const content = document.getElementById('briefPreview').innerHTML;
   const w = window.open('','_blank');
@@ -1272,7 +1292,7 @@ function downloadPDF() {
 }
 
 function openDriveUpload() {
-  showToast('Opening Google Drive folder…');
+  showToast('Opening Google Drive folderâ¦');
   window.open('https://drive.google.com/drive/folders/1IkvW4HGv2w_Ro2RSYy0Ii52CfhG_SQUO', '_blank');
 }
 
