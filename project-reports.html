@@ -495,7 +495,7 @@
 // STATE
 // ─────────────────────────────────────────────
 let ragStatus = null;
-let savedReports = [];
+let savedReports = JSON.parse(localStorage.getItem('mama-reports') || '[]');
 let lastGenerated = null;
 
 const logoSVG = '<svg viewBox="0 0 15 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 0 L7.5 7 L15 0 L15 13 L0 13 Z" fill="#0e0e0e"/></svg>';
@@ -559,12 +559,14 @@ function setRag(btn, status) {
 function generateReport() {
   const jobVal = document.getElementById('rJob').value;
   if (!jobVal) { showToast('Select a job first'); return; }
-  if (!ragStatus) { showToast('Set the overall status'); return; }
+  const period = document.getElementById('rPeriod').value.trim();
+  if (!period) { showToast('Enter a reporting period'); return; }
+  const author = document.getElementById('rAuthor').value;
+  if (!author) { showToast('Select an author'); return; }
+  if (!ragStatus) { showToast('Set the overall status (green / amber / red)'); return; }
 
   const [jobId, jobName] = jobVal.split('|');
-  const period = document.getElementById('rPeriod').value || '—';
   const date = document.getElementById('rDate').value || new Date().toISOString().slice(0,10);
-  const author = document.getElementById('rAuthor').value || '—';
   const progress = document.getElementById('rProgress').value.trim();
   const next = document.getElementById('rNext').value.trim();
   const risks = document.getElementById('rRisks').value.trim();
@@ -623,7 +625,13 @@ function generateReport() {
   document.getElementById('generatedSection').scrollIntoView({ behavior:'smooth' });
 
   lastGenerated = { jobId, jobName, period, date, author, rag: ragStatus, html };
-  showToast('Report generated');
+  const existing = savedReports.findIndex(r => r.jobId === jobId && r.period === period);
+  if (existing > -1) { savedReports[existing] = { ...lastGenerated, savedAt: new Date().toISOString() }; }
+  else { savedReports.unshift({ ...lastGenerated, savedAt: new Date().toISOString() }); }
+  localStorage.setItem('mama-reports', JSON.stringify(savedReports));
+  renderSaved();
+  if (window.Mama) Mama.Guard.clear();
+  showToast('Report generated and saved to Job Hub ✓');
 }
 
 // ─────────────────────────────────────────────
@@ -631,9 +639,12 @@ function generateReport() {
 // ─────────────────────────────────────────────
 function saveReport() {
   if (!lastGenerated) return;
-  savedReports.unshift({ ...lastGenerated, savedAt: new Date().toISOString() });
+  const existing = savedReports.findIndex(r => r.jobId === lastGenerated.jobId && r.period === lastGenerated.period);
+  if (existing > -1) { savedReports[existing] = { ...lastGenerated, savedAt: new Date().toISOString() }; }
+  else { savedReports.unshift({ ...lastGenerated, savedAt: new Date().toISOString() }); }
+  localStorage.setItem('mama-reports', JSON.stringify(savedReports));
   renderSaved();
-  showToast('Report saved — find it in "Saved reports"');
+  showToast('Report saved to Job Hub');
 }
 
 function renderSaved() {
