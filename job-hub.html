@@ -398,10 +398,6 @@
 <div class="modal-overlay" id="docModal" onclick="if(event.target===this)closeDoc()">
   <div class="doc-modal">
     <button class="modal-close" onclick="closeDoc()">×</button>
-    <div id="docActionBar" style="display:none;padding-bottom:14px;margin-bottom:18px;border-bottom:1px solid var(--border);display:none;gap:8px;flex-wrap:wrap">
-      <button onclick="docEdit()" style="padding:7px 14px;font-size:12px;font-weight:700;background:var(--yellow);color:var(--black);border:none;border-radius:7px;cursor:pointer">Edit report</button>
-      <button onclick="docContinue()" style="padding:7px 14px;font-size:12px;background:var(--off);color:var(--text);border:1px solid var(--border);border-radius:7px;cursor:pointer">Continue from last →</button>
-    </div>
     <div id="docContent"></div>
   </div>
 </div>
@@ -508,8 +504,6 @@ window.addEventListener('storage', () => {
   todos = storeGet(STORE_TODOS) || [];
   // ─── TODO COMPLETION ────────────────────────────────
 let pendingTodoId = null;
-let viewingReportJobId = null;
-let viewingReportPeriod = null;
 
 function startComplete(todoId) {
   const t = todos.find(x => x.id === todoId);
@@ -719,37 +713,20 @@ function closeJob() {
 function viewBrief(i) {
   const b = briefs[i];
   if (!b) return;
-  viewingReportJobId = null; viewingReportPeriod = null;
-  document.getElementById('docActionBar').style.display = 'none';
   document.getElementById('docContent').innerHTML = b.html;
   document.getElementById('docModal').classList.add('open');
 }
 function viewQuote(i) {
   const q = quotes[i];
   if (!q) return;
-  viewingReportJobId = null; viewingReportPeriod = null;
-  document.getElementById('docActionBar').style.display = 'none';
   document.getElementById('docContent').innerHTML = q.html;
   document.getElementById('docModal').classList.add('open');
 }
 function viewReport(i) {
   const r = reports[i];
   if (!r) return;
-  viewingReportJobId = r.jobId;
-  viewingReportPeriod = r.period;
-  document.getElementById('docActionBar').style.display = 'flex';
   document.getElementById('docContent').innerHTML = r.html;
   document.getElementById('docModal').classList.add('open');
-}
-function docEdit() {
-  if (!viewingReportJobId) return;
-  localStorage.setItem('mama-report-action', JSON.stringify({ action: 'edit', jobId: viewingReportJobId, period: viewingReportPeriod }));
-  window.location.href = 'project-reports.html';
-}
-function docContinue() {
-  if (!viewingReportJobId) return;
-  localStorage.setItem('mama-report-action', JSON.stringify({ action: 'continue', jobId: viewingReportJobId }));
-  window.location.href = 'project-reports.html';
 }
 function closeDoc() {
   document.getElementById('docModal').classList.remove('open');
