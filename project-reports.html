@@ -889,229 +889,24 @@ renderSaved();
 <div class="toast" id="toast"></div>
 
 <script>
-// ─────────────────────────────────────────────
-// STATE
-// ─────────────────────────────────────────────
-let ragStatus = null;
-let savedReports = JSON.parse(localStorage.getItem('mama-reports') || '[]');
-let lastGenerated = null;
-
-const logoSVG = '<svg viewBox="0 0 15 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 0 L7.5 7 L15 0 L15 13 L0 13 Z" fill="#0e0e0e"/></svg>';
-
-// ─────────────────────────────────────────────
-// MILESTONES & DELIVERABLES
-// ─────────────────────────────────────────────
-function addMilestone(name = '', date = '', status = 'Upcoming') {
-  const list = document.getElementById('milestoneList');
-  const row = document.createElement('div');
-  row.className = 'item-row';
-  row.innerHTML = `
-    <input type="text" class="ms-name" placeholder="Milestone, e.g. Campaign launch" value="${name}">
-    <input type="date" class="ms-date" value="${date}">
-    <select class="ms-status">
-      <option${status==='Upcoming'?' selected':''}>Upcoming</option>
-      <option${status==='In progress'?' selected':''}>In progress</option>
-      <option${status==='Complete'?' selected':''}>Complete</option>
-      <option${status==='Delayed'?' selected':''}>Delayed</option>
-    </select>
-    <button class="item-remove" onclick="this.parentElement.remove()">×</button>
-  `;
-  list.appendChild(row);
-}
-
-function addDeliverable(name = '', owner = '', status = 'Not started') {
-  const list = document.getElementById('deliverableList');
-  const row = document.createElement('div');
-  row.className = 'item-row';
-  row.innerHTML = `
-    <input type="text" class="dl-name" placeholder="Deliverable, e.g. 6x social carousels" value="${name}">
-    <select class="dl-owner">
-      <option value="">Owner</option>
-      <option${owner==='Cassidy'?' selected':''}>Cassidy</option>
-      <option${owner==='Max'?' selected':''}>Max</option>
-      <option${owner==='Ally'?' selected':''}>Ally</option>
-      <option${owner==='Alexa'?' selected':''}>Alexa</option>
-      <option${owner==='Studio'?' selected':''}>Studio</option>
-    </select>
-    <select class="dl-status">
-      <option${status==='Not started'?' selected':''}>Not started</option>
-      <option${status==='In progress'?' selected':''}>In progress</option>
-      <option${status==='With client'?' selected':''}>With client</option>
-      <option${status==='Approved'?' selected':''}>Approved</option>
-      <option${status==='Delivered'?' selected':''}>Delivered</option>
-    </select>
-    <button class="item-remove" onclick="this.parentElement.remove()">×</button>
-  `;
-  list.appendChild(row);
-}
-
-function setRag(btn, status) {
-  ragStatus = status;
-  document.querySelectorAll('.rag-btn').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
-}
-
-// ─────────────────────────────────────────────
-// GENERATE
-// ─────────────────────────────────────────────
-function generateReport() {
-  const jobVal = document.getElementById('rJob').value;
-  if (!jobVal) { showToast('Select a job first'); return; }
-  const period = document.getElementById('rPeriod').value.trim();
-  if (!period) { showToast('Enter a reporting period'); return; }
-  const author = document.getElementById('rAuthor').value;
-  if (!author) { showToast('Select an author'); return; }
-  if (!ragStatus) { showToast('Set the overall status (green / amber / red)'); return; }
-
-  const [jobId, jobName] = jobVal.split('|');
-  const date = document.getElementById('rDate').value || new Date().toISOString().slice(0,10);
-  const progress = document.getElementById('rProgress').value.trim();
-  const next = document.getElementById('rNext').value.trim();
-  const risks = document.getElementById('rRisks').value.trim();
-
-  const milestones = [...document.querySelectorAll('#milestoneList .item-row')].map(r => ({
-    name: r.querySelector('.ms-name').value.trim(),
-    date: r.querySelector('.ms-date').value,
-    status: r.querySelector('.ms-status').value
-  })).filter(m => m.name);
-
-  const deliverables = [...document.querySelectorAll('#deliverableList .item-row')].map(r => ({
-    name: r.querySelector('.dl-name').value.trim(),
-    owner: r.querySelector('.dl-owner').value,
-    status: r.querySelector('.dl-status').value
-  })).filter(d => d.name);
-
-  const ragLabel = { green: 'On track', amber: 'At risk', red: 'Off track' }[ragStatus];
-
-  let html = `
-    <div class="rp-head">
-      <div>
-        <div class="rp-title">${jobName} — Status Report</div>
-        <div class="rp-meta">${jobId} · ${period} · ${new Date(date).toLocaleDateString('en-ZA',{day:'numeric',month:'long',year:'numeric'})} · Prepared by ${author}</div>
-      </div>
-      <div class="rp-mark">${logoSVG}</div>
-    </div>
-    <div class="rp-status-banner ${ragStatus}">● ${ragLabel}</div>
-  `;
-
-  if (progress) html += `<h2>Progress this period</h2><p>${progress.replace(/\n/g,'<br>')}</p>`;
-  if (next) html += `<h2>Up next</h2><p>${next.replace(/\n/g,'<br>')}</p>`;
-  if (risks) html += `<h2>Risks &amp; blockers</h2><p>${risks.replace(/\n/g,'<br>')}</p>`;
-
-  if (milestones.length) {
-    html += `<h2>Milestones</h2><table class="rp-table">
-      <tr><th>Milestone</th><th>Date</th><th>Status</th></tr>`;
-    milestones.forEach(m => {
-      html += `<tr><td>${m.name}</td><td>${m.date ? new Date(m.date).toLocaleDateString('en-ZA',{day:'numeric',month:'short'}) : '—'}</td><td>${m.status}</td></tr>`;
-    });
-    html += `</table>`;
-  }
-
-  if (deliverables.length) {
-    html += `<h2>Deliverables</h2><table class="rp-table">
-      <tr><th>Deliverable</th><th>Owner</th><th>Status</th></tr>`;
-    deliverables.forEach(d => {
-      html += `<tr><td>${d.name}</td><td>${d.owner || '—'}</td><td>${d.status}</td></tr>`;
-    });
-    html += `</table>`;
-  }
-
-  html += `<p style="margin-top:32px; font-size:11px; color:var(--muted)">Generated via Mama Hub · ${new Date().toLocaleDateString('en-ZA',{day:'numeric',month:'long',year:'numeric'})}</p>`;
-
-  document.getElementById('reportPreview').innerHTML = html;
-  document.getElementById('generatedSection').style.display = 'block';
-  document.getElementById('generatedSection').scrollIntoView({ behavior:'smooth' });
-
-  lastGenerated = { jobId, jobName, period, date, author, rag: ragStatus, html };
-  const existing = savedReports.findIndex(r => r.jobId === jobId && r.period === period);
-  if (existing > -1) { savedReports[existing] = { ...lastGenerated, savedAt: new Date().toISOString() }; }
-  else { savedReports.unshift({ ...lastGenerated, savedAt: new Date().toISOString() }); }
-  localStorage.setItem('mama-reports', JSON.stringify(savedReports));
-  renderSaved();
-  if (window.Mama) Mama.Guard.clear();
-  showToast('Report generated and saved to Job Hub ✓');
-}
-
-// ─────────────────────────────────────────────
-// SAVE / LIST
-// ─────────────────────────────────────────────
-function saveReport() {
-  if (!lastGenerated) return;
-  const existing = savedReports.findIndex(r => r.jobId === lastGenerated.jobId && r.period === lastGenerated.period);
-  if (existing > -1) { savedReports[existing] = { ...lastGenerated, savedAt: new Date().toISOString() }; }
-  else { savedReports.unshift({ ...lastGenerated, savedAt: new Date().toISOString() }); }
-  localStorage.setItem('mama-reports', JSON.stringify(savedReports));
-  renderSaved();
-  showToast('Report saved to Job Hub');
-}
-
-function renderSaved() {
-  const el = document.getElementById('savedList');
-  if (!savedReports.length) {
-    el.innerHTML = '<div class="empty-state">No saved reports yet. Generate one in the "New report" tab and hit save.</div>';
-    return;
-  }
-  el.innerHTML = savedReports.map((r, i) => {
-    const chip = { green:'chip-green', amber:'chip-amber', red:'chip-red' }[r.rag];
-    const label = { green:'On track', amber:'At risk', red:'Off track' }[r.rag];
-    return `<div class="report-list-item" onclick="viewSavedReport(${i})">
-      <div class="rli-left">
-        <div class="rli-title">${r.jobName} — ${r.period}</div>
-        <div class="rli-meta">${r.jobId} · ${new Date(r.date).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'})} · ${r.author}${r.savedAt?' · Saved '+new Date(r.savedAt).toLocaleString('en-ZA',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):''}</div>
-      </div>
-      <span class="chip ${chip}">${label}</span>
-    </div>`;
-  }).join('');
-}
-
-function viewSavedReport(i) {
-  const r = savedReports[i];
-  switchView('new');
-  document.getElementById('reportPreview').innerHTML = r.html;
-  document.getElementById('generatedSection').style.display = 'block';
-  document.getElementById('generatedSection').scrollIntoView({ behavior:'smooth' });
-}
-
-// ─────────────────────────────────────────────
-// MISC
-// ─────────────────────────────────────────────
-function copyReport() {
-  navigator.clipboard.writeText(document.getElementById('reportPreview').innerText)
-    .then(() => showToast('Copied to clipboard'));
-}
-
-function clearForm() {
-  if (!confirm('Clear the form?')) return;
-  document.querySelectorAll('#viewNew input[type=text], #viewNew textarea').forEach(e => e.value = '');
-  document.getElementById('rJob').value = '';
-  document.getElementById('rAuthor').value = '';
-  document.querySelectorAll('.rag-btn').forEach(b => b.classList.remove('selected'));
-  ragStatus = null;
-  document.getElementById('milestoneList').innerHTML = '';
-  document.getElementById('deliverableList').innerHTML = '';
-  addMilestone(); addDeliverable();
-  document.getElementById('generatedSection').style.display = 'none';
-}
-
-function switchView(view) {
-  document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  const cap = view.charAt(0).toUpperCase() + view.slice(1);
-  document.getElementById('view' + cap).classList.add('active');
-  document.getElementById('tab' + cap).classList.add('active');
-}
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2600);
-}
-
-// INIT
-document.getElementById('rDate').valueAsDate = new Date();
-addMilestone();
-addDeliverable();
+let ragStatus=null,savedReports=JSON.parse(localStorage.getItem('mama-reports')||'[]'),lastGenerated=null;
+const logoSVG='<svg viewBox="0 0 15 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 0 L7.5 7 L15 0 L15 13 L0 13 Z" fill="#0e0e0e"/></svg>';
+function addMilestone(name='',date='',status='Upcoming'){const list=document.getElementById('milestoneList');const row=document.createElement('div');row.className='item-row';row.innerHTML=`<input type="text" class="ms-name" placeholder="Milestone, e.g. Campaign launch" value="${name}"><input type="date" class="ms-date" value="${date}"><select class="ms-status"><option${status==='Upcoming'?' selected':''}>Upcoming</option><option${status==='In progress'?' selected':''}>In progress</option><option${status==='Complete'?' selected':''}>Complete</option><option${status==='Delayed'?' selected':''}>Delayed</option></select><button class="item-remove" onclick="this.parentElement.remove()">×</button>`;list.appendChild(row);}
+function addDeliverable(name='',owner='',status='Not started'){const list=document.getElementById('deliverableList');const row=document.createElement('div');row.className='item-row';row.innerHTML=`<input type="text" class="dl-name" placeholder="Deliverable, e.g. 6x social carousels" value="${name}"><select class="dl-owner"><option value="">Owner</option><option${owner==='Cassidy'?' selected':''}>Cassidy</option><option${owner==='Max'?' selected':''}>Max</option><option${owner==='Ally'?' selected':''}>Ally</option><option${owner==='Alexa'?' selected':''}>Alexa</option><option${owner==='Studio'?' selected':''}>Studio</option></select><select class="dl-status"><option${status==='Not started'?' selected':''}>Not started</option><option${status==='In progress'?' selected':''}>In progress</option><option${status==='With client'?' selected':''}>With client</option><option${status==='Approved'?' selected':''}>Approved</option><option${status==='Delivered'?' selected':''}>Delivered</option></select><button class="item-remove" onclick="this.parentElement.remove()">×</button>`;list.appendChild(row);}
+function setRag(btn,status){ragStatus=status;document.querySelectorAll('.rag-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');}
+function checkContinue(){const v=document.getElementById('rJob').value,bn=document.getElementById('continueBanner');if(!v){bn.style.display='none';return;}const[jid]=v.split('|');const last=savedReports.find(r=>r.jobId===jid);if(last){document.getElementById('continueLabel').textContent=last.period+(last.date?' · '+new Date(last.date).toLocaleDateString('en-ZA',{day:'numeric',month:'short'}):'');bn.style.display='flex';}else{bn.style.display='none';}}
+function continueFromLast(){const v=document.getElementById('rJob').value;if(!v)return;const[jid]=v.split('|');const last=savedReports.find(r=>r.jobId===jid);if(last)continueFromReport(last);}
+function continueFromReport(r){if(!r)return;switchView('new');const m=[...document.querySelectorAll('#rJob option')].find(o=>o.value.startsWith(r.jobId+'|'));if(m)document.getElementById('rJob').value=m.value;document.getElementById('rAuthor').value=r.author||'';document.getElementById('rPeriod').value='';document.getElementById('rDate').valueAsDate=new Date();document.getElementById('rProgress').value=r.next||'';document.getElementById('rNext').value='';document.getElementById('rRisks').value=r.risks||'';ragStatus=null;document.querySelectorAll('.rag-btn').forEach(b=>b.classList.remove('selected'));document.getElementById('milestoneList').innerHTML='';(r.milestones||[]).forEach(ms=>addMilestone(ms.name,ms.date,ms.status));if(!(r.milestones||[]).length)addMilestone();document.getElementById('deliverableList').innerHTML='';(r.deliverables||[]).forEach(d=>addDeliverable(d.name,d.owner,d.status));if(!(r.deliverables||[]).length)addDeliverable();document.getElementById('continueBanner').style.display='none';document.getElementById('generatedSection').style.display='none';showToast('Pre-filled from last report — update what changed, then generate.');window.scrollTo(0,0);}
+function generateReport(){const jv=document.getElementById('rJob').value;if(!jv){showToast('Select a job first');return;}const period=document.getElementById('rPeriod').value.trim();if(!period){showToast('Enter a reporting period');return;}const author=document.getElementById('rAuthor').value;if(!author){showToast('Select an author');return;}if(!ragStatus){showToast('Set the overall status');return;}const[jobId,jobName]=jv.split('|');const date=document.getElementById('rDate').value||new Date().toISOString().slice(0,10);const progress=document.getElementById('rProgress').value.trim();const next=document.getElementById('rNext').value.trim();const risks=document.getElementById('rRisks').value.trim();const milestones=[...document.querySelectorAll('#milestoneList .item-row')].map(r=>({name:r.querySelector('.ms-name').value.trim(),date:r.querySelector('.ms-date').value,status:r.querySelector('.ms-status').value})).filter(m=>m.name);const deliverables=[...document.querySelectorAll('#deliverableList .item-row')].map(r=>({name:r.querySelector('.dl-name').value.trim(),owner:r.querySelector('.dl-owner').value,status:r.querySelector('.dl-status').value})).filter(d=>d.name);const msA=milestones.filter(m=>m.status!=='Complete'),msD=milestones.filter(m=>m.status==='Complete');const dlA=deliverables.filter(d=>d.status!=='Delivered'),dlD=deliverables.filter(d=>d.status==='Delivered');const rl={green:'On track',amber:'At risk',red:'Off track'}[ragStatus];let html=`<div class="rp-head"><div><div class="rp-title">${jobName} — Status Report</div><div class="rp-meta">${jobId} · ${period} · ${new Date(date).toLocaleDateString('en-ZA',{day:'numeric',month:'long',year:'numeric'})} · Prepared by ${author}</div></div><div class="rp-mark">${logoSVG}</div></div><div class="rp-status-banner ${ragStatus}">● ${rl}</div>`;if(progress)html+=`<h2>Progress this period</h2><p>${progress.replace(/\n/g,'<br>')}</p>`;if(next)html+=`<h2>Up next</h2><p>${next.replace(/\n/g,'<br>')}</p>`;if(risks)html+=`<h2>Risks &amp; blockers</h2><p>${risks.replace(/\n/g,'<br>')}</p>`;if(milestones.length){html+=`<h2>Milestones</h2><table class="rp-table"><tr><th>Milestone</th><th>Date</th><th>Status</th></tr>`;[...msA,...msD].forEach(m=>{const dn=m.status==='Complete';html+=`<tr style="${dn?'opacity:0.45':''}"><td style="${dn?'text-decoration:line-through':''}">${m.name}</td><td>${m.date?new Date(m.date).toLocaleDateString('en-ZA',{day:'numeric',month:'short'}):'—'}</td><td>${m.status}</td></tr>`;});html+=`</table>`;}if(deliverables.length){html+=`<h2>Deliverables</h2><table class="rp-table"><tr><th>Deliverable</th><th>Owner</th><th>Status</th></tr>`;[...dlA,...dlD].forEach(d=>{const dn=d.status==='Delivered';html+=`<tr style="${dn?'opacity:0.45':''}"><td style="${dn?'text-decoration:line-through':''}">${d.name}</td><td>${d.owner||'—'}</td><td>${d.status}</td></tr>`;});html+=`</table>`;}html+=`<p style="margin-top:32px;font-size:11px;color:var(--muted)">Mama Hub · ${new Date().toLocaleDateString('en-ZA',{day:'numeric',month:'long',year:'numeric'})}</p>`;document.getElementById('reportPreview').innerHTML=html;document.getElementById('generatedSection').style.display='block';document.getElementById('generatedSection').scrollIntoView({behavior:'smooth'});lastGenerated={jobId,jobName,period,date,author,rag:ragStatus,progress,next,risks,milestones,deliverables,html};const ex=savedReports.findIndex(r=>r.jobId===jobId&&r.period===period);if(ex>-1){savedReports[ex]={...lastGenerated,savedAt:new Date().toISOString()};}else{savedReports.unshift({...lastGenerated,savedAt:new Date().toISOString()});}localStorage.setItem('mama-reports',JSON.stringify(savedReports));renderSaved();if(window.Mama)Mama.Guard.clear();showToast('Report saved ✓');}
+function renderSaved(){const el=document.getElementById('savedList');if(!savedReports.length){el.innerHTML='<div class="empty-state">No saved reports yet. Generate one above.</div>';return;}el.innerHTML=savedReports.map((r,i)=>{const chip={green:'chip-green',amber:'chip-amber',red:'chip-red'}[r.rag]||'';const label={green:'On track',amber:'At risk',red:'Off track'}[r.rag]||'—';const ts=r.savedAt?new Date(r.savedAt).toLocaleString('en-ZA',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'';return `<div class="report-list-item" style="display:flex;align-items:center;gap:10px"><div style="flex:1;cursor:pointer;min-width:0" onclick="viewSavedReport(${i})"><div class="rli-title">${r.jobName} — ${r.period}</div><div class="rli-meta">${r.author}${ts?' · '+ts:''}</div></div><button onclick="event.stopPropagation();continueFromReport(savedReports[${i}])" style="padding:5px 12px;font-size:12px;font-weight:700;border:none;border-radius:6px;background:var(--yellow);color:var(--black);cursor:pointer;white-space:nowrap;flex-shrink:0">Continue →</button><span class="chip ${chip}" style="flex-shrink:0">${label}</span></div>`;}).join('');}
+function viewSavedReport(i){const r=savedReports[i];switchView('new');document.getElementById('reportPreview').innerHTML=r.html;document.getElementById('generatedSection').style.display='block';document.getElementById('generatedSection').scrollIntoView({behavior:'smooth'});}
+function copyReport(){navigator.clipboard.writeText(document.getElementById('reportPreview').innerText).then(()=>showToast('Copied'));}
+function clearForm(){if(!confirm('Clear the form?'))return;document.querySelectorAll('#viewNew input[type=text],#viewNew textarea').forEach(e=>e.value='');document.getElementById('rJob').value='';document.getElementById('rAuthor').value='';document.querySelectorAll('.rag-btn').forEach(b=>b.classList.remove('selected'));ragStatus=null;document.getElementById('milestoneList').innerHTML='';document.getElementById('deliverableList').innerHTML='';document.getElementById('continueBanner').style.display='none';addMilestone();addDeliverable();document.getElementById('generatedSection').style.display='none';}
+function switchView(v){document.querySelectorAll('.view-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));const cap=v.charAt(0).toUpperCase()+v.slice(1);document.getElementById('view'+cap).classList.add('active');document.getElementById('tab'+cap).classList.add('active');}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);}
+const _pa=(()=>{try{return JSON.parse(localStorage.getItem('mama-report-action'));}catch(e){return null;}})();
+if(_pa){localStorage.removeItem('mama-report-action');if(_pa.action==='continue'){const _r=savedReports.find(r=>r.jobId===_pa.jobId&&(_pa.period?r.period===_pa.period:true));if(_r)setTimeout(()=>continueFromReport(_r),100);}}
+document.getElementById('rDate').valueAsDate=new Date();addMilestone();addDeliverable();renderSaved();
 </script>
 </body>
 </html>
