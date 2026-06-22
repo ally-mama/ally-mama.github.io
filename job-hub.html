@@ -300,6 +300,14 @@
     pointer-events: none;
   }
   .toast.show { opacity: 1; transform: translateY(0); }
+  .cmp-modal { background: var(--white); border-radius: 14px; padding: 28px; width: 100%; max-width: 360px; position: relative; }
+  .cmp-modal h3 { font-family: var(--serif); font-size: 18px; margin: 0 0 4px; }
+  .cmp-modal .cmp-subtitle { font-size: 13px; color: var(--muted); margin: 0 0 20px; }
+  .cmp-modal label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); display: block; margin-bottom: 6px; margin-top: 14px; }
+  .cmp-modal select, .cmp-modal input[type=number] { width: 100%; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--off); color: var(--text); font-size: 14px; box-sizing: border-box; }
+  .cmp-modal .cmp-actions { display: flex; gap: 8px; margin-top: 20px; }
+  .cmp-modal .btn-confirm { flex: 1; padding: 10px; background: var(--yellow); color: var(--black); font-weight: 700; font-size: 14px; border: none; border-radius: 8px; cursor: pointer; }
+  .cmp-modal .btn-cancel { padding: 10px 16px; background: var(--off); color: var(--muted); font-size: 14px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; }
 </style>
   <script src="mama-shared.js"></script>
 </head>
@@ -396,6 +404,23 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- COMPLETION MODAL -->
+<div class="modal-overlay" id="completionModal" onclick="if(event.target===this)closeCompletion()">
+  <div class="cmp-modal">
+    <button class="modal-close" onclick="closeCompletion()">×</button>
+    <h3>Mark complete</h3>
+    <p class="cmp-subtitle" id="cmpTitle"></p>
+    <label>Completed by</label>
+    <select id="cmpMember"></select>
+    <label>Hours spent</label>
+    <input type="number" id="cmpHours" min="0.25" step="0.25" placeholder="e.g. 2.5" />
+    <div class="cmp-actions">
+      <button class="btn-cancel" onclick="closeCompletion()">Cancel</button>
+      <button class="btn-confirm" onclick="confirmComplete()">Log & complete</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ─────────────────────────────────────────────
 // SHARED STORAGE (same keys as the other tools)
@@ -477,7 +502,54 @@ window.addEventListener('storage', () => {
   reports = storeGet(STORE_REPORTS) || [];
   quotes = storeGet(STORE_QUOTES) || [];
   todos = storeGet(STORE_TODOS) || [];
-  renderList();
+  // ─── TODO COMPLETION ────────────────────────────────
+let pendingTodoId = null;
+
+function startComplete(todoId) {
+  const t = todos.find(x => x.id === todoId);
+  if (!t || t.done) return;
+  pendingTodoId = todoId;
+  document.getElementById('cmpTitle').textContent = '"' + (t.title || 'To-do') + '"';
+  const identityId = (() => { try { return JSON.parse(localStorage.getItem('mama-time-identity')); } catch(e) { return null; }})()
+    || (() => { try { return JSON.parse(localStorage.getItem('mama-todos-identity')); } catch(e) { return null; }})();
+  document.getElementById('cmpMember').innerHTML = team.map(m =>
+    `<option value="${m.id}"${m.id === identityId ? ' selected' : ''}>${m.name} — ${m.role}</option>`
+  ).join('');
+  document.getElementById('cmpHours').value = '';
+  document.getElementById('completionModal').classList.add('open');
+}
+
+function closeCompletion() {
+  document.getElementById('completionModal').classList.remove('open');
+  pendingTodoId = null;
+}
+
+function confirmComplete() {
+  const hours = parseFloat(document.getElementById('cmpHours').value);
+  if (!hours || hours <= 0) { showToast('Enter how many hours it took'); return; }
+  const memberId = parseInt(document.getElementById('cmpMember').value);
+  const t = todos.find(x => x.id === pendingTodoId);
+  if (!t) return;
+
+  // Mark todo done
+  t.done = true; t.status = 'done';
+  try { localStorage.setItem('mama-todos', JSON.stringify(todos)); } catch(e) {}
+
+  // Create time entry
+  const allEntries = (() => { try { return JSON.parse(localStorage.getItem('mama-time-entries') || '[]'); } catch(e) { return []; }})();
+  const newId = Math.max(0, ...allEntries.map(e => e.id || 0)) + 1;
+  allEntries.push({ id: newId, memberId, jobId: t.jobId, date: new Date().toISOString().slice(0,10), hours, desc: t.title || 'To-do completed', type: 'work' });
+  try { localStorage.setItem('mama-time-entries', JSON.stringify(allEntries)); } catch(e) {}
+
+  // Refresh local state and re-render
+  entries = storeGet(STORE_ENTRIES) || [];
+  closeCompletion();
+  openJob(currentJob, true);
+  const memberName = team.find(m => m.id === memberId)?.name || 'Team member';
+  showToast(`✓ ${hours}h logged for ${memberName}`);
+}
+
+renderList();
   if (currentJob) openJob(currentJob, true);
 });
 
@@ -596,12 +668,12 @@ function openJob(i, keepScroll) {
   const jt = jobTodos(j);
   document.getElementById('todosList').innerHTML = jt.length
     ? jt.map(t => `
-        <div class="doc-row">
+        <div class="doc-row" style="cursor:${t.done?'default':'pointer'}" onclick="${t.done?'':('startComplete('+t.id+')')}">
           <div style="display:flex;align-items:center;gap:10px">
-            <div style="width:16px;height:16px;border-radius:4px;border:2px solid var(--border);background:${t.done?'var(--yellow)':'transparent'};flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px">${t.done?'✓':''}</div>
-            <div>
+            <div style="width:18px;height:18px;border-radius:5px;border:2px solid ${t.done?'var(--yellow)':'var(--border)'};background:${t.done?'var(--yellow)':'transparent'};flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;transition:all .15s">${t.done?'✓':''}</div>
+            <div style="flex:1;min-width:0">
               <div class="doc-title" style="${t.done?'text-decoration:line-through;opacity:0.5':''}">${t.title||'Untitled'}</div>
-              <div class="doc-meta">${t.done?'Done':t.status==='in-progress'?'In progress':'To do'}${t.due?' · Due '+t.due:''}</div>
+              <div class="doc-meta">${t.done?'Done — hours logged':'Click to mark complete & log hours'}</div>
             </div>
           </div>
         </div>`).join('')
