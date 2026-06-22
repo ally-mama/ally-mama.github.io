@@ -499,9 +499,10 @@ function renderList() {
       <div class="job-card-id">${j.id}</div>
       <div class="job-card-name">${j.name}</div>
       <div class="job-card-stats">
-        <div><div class="jc-stat-num">${jobHours(j)}h</div><div class="jc-stat-label">Logged</div></div>
         <div><div class="jc-stat-num">${jobBriefs(j).length}</div><div class="jc-stat-label">Briefs</div></div>
         <div><div class="jc-stat-num">${jobReports(j).length}</div><div class="jc-stat-label">Reports</div></div>
+        <div><div class="jc-stat-num">${jobQuotes(j).length}</div><div class="jc-stat-label">Quotes</div></div>
+        <div><div class="jc-stat-num">${jobHours(j)}h</div><div class="jc-stat-label">Logged</div></div>
       </div>
     </div>
   `).join('');
