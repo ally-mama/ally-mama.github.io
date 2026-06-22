@@ -374,3 +374,429 @@
     <a href="settings.html">Settings</a>
   </nav>
 </div>
+
+<div class="container">
+  <div class="main-header">
+    <div>
+      <div class="main-title">Status Reports</div>
+      <div class="main-sub">Track project status per job. Snapshots build on each other — carry milestones forward, update what changed, keep the history.</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" id="tabNew" onclick="switchView('new')">New report</button>
+    <button class="tab" id="tabSaved" onclick="switchView('saved')">Saved reports</button>
+  </div>
+
+  <!-- ── NEW REPORT ── -->
+  <div class="view-panel active" id="viewNew">
+
+    <div class="card">
+      <div class="card-title">Report details</div>
+      <div class="field-row-3">
+        <div class="field">
+          <label>Job</label>
+          <select id="rJob" onchange="checkContinue()">
+            <option value="">— Select job —</option>
+            <option value="SAFW001|SA Fashion Week">SAFW001 — SA Fashion Week</option>
+            <option value="SHA001|Share Agency">SHA001 — Share Agency</option>
+            <option value="GAN001|Gan Tamar">GAN001 — Gan Tamar</option>
+            <option value="BAN001|Better Angels">BAN001 — Better Angels</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Reporting period</label>
+          <input type="text" id="rPeriod" placeholder="e.g. Week 24 / June 2026">
+        </div>
+        <div class="field">
+          <label>Date</label>
+          <input type="date" id="rDate">
+        </div>
+      </div>
+      <div id="continueBanner" style="display:none;background:#fffbeb;border:1px solid #f0c14b;border-radius:10px;padding:12px 16px;margin-bottom:12px;align-items:center;justify-content:space-between;gap:12px">
+        <div style="font-size:13px;color:#0e0e0e">Last report: <strong id="continueLabel"></strong></div>
+        <button onclick="continueFromLast()" style="padding:6px 14px;background:var(--yellow);color:var(--black);font-weight:700;font-size:12px;border:none;border-radius:7px;cursor:pointer;white-space:nowrap">Continue from last →</button>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Prepared by</label>
+          <select id="rAuthor">
+            <option value="">— Select —</option>
+            <option>Cassidy — Strategist</option>
+            <option>Max — Account Manager</option>
+            <option>Ally — Strategist</option>
+            <option>Alexa — COO</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Overall status</label>
+          <div class="rag-group" id="ragGroup">
+            <button class="rag-btn green" onclick="setRag(this,'green')">● On track</button>
+            <button class="rag-btn amber" onclick="setRag(this,'amber')">● At risk</button>
+            <button class="rag-btn red" onclick="setRag(this,'red')">● Off track</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Summary</div>
+      <div class="field">
+        <label>Progress this period</label>
+        <textarea id="rProgress" placeholder="What moved forward? Key wins, completed work, decisions made..."></textarea>
+      </div>
+      <div class="field">
+        <label>Up next</label>
+        <textarea id="rNext" placeholder="What's happening in the next period..."></textarea>
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label>Risks / blockers / needs from client</label>
+        <textarea id="rRisks" placeholder="Anything at risk, blocked, or waiting on client input..."></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Milestones</div>
+      <div class="item-list" id="milestoneList"></div>
+      <button class="add-item-btn" onclick="addMilestone()">+ Add milestone</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Deliverables</div>
+      <div class="item-list" id="deliverableList"></div>
+      <button class="add-item-btn" onclick="addDeliverable()">+ Add deliverable</button>
+    </div>
+
+    <div style="display:flex; gap:10px">
+      <button class="btn btn-yellow" id="generateBtn" onclick="generateReport()">Generate report ✦</button>
+      <button class="btn btn-outline" onclick="clearForm()">Clear</button>
+    </div>
+
+    <!-- GENERATED REPORT -->
+    <div id="generatedSection" style="display:none; margin-top:28px">
+      <!-- shown after fresh generate -->
+      <div class="action-bar" id="normalActionBar">
+        <button class="btn btn-primary btn-sm" onclick="saveReport()">💾 Save report</button>
+        <button class="btn btn-outline btn-sm" onclick="copyReport()">📋 Copy text</button>
+        <button class="btn btn-outline btn-sm" onclick="window.print()">⬇ Download PDF</button>
+        <button class="btn btn-yellow btn-sm" onclick="window.open('https://drive.google.com/drive/folders/1IkvW4HGv2w_Ro2RSYy0Ii52CfhG_SQUO','_blank')">☁ Open Drive folder</button>
+      </div>
+      <!-- shown when viewing previous report in continue mode -->
+      <div id="continueActionBar" style="display:none;margin-bottom:12px;padding:12px 16px;background:var(--mid);border-radius:10px;font-size:12px;color:var(--muted)">
+        ↑ Previous report shown for reference — update the form above, then generate the new one.
+      </div>
+      <div class="report-preview" id="reportPreview"></div>
+    </div>
+  </div>
+
+  <!-- ── SAVED ── -->
+  <div class="view-panel" id="viewSaved">
+    <div id="savedList">
+      <div class="empty-state">No saved reports yet. Generate one in the "New report" tab and hit save.</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let ragStatus = null;
+let savedReports = JSON.parse(localStorage.getItem('mama-reports') || '[]');
+let lastGenerated = null;
+let continueMode = false;
+const logoSVG = '<svg viewBox="0 0 15 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 0 L7.5 7 L15 0 L15 13 L0 13 Z" fill="#0e0e0e"/></svg>';
+
+// ─── CONTINUE BANNER ────────────────────────────────────
+function checkContinue() {
+  const jobVal = document.getElementById('rJob').value;
+  const banner = document.getElementById('continueBanner');
+  if (!jobVal) { banner.style.display = 'none'; return; }
+  const [jobId] = jobVal.split('|');
+  const last = savedReports.find(r => r.jobId === jobId);
+  if (last) {
+    document.getElementById('continueLabel').textContent = last.period + (last.date ? ' · ' + new Date(last.date).toLocaleDateString('en-ZA', {day:'numeric',month:'short'}) : '');
+    banner.style.display = 'flex';
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+function continueFromLast() {
+  const jobVal = document.getElementById('rJob').value;
+  if (!jobVal) return;
+  const [jobId] = jobVal.split('|');
+  const last = savedReports.find(r => r.jobId === jobId);
+  if (last) continueFromReport(last);
+}
+
+function continueFromReport(r) {
+  if (!r) return;
+  switchView('new');
+  const match = [...document.querySelectorAll('#rJob option')].find(o => o.value.startsWith(r.jobId + '|'));
+  if (match) document.getElementById('rJob').value = match.value;
+  document.getElementById('rAuthor').value = r.author || '';
+  document.getElementById('rPeriod').value = '';
+  document.getElementById('rDate').valueAsDate = new Date();
+  document.getElementById('rProgress').value = r.next || '';
+  document.getElementById('rNext').value = '';
+  document.getElementById('rRisks').value = r.risks || '';
+  ragStatus = null;
+  document.querySelectorAll('.rag-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('milestoneList').innerHTML = '';
+  (r.milestones || []).forEach(m => addMilestone(m.name, m.date, m.status));
+  if (!(r.milestones || []).length) addMilestone();
+  document.getElementById('deliverableList').innerHTML = '';
+  (r.deliverables || []).forEach(d => addDeliverable(d.name, d.owner, d.status));
+  if (!(r.deliverables || []).length) addDeliverable();
+  document.getElementById('continueBanner').style.display = 'none';
+  // show previous report for reference, with continue-mode UI
+  continueMode = true;
+  document.getElementById('generateBtn').textContent = 'Update status report ✦';
+  document.getElementById('reportPreview').innerHTML = r.html || '';
+  document.getElementById('normalActionBar').style.display = 'none';
+  document.getElementById('continueActionBar').style.display = 'block';
+  document.getElementById('generatedSection').style.display = r.html ? 'block' : 'none';
+  const hasRaw = !!(r.milestones || r.next || r.progress);
+  showToast(hasRaw ? 'Pre-filled from last report — update what changed, then generate.' : 'Job and author pre-filled. Re-enter milestones and deliverables, then generate.');
+  window.scrollTo(0, 0);
+}
+
+// ─────────────────────────────────────────────
+// MILESTONES & DELIVERABLES
+// ─────────────────────────────────────────────
+function addMilestone(name = '', date = '', status = 'Upcoming') {
+  const list = document.getElementById('milestoneList');
+  const row = document.createElement('div');
+  row.className = 'item-row';
+  row.innerHTML = `
+    <input type="text" class="ms-name" placeholder="Milestone, e.g. Campaign launch" value="${name}">
+    <input type="date" class="ms-date" value="${date}">
+    <select class="ms-status">
+      <option${status==='Upcoming'?' selected':''}>Upcoming</option>
+      <option${status==='In progress'?' selected':''}>In progress</option>
+      <option${status==='Complete'?' selected':''}>Complete</option>
+      <option${status==='Delayed'?' selected':''}>Delayed</option>
+    </select>
+    <button class="item-remove" onclick="this.parentElement.remove()">×</button>
+  `;
+  list.appendChild(row);
+}
+
+function addDeliverable(name = '', owner = '', status = 'Not started') {
+  const list = document.getElementById('deliverableList');
+  const row = document.createElement('div');
+  row.className = 'item-row';
+  row.innerHTML = `
+    <input type="text" class="dl-name" placeholder="Deliverable, e.g. 6x social carousels" value="${name}">
+    <select class="dl-owner">
+      <option value="">Owner</option>
+      <option${owner==='Cassidy'?' selected':''}>Cassidy</option>
+      <option${owner==='Max'?' selected':''}>Max</option>
+      <option${owner==='Ally'?' selected':''}>Ally</option>
+      <option${owner==='Alexa'?' selected':''}>Alexa</option>
+      <option${owner==='Studio'?' selected':''}>Studio</option>
+    </select>
+    <select class="dl-status">
+      <option${status==='Not started'?' selected':''}>Not started</option>
+      <option${status==='In progress'?' selected':''}>In progress</option>
+      <option${status==='With client'?' selected':''}>With client</option>
+      <option${status==='Approved'?' selected':''}>Approved</option>
+      <option${status==='Delivered'?' selected':''}>Delivered</option>
+    </select>
+    <button class="item-remove" onclick="this.parentElement.remove()">×</button>
+  `;
+  list.appendChild(row);
+}
+
+function setRag(btn, status) {
+  ragStatus = status;
+  document.querySelectorAll('.rag-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+// ─────────────────────────────────────────────
+// GENERATE
+// ─────────────────────────────────────────────
+function generateReport() {
+  const jobVal = document.getElementById('rJob').value;
+  if (!jobVal) { showToast('Select a job first'); return; }
+  const period = document.getElementById('rPeriod').value.trim();
+  if (!period) { showToast('Enter a reporting period'); return; }
+  const author = document.getElementById('rAuthor').value;
+  if (!author) { showToast('Select an author'); return; }
+  if (!ragStatus) { showToast('Set the overall status (green / amber / red)'); return; }
+
+  const [jobId, jobName] = jobVal.split('|');
+  const date = document.getElementById('rDate').value || new Date().toISOString().slice(0,10);
+  const progress = document.getElementById('rProgress').value.trim();
+  const next = document.getElementById('rNext').value.trim();
+  const risks = document.getElementById('rRisks').value.trim();
+
+  const milestones = [...document.querySelectorAll('#milestoneList .item-row')].map(r => ({
+    name: r.querySelector('.ms-name').value.trim(),
+    date: r.querySelector('.ms-date').value,
+    status: r.querySelector('.ms-status').value
+  })).filter(m => m.name);
+
+  const deliverables = [...document.querySelectorAll('#deliverableList .item-row')].map(r => ({
+    name: r.querySelector('.dl-name').value.trim(),
+    owner: r.querySelector('.dl-owner').value,
+    status: r.querySelector('.dl-status').value
+  })).filter(d => d.name);
+
+  const ragLabel = { green: 'On track', amber: 'At risk', red: 'Off track' }[ragStatus];
+
+  let html = `
+    <div class="rp-head">
+      <div>
+        <div class="rp-title">${jobName} — Status Report</div>
+        <div class="rp-meta">${jobId} · ${period} · ${new Date(date).toLocaleDateString('en-ZA',{day:'numeric',month:'long',year:'numeric'})} · Prepared by ${author}</div>
+      </div>
+      <div class="rp-mark">${logoSVG}</div>
+    </div>
+    <div class="rp-status-banner ${ragStatus}">● ${ragLabel}</div>
+  `;
+
+  if (progress) html += `<h2>Progress this period</h2><p>${progress.replace(/\n/g,'<br>')}</p>`;
+  if (next) html += `<h2>Up next</h2><p>${next.replace(/\n/g,'<br>')}</p>`;
+  if (risks) html += `<h2>Risks &amp; blockers</h2><p>${risks.replace(/\n/g,'<br>')}</p>`;
+
+  if (milestones.length) {
+    html += `<h2>Milestones</h2><table class="rp-table">
+      <tr><th>Milestone</th><th>Date</th><th>Status</th></tr>`;
+    milestones.forEach(m => {
+      html += `<tr><td>${m.name}</td><td>${m.date ? new Date(m.date).toLocaleDateString('en-ZA',{day:'numeric',month:'short'}) : '—'}</td><td>${m.status}</td></tr>`;
+    });
+    html += `</table>`;
+  }
+
+  if (deliverables.length) {
+    html += `<h2>Deliverables</h2><table class="rp-table">
+      <tr><th>Deliverable</th><th>Owner</th><th>Status</th></tr>`;
+    deliverables.forEach(d => {
+      html += `<tr><td>${d.name}</td><td>${d.owner || '—'}</td><td>${d.status}</td></tr>`;
+    });
+    html += `</table>`;
+  }
+
+  html += `<p style="margin-top:32px; font-size:11px; color:var(--muted)">Generated via Mama Hub · ${new Date().toLocaleDateString('en-ZA',{day:'numeric',month:'long',year:'numeric'})}</p>`;
+
+  document.getElementById('reportPreview').innerHTML = html;
+  document.getElementById('generatedSection').style.display = 'block';
+  // reset continue mode UI
+  continueMode = false;
+  document.getElementById('generateBtn').textContent = 'Generate report ✦';
+  document.getElementById('normalActionBar').style.display = 'flex';
+  document.getElementById('continueActionBar').style.display = 'none';
+  document.getElementById('generatedSection').scrollIntoView({ behavior:'smooth' });
+
+  lastGenerated = { jobId, jobName, period, date, author, rag: ragStatus, progress, next, risks, milestones, deliverables, html };
+
+  const existing = savedReports.findIndex(r => r.jobId === jobId && r.period === period);
+  if (existing > -1) { savedReports[existing] = { ...lastGenerated, savedAt: new Date().toISOString() }; }
+  else { savedReports.unshift({ ...lastGenerated, savedAt: new Date().toISOString() }); }
+  localStorage.setItem('mama-reports', JSON.stringify(savedReports));
+  renderSaved();
+  if (window.Mama) Mama.Guard.clear();
+  showToast('Report saved ✓');
+}
+
+// ─────────────────────────────────────────────
+// SAVE / LIST
+// ─────────────────────────────────────────────
+function saveReport() {
+  if (!lastGenerated) return;
+  const existing = savedReports.findIndex(r => r.jobId === lastGenerated.jobId && r.period === lastGenerated.period);
+  if (existing > -1) { savedReports[existing] = { ...lastGenerated, savedAt: new Date().toISOString() }; }
+  else { savedReports.unshift({ ...lastGenerated, savedAt: new Date().toISOString() }); }
+  localStorage.setItem('mama-reports', JSON.stringify(savedReports));
+  renderSaved();
+  showToast('Report saved to Job Hub');
+}
+
+function renderSaved() {
+  const el = document.getElementById('savedList');
+  if (!savedReports.length) {
+    el.innerHTML = '<div class="empty-state">No saved reports yet. Generate one in the "New report" tab and hit save.</div>';
+    return;
+  }
+  el.innerHTML = savedReports.map((r, i) => {
+    const chip = { green:'chip-green', amber:'chip-amber', red:'chip-red' }[r.rag] || '';
+    const label = { green:'On track', amber:'At risk', red:'Off track' }[r.rag] || '—';
+    const savedDate = r.savedAt ? new Date(r.savedAt) : null;
+    const dateLabel = savedDate ? savedDate.toLocaleDateString('en-ZA', {weekday:'long', day:'numeric', month:'long', year:'numeric'}) : '';
+    const timeLabel = savedDate ? savedDate.toLocaleTimeString('en-ZA', {hour:'2-digit', minute:'2-digit'}) : '';
+    return `<div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin:${i>0?'20px':'0'} 0 6px">${dateLabel}</div>
+    <div class="report-list-item" style="display:flex;align-items:center;gap:10px">
+      <div style="flex:1;cursor:pointer;min-width:0" onclick="viewSavedReport(${i})">
+        <div class="rli-title">${r.jobName} — ${r.period}</div>
+        <div class="rli-meta">${r.author}${timeLabel ? ' · ' + timeLabel : ''}</div>
+      </div>
+      <button onclick="event.stopPropagation();continueFromReport(savedReports[${i}])" style="padding:5px 12px;font-size:12px;font-weight:700;border:none;border-radius:6px;background:var(--yellow);color:var(--black);cursor:pointer;white-space:nowrap;flex-shrink:0">Continue →</button>
+      <span class="chip ${chip}" style="flex-shrink:0">${label}</span>
+    </div>`;
+  }).join('');
+}
+
+function viewSavedReport(i) {
+  const r = savedReports[i];
+  switchView('new');
+  document.getElementById('reportPreview').innerHTML = r.html;
+  document.getElementById('generatedSection').style.display = 'block';
+  document.getElementById('generatedSection').scrollIntoView({ behavior:'smooth' });
+}
+
+// ─────────────────────────────────────────────
+// MISC
+// ─────────────────────────────────────────────
+function copyReport() {
+  navigator.clipboard.writeText(document.getElementById('reportPreview').innerText)
+    .then(() => showToast('Copied to clipboard'));
+}
+
+function clearForm() {
+  if (!confirm('Clear the form?')) return;
+  document.querySelectorAll('#viewNew input[type=text], #viewNew textarea').forEach(e => e.value = '');
+  document.getElementById('rJob').value = '';
+  document.getElementById('rAuthor').value = '';
+  document.querySelectorAll('.rag-btn').forEach(b => b.classList.remove('selected'));
+  ragStatus = null;
+  document.getElementById('milestoneList').innerHTML = '';
+  document.getElementById('deliverableList').innerHTML = '';
+  addMilestone(); addDeliverable();
+  document.getElementById('generatedSection').style.display = 'none';
+}
+
+function switchView(view) {
+  document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  const cap = view.charAt(0).toUpperCase() + view.slice(1);
+  document.getElementById('view' + cap).classList.add('active');
+  document.getElementById('tab' + cap).classList.add('active');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+// Handle action queued from Job Hub
+const _pa = (() => { try { return JSON.parse(localStorage.getItem('mama-report-action')); } catch(e) { return null; } })();
+if (_pa) {
+  localStorage.removeItem('mama-report-action');
+  if (_pa.action === 'continue') {
+    const _r = savedReports.find(r => r.jobId === _pa.jobId && (_pa.period ? r.period === _pa.period : true));
+    if (_r) setTimeout(() => continueFromReport(_r), 100);
+  }
+}
+
+// INIT
+document.getElementById('rDate').valueAsDate = new Date();
+addMilestone();
+addDeliverable();
+renderSaved();
+</script>
+</body>
+</html>
