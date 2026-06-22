@@ -370,6 +370,14 @@
 
     <div class="section-card">
       <div class="section-head">
+        <span class="section-title">To-dos</span>
+        <a class="section-action" href="my-todos.html">+ New to-do</a>
+      </div>
+      <div id="todosList"></div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-head">
         <span class="section-title">Time on this job</span>
         <a class="section-action" href="my-time.html">+ Log time</a>
       </div>
@@ -397,6 +405,7 @@ const STORE_TEAM = 'mama-time-team';
 const STORE_BRIEFS = 'mama-briefs';
 const STORE_REPORTS = 'mama-reports';
 const STORE_QUOTES = 'mama-quotes';
+const STORE_TODOS = 'mama-todos';
 
 let memStore = {};
 function storeGet(key) {
@@ -457,6 +466,7 @@ let entries = storeGet(STORE_ENTRIES) || [];
 let briefs = storeGet(STORE_BRIEFS) || [];
 let reports = storeGet(STORE_REPORTS) || [];
 let quotes = storeGet(STORE_QUOTES) || [];
+let todos = storeGet(STORE_TODOS) || [];
 let currentJob = null;
 
 // Live refresh when other tools save data
@@ -466,6 +476,7 @@ window.addEventListener('storage', () => {
   briefs = storeGet(STORE_BRIEFS) || [];
   reports = storeGet(STORE_REPORTS) || [];
   quotes = storeGet(STORE_QUOTES) || [];
+  todos = storeGet(STORE_TODOS) || [];
   renderList();
   if (currentJob) openJob(currentJob, true);
 });
@@ -481,6 +492,9 @@ function jobReports(job) {
 }
 function jobQuotes(job) {
   return quotes.filter(q => q.jobId === job.id);
+}
+function jobTodos(job) {
+  return todos.filter(t => t.jobId === job.id);
 }
 function jobHours(job) {
   return entries.filter(e => e.jobId === job.id).reduce((s,e)=>s+e.hours,0);
@@ -502,6 +516,7 @@ function renderList() {
         <div><div class="jc-stat-num">${jobBriefs(j).length}</div><div class="jc-stat-label">Briefs</div></div>
         <div><div class="jc-stat-num">${jobReports(j).length}</div><div class="jc-stat-label">Reports</div></div>
         <div><div class="jc-stat-num">${jobQuotes(j).length}</div><div class="jc-stat-label">Quotes</div></div>
+        <div><div class="jc-stat-num">${jobTodos(j).length}</div><div class="jc-stat-label">To-dos</div></div>
         <div><div class="jc-stat-num">${jobHours(j)}h</div><div class="jc-stat-label">Logged</div></div>
       </div>
     </div>
@@ -577,6 +592,20 @@ function openJob(i, keepScroll) {
           <span style="font-size:12px;color:var(--muted)">›</span>
         </div>`).join('')
     : '<div class="empty-row">No quotes yet for this job. Build one in Quote Builder and it appears here automatically.</div>';
+
+  const jt = jobTodos(j);
+  document.getElementById('todosList').innerHTML = jt.length
+    ? jt.map(t => `
+        <div class="doc-row">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:16px;height:16px;border-radius:4px;border:2px solid var(--border);background:${t.done?'var(--yellow)':'transparent'};flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px">${t.done?'✓':''}</div>
+            <div>
+              <div class="doc-title" style="${t.done?'text-decoration:line-through;opacity:0.5':''}">${t.title||'Untitled'}</div>
+              <div class="doc-meta">${t.done?'Done':t.status==='in-progress'?'In progress':'To do'}${t.due?' · Due '+t.due:''}</div>
+            </div>
+          </div>
+        </div>`).join('')
+    : '<div class="empty-row">No to-dos logged for this job yet. Add one in the To-Dos section and it appears here automatically.</div>';
 
   // Time per member
   const byMember = {};
