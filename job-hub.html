@@ -458,7 +458,6 @@ const jobs = [
       { label: 'YouTube', url: 'https://www.youtube.com/user/SAFashionWeek' },
       { label: 'TikTok', url: 'https://www.tiktok.com/@safashionweek' },
     ],
-    // Brief-builder job keys that map to this job
     briefKeys: ['safw'],
   },
   {
@@ -496,6 +495,7 @@ let reports = storeGet(STORE_REPORTS) || [];
 let quotes = storeGet(STORE_QUOTES) || [];
 let todos = storeGet(STORE_TODOS) || [];
 let currentJob = null;
+let currentReportIdx = null;
 
 // Live refresh when other tools save data
 window.addEventListener('storage', () => {
@@ -505,7 +505,11 @@ window.addEventListener('storage', () => {
   reports = storeGet(STORE_REPORTS) || [];
   quotes = storeGet(STORE_QUOTES) || [];
   todos = storeGet(STORE_TODOS) || [];
-  // ─── TODO COMPLETION ────────────────────────────────
+  renderList();
+  if (currentJob !== null) openJob(currentJob, true);
+});
+
+// ─── TODO COMPLETION ────────────────────────────────
 let pendingTodoId = null;
 
 function startComplete(todoId) {
@@ -534,27 +538,20 @@ function confirmComplete() {
   const t = todos.find(x => x.id === pendingTodoId);
   if (!t) return;
 
-  // Mark todo done
   t.done = true; t.status = 'done';
   try { localStorage.setItem('mama-todos', JSON.stringify(todos)); } catch(e) {}
 
-  // Create time entry
   const allEntries = (() => { try { return JSON.parse(localStorage.getItem('mama-time-entries') || '[]'); } catch(e) { return []; }})();
   const newId = Math.max(0, ...allEntries.map(e => e.id || 0)) + 1;
   allEntries.push({ id: newId, memberId, jobId: t.jobId, date: new Date().toISOString().slice(0,10), hours, desc: t.title || 'To-do completed', type: 'work' });
   try { localStorage.setItem('mama-time-entries', JSON.stringify(allEntries)); } catch(e) {}
 
-  // Refresh local state and re-render
   entries = storeGet(STORE_ENTRIES) || [];
   closeCompletion();
   openJob(currentJob, true);
   const memberName = team.find(m => m.id === memberId)?.name || 'Team member';
   showToast(`✓ ${hours}h logged for ${memberName}`);
 }
-
-renderList();
-  if (currentJob) openJob(currentJob, true);
-});
 
 // ─────────────────────────────────────────────
 // HELPERS
@@ -645,7 +642,7 @@ function openJob(i, keepScroll) {
   const ragChip = { green:'chip-green', amber:'chip-amber', red:'chip-red' };
   const ragLabel = { green:'On track', amber:'At risk', red:'Off track' };
   document.getElementById('reportsList').innerHTML = jr.length
-    ? jr.map(r => `
+    ? jr.map((r, ri) => `
         <div class="doc-row" onclick="viewReport(${reports.indexOf(r)})">
           <div>
             <div class="doc-title">${r.period || 'Status report'}</div>
@@ -716,23 +713,36 @@ function closeJob() {
 function viewBrief(i) {
   const b = briefs[i];
   if (!b) return;
+  document.getElementById('docActionBar').style.display = 'none';
   document.getElementById('docContent').innerHTML = b.html;
   document.getElementById('docModal').classList.add('open');
 }
 function viewQuote(i) {
   const q = quotes[i];
   if (!q) return;
+  document.getElementById('docActionBar').style.display = 'none';
   document.getElementById('docContent').innerHTML = q.html;
   document.getElementById('docModal').classList.add('open');
 }
 function viewReport(i) {
   const r = reports[i];
   if (!r) return;
+  currentReportIdx = i;
+  document.getElementById('docActionBar').style.display = 'flex';
   document.getElementById('docContent').innerHTML = r.html;
   document.getElementById('docModal').classList.add('open');
 }
 function closeDoc() {
   document.getElementById('docModal').classList.remove('open');
+  currentReportIdx = null;
+}
+
+function docContinue() {
+  const r = reports[currentReportIdx];
+  if (!r) return;
+  closeDoc();
+  localStorage.setItem('mama-report-action', JSON.stringify({ action: 'continue', jobId: r.jobId, period: r.period }));
+  window.location.href = 'project-reports.html';
 }
 
 function showToast(msg) {
