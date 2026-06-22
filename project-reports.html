@@ -564,6 +564,28 @@ function continueFromReport(r) {
 // ─────────────────────────────────────────────
 // MILESTONES & DELIVERABLES
 // ─────────────────────────────────────────────
+function flagPastDate(input) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const val = input.value;
+  if (val && new Date(val) < today) {
+    input.style.borderColor = '#e53e3e';
+    input.title = 'This date is in the past';
+    if (!input.nextElementSibling || !input.nextElementSibling.classList.contains('past-flag')) {
+      const flag = document.createElement('span');
+      flag.className = 'past-flag';
+      flag.textContent = 'Past';
+      flag.style.cssText = 'font-size:10px;font-weight:700;color:#e53e3e;white-space:nowrap;align-self:center';
+      input.parentNode.insertBefore(flag, input.nextSibling);
+    }
+  } else {
+    input.style.borderColor = '';
+    input.title = '';
+    if (input.nextElementSibling && input.nextElementSibling.classList.contains('past-flag')) {
+      input.nextElementSibling.remove();
+    }
+  }
+}
+
 function addMilestone(name = '', date = '', status = 'Upcoming') {
   const list = document.getElementById('milestoneList');
   const row = document.createElement('div');
@@ -580,6 +602,9 @@ function addMilestone(name = '', date = '', status = 'Upcoming') {
     <button class="item-remove" onclick="this.parentElement.remove()">×</button>
   `;
   list.appendChild(row);
+  const dateInput = row.querySelector('.ms-date');
+  flagPastDate(dateInput);
+  dateInput.addEventListener('change', () => flagPastDate(dateInput));
 }
 
 function addDeliverable(name = '', owner = '', status = 'Not started') {
