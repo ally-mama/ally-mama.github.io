@@ -398,6 +398,9 @@
 <div class="modal-overlay" id="docModal" onclick="if(event.target===this)closeDoc()">
   <div class="doc-modal">
     <button class="modal-close" onclick="closeDoc()">×</button>
+    <div id="docActionBar" style="display:none;padding-bottom:14px;margin-bottom:18px;border-bottom:1px solid var(--border);gap:8px">
+      <button onclick="docContinue()" style="padding:7px 16px;font-size:13px;font-weight:700;background:var(--yellow);color:var(--black);border:none;border-radius:8px;cursor:pointer">Continue from last →</button>
+    </div>
     <div id="docContent"></div>
   </div>
 </div>
