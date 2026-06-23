@@ -722,7 +722,7 @@ function render() {
       ? `${dueWeek.length} due in the next 7 days — on top of it`
       : open.length
         ? `${open.length} open, nothing urgent — all clear`
-        : `All clear — nothing open.`;
+        : ``;
   document.getElementById('standing').textContent = standing;
 
   // Job select (assigned jobs only, like My Time)

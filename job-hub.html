@@ -566,7 +566,7 @@ function jobQuotes(job) {
   return quotes.filter(q => q.jobId === job.id);
 }
 function jobTodos(job) {
-  return todos.filter(t => t.jobId === job.id);
+  return todos.filter(t => t.jobId === job.id && !t.done);
 }
 function jobHours(job) {
   return entries.filter(e => e.jobId === job.id).reduce((s,e)=>s+e.hours,0);
