@@ -769,6 +769,8 @@ function logEntry() {
 
   if (!jobId || !date || !hours || !desc) { showToast('Please fill in all fields'); return; }
   if (hours <= 0 || hours > 24) { showToast('Hours must be between 0.5 and 24'); return; }
+  const _dow = new Date(date + 'T12:00:00').getDay();
+  if (_dow === 0 || _dow === 6) { showToast('Weekends can\'t be logged — select a weekday'); return; }
 
   const nextId = entries.length ? Math.max(...entries.map(e=>e.id)) + 1 : 1;
   entries.push({ id: nextId, memberId: me, jobId, date, hours, desc, type: entryType });
@@ -812,7 +814,18 @@ function showToast(msg) {
 }
 
 // INIT
-document.getElementById('logDate').valueAsDate = new Date();
+const _initDate = new Date();
+const _initDow = _initDate.getDay();
+if (_initDow === 6) _initDate.setDate(_initDate.getDate() - 1); // Sat → Fri
+if (_initDow === 0) _initDate.setDate(_initDate.getDate() - 2); // Sun → Fri
+document.getElementById('logDate').valueAsDate = _initDate;
+document.getElementById('logDate').addEventListener('change', function() {
+  const _d = new Date(this.value + 'T12:00:00');
+  if (_d.getDay() === 0 || _d.getDay() === 6) {
+    showToast('Weekends can\'t be logged — select a weekday');
+    this.value = '';
+  }
+});
 if (Mama.Session.memberValid()) { me = Mama.Session.member(); storeSet(STORE_ME, me); }
 else { me = null; }
 renderIdentityGate();
