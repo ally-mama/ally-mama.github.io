@@ -564,6 +564,11 @@ function enterApp() {
   document.getElementById('meAvatar').style.color = memberTextColor(m.id);
   document.getElementById('meAvatar').textContent = m.initials;
   document.getElementById('greeting').textContent = m.name + "'s to-dos";
+  // purge completed todos older than 7 days
+  const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 7); cutoff.setHours(0,0,0,0);
+  const before = todos.length;
+  todos = todos.filter(t => !t.done || !t.doneAt || new Date(t.doneAt) >= cutoff);
+  if (todos.length !== before) persist();
   render();
 }
 
@@ -764,27 +769,25 @@ function render() {
   }
   document.getElementById('viewTimeline').innerHTML = tlHtml || '<div class="empty-state">No open to-dos — add one above 👆</div>';
 
-  // DONE VIEW — grouped by completion date, newest first
+  // DONE VIEW — grouped by completion date, newest date first, within each date ordered by time ticked off
   const doneByDate = {};
   [...done].forEach(t => {
     const key = t.doneAt ? t.doneAt.slice(0,10) : 'unknown';
     (doneByDate[key] = doneByDate[key] || []).push(t);
   });
+  // sort each day's tasks by doneAt ascending (order they were ticked off)
+  Object.values(doneByDate).forEach(arr => arr.sort((a,b) => (a.doneAt||'').localeCompare(b.doneAt||'')));
   let doneHtml = '';
   Object.keys(doneByDate).sort().reverse().forEach(day => {
-    const label = day === 'unknown' ? 'Completed' :
-      (() => {
-        const dd = daysFromToday(day);
-        if (dd === 0) return 'Today';
-        if (dd === -1) return 'Yesterday';
-        return new Date(day).toLocaleDateString('en-ZA', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
-      })();
+    const label = day === 'unknown'
+      ? 'Completed'
+      : new Date(day + 'T12:00:00').toLocaleDateString('en-ZA', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
     doneHtml += `<div class="tl-day">
       <div class="tl-day-label" style="color:var(--success)">${label} <span class="count">${doneByDate[day].length}</span><div class="line"></div></div>
       ${doneByDate[day].map(taskHTML).join('')}
     </div>`;
   });
-  document.getElementById('viewDoneV').innerHTML = doneHtml || '<div class="empty-state">Nothing completed yet — it\'ll feel good when there is.</div>';
+  document.getElementById('viewDoneV').innerHTML = doneHtml || '<div class="empty-state">Nothing completed yet.</div>';
 }
 
 // ─────────────────────────────────────────────
