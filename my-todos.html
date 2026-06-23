@@ -1019,9 +1019,9 @@ function makeDatePicker(cfg) {
     }
     popup.innerHTML = `
       <div class="cal-nav">
-        <button onclick="dpInstances['${cfg.id}'].nav(-1)">‹</button>
+        <button onclick="dpInstances['${cfg.id}'].nav(-1);event.stopPropagation()">‹</button>
         <span class="cal-month">${monthLabel}</span>
-        <button onclick="dpInstances['${cfg.id}'].nav(1)">›</button>
+        <button onclick="dpInstances['${cfg.id}'].nav(1);event.stopPropagation()">›</button>
       </div>
       <div class="cal-grid">${grid}</div>`;
   }

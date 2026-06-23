@@ -965,9 +965,9 @@ function calRender() {
 
   popup.innerHTML = `
     <div class="cal-nav">
-      <button onclick="calNav(-1)">‹</button>
+      <button onclick="calNav(-1);event.stopPropagation()">‹</button>
       <span class="cal-month">${monthLabel}</span>
-      <button onclick="calNav(1)">›</button>
+      <button onclick="calNav(1);event.stopPropagation()">›</button>
     </div>
     <div class="cal-grid">${grid}</div>`;
 }
