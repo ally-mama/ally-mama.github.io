@@ -325,6 +325,9 @@
   .rp-table tr:last-child td { border-bottom: none; }
   .action-bar { display: flex; gap: 10px; flex-wrap: wrap; margin: 18px 0; }
 
+  /* CUSTOM DATE PICKER */
+  .date-picker-wrap{position:relative}.date-display{width:100%;background:var(--off);border:1px solid var(--border);border-radius:var(--radius);padding:9px 11px;font-family:var(--sans);font-size:13px;cursor:pointer;text-align:left;outline:none;transition:border-color .15s;color:var(--text)}.date-display.open{border-color:var(--yellow);background:#fff}.date-display.empty{color:var(--muted)}.cal-popup{position:absolute;top:calc(100% + 4px);left:0;z-index:300;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:0 4px 20px rgba(0,0,0,.12);padding:12px;min-width:238px;display:none}.cal-popup.open{display:block}.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.cal-nav button{background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:6px;font-size:15px;color:var(--text-2)}.cal-nav button:hover{background:var(--mid)}.cal-month{font-size:13px;font-weight:600}.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}.cal-dow{font-size:10px;font-weight:700;text-align:center;color:var(--muted);text-transform:uppercase;padding:2px 0 6px}.cal-dow.we{color:var(--border)}.cal-day{font-size:12px;text-align:center;padding:5px 2px;border-radius:6px;cursor:pointer;transition:background .1s}.cal-day:hover:not(.we):not(.om){background:var(--yellow-light)}.cal-day.sel{background:var(--yellow);font-weight:700;color:var(--black)}.cal-day.tod{font-weight:700;color:var(--yellow-dark)}.cal-day.tod.sel{color:var(--black)}.cal-day.we{color:#d8d5cd;cursor:default;pointer-events:none}.cal-day.om{color:#d8d5cd}.cal-day.om.we{color:#e8e5de}
+
   /* TOAST */
   .toast {
     position: fixed;
@@ -410,7 +413,7 @@
         </div>
         <div class="field">
           <label>Date</label>
-          <input type="date" id="rDate">
+          <div class="date-picker-wrap" id="rDateWrap"><button type="button" class="date-display empty" id="rDateBtn" onclick="calToggle()">Select date</button><div class="cal-popup" id="rDatePop"></div><input type="hidden" id="rDate"></div>
         </div>
       </div>
       <div id="continueBanner" style="display:none;background:#fffbeb;border:1px solid #f0c14b;border-radius:10px;padding:12px 16px;margin-bottom:12px;align-items:center;justify-content:space-between;gap:12px">
@@ -595,9 +598,14 @@ function addMilestone(name = '', date = '', status = 'Upcoming') {
   const list = document.getElementById('milestoneList');
   const row = document.createElement('div');
   row.className = 'item-row';
+  const idx = _msIdx++;
   row.innerHTML = `
     <input type="text" class="ms-name" placeholder="Milestone, e.g. Campaign launch">
-    <input type="date" class="ms-date" value="${date}">
+    <div class="date-picker-wrap" id="msDpW${idx}" style="position:relative;display:inline-block">
+      <button type="button" class="date-display empty" id="msDpB${idx}" onclick="msTog(${idx})" style="font-size:12px;padding:7px 9px;min-width:110px">Date</button>
+      <div class="cal-popup" id="msDpP${idx}"></div>
+      <input type="hidden" class="ms-date" id="msDpH${idx}">
+    </div>
     <select class="ms-status">
       <option${status==='Upcoming'?' selected':''}>Upcoming</option>
       <option${status==='In progress'?' selected':''}>In progress</option>
@@ -608,9 +616,7 @@ function addMilestone(name = '', date = '', status = 'Upcoming') {
   `;
   list.appendChild(row);
   row.querySelector('.ms-name').value = name;
-  const dateInput = row.querySelector('.ms-date');
-  flagPastDate(dateInput);
-  dateInput.addEventListener('change', () => flagPastDate(dateInput));
+  msInit(idx, date);
 }
 
 function addDeliverable(name = '', owner = '', status = 'Not started') {
@@ -814,8 +820,28 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2600);
 }
 
+// MILESTONE ROW DATE PICKERS
+let _msIdx=0;const _msState={};
+function _msStr(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function msInit(idx,dateStr){const now=new Date();let sel=null;if(dateStr){const p=dateStr.split('-');sel=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));}_msState[idx]={sel,vy:sel?sel.getFullYear():now.getFullYear(),vm:sel?sel.getMonth():now.getMonth(),open:false};const btn=document.getElementById('msDpB'+idx),h=document.getElementById('msDpH'+idx);if(sel&&btn){btn.textContent=sel.toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'});btn.classList.remove('empty');}if(h&&sel)h.value=_msStr(sel);}
+function msTog(idx){Object.keys(_msState).forEach(k=>{if(k!=idx&&_msState[k].open)msClose(k);});const s=_msState[idx];s.open=!s.open;document.getElementById('msDpP'+idx).classList.toggle('open',s.open);document.getElementById('msDpB'+idx).classList.toggle('open',s.open);if(s.open)msRender(idx);}
+function msClose(idx){if(!_msState[idx])return;_msState[idx].open=false;const p=document.getElementById('msDpP'+idx),b=document.getElementById('msDpB'+idx);if(p)p.classList.remove('open');if(b)b.classList.remove('open');}
+function msPick(idx,y,m,d){const s=_msState[idx];s.sel=new Date(y,m,d);s.vy=y;s.vm=m;const btn=document.getElementById('msDpB'+idx),h=document.getElementById('msDpH'+idx);btn.textContent=s.sel.toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'});btn.classList.remove('empty');h.value=_msStr(s.sel);const today=new Date();today.setHours(0,0,0,0);btn.style.borderColor=s.sel<today?'var(--warn)':'';btn.title=s.sel<today?'Date is in the past':'';msClose(idx);}
+function msNav(idx,dir){const s=_msState[idx];s.vm+=dir;if(s.vm<0){s.vm=11;s.vy--;}if(s.vm>11){s.vm=0;s.vy++;}msRender(idx);}
+function msRender(idx){const s=_msState[idx],p=document.getElementById('msDpP'+idx);if(!p)return;const y=s.vy,m=s.vm,ml=new Date(y,m,1).toLocaleDateString('en-ZA',{month:'long',year:'numeric'}),fd=new Date(y,m,1).getDay(),dim=new Date(y,m+1,0).getDate(),ts=_msStr(new Date()),ss=s.sel?_msStr(s.sel):null,so=fd===0?6:fd-1;let g='';['M','T','W','T','F','S','S'].forEach((d,i)=>{g+=`<div class="cal-dow${i>=5?' we':''}">${d}</div>`;});const pt=new Date(y,m,0).getDate();for(let i=0;i<so;i++){const pn=pt-so+i+1,pd=new Date(y,m-1,pn),we=pd.getDay()===0||pd.getDay()===6;g+=`<div class="cal-day om${we?' we':''}">${pn}</div>`;}for(let i=1;i<=dim;i++){const d=new Date(y,m,i),dw=d.getDay(),we=dw===0||dw===6,ds=_msStr(d),cl=['cal-day',we?'we':'',ds===ts?'tod':'',ds===ss?'sel':''].filter(Boolean).join(' ');g+=`<div class="${cl}"${we?'':` onclick="msPick(${idx},${y},${m},${i})"`}>${i}</div>`;}const tot=Math.ceil((so+dim)/7)*7;for(let i=1;i<=tot-so-dim;i++){const nd=new Date(y,m+1,i),we=nd.getDay()===0||nd.getDay()===6;g+=`<div class="cal-day om${we?' we':''}">${i}</div>`;}p.innerHTML=`<div class="cal-nav"><button onclick="msNav(${idx},-1)">‹</button><span class="cal-month">${ml}</span><button onclick="msNav(${idx},1)">›</button></div><div class="cal-grid">${g}</div>`;}
+
+// WEEKDAY DATE PICKER
+let _cSel=null,_cVY=new Date().getFullYear(),_cVM=new Date().getMonth(),_cOpen=false;
+function _cStr(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function calToggle(){_cOpen=!_cOpen;document.getElementById('rDatePop').classList.toggle('open',_cOpen);document.getElementById('rDateBtn').classList.toggle('open',_cOpen);if(_cOpen)calRender();}
+function calClose(){_cOpen=false;document.getElementById('rDatePop').classList.remove('open');document.getElementById('rDateBtn').classList.remove('open');}
+function calRender(){const p=document.getElementById('rDatePop'),y=_cVY,m=_cVM,ml=new Date(y,m,1).toLocaleDateString('en-ZA',{month:'long',year:'numeric'}),fd=new Date(y,m,1).getDay(),dim=new Date(y,m+1,0).getDate(),ts=_cStr(new Date()),ss=_cSel?_cStr(_cSel):null,so=fd===0?6:fd-1;let g='';['M','T','W','T','F','S','S'].forEach((d,i)=>{g+=`<div class="cal-dow${i>=5?' we':''}">${d}</div>`;});const pt=new Date(y,m,0).getDate();for(let i=0;i<so;i++){const pn=pt-so+i+1,pd=new Date(y,m-1,pn),we=pd.getDay()===0||pd.getDay()===6;g+=`<div class="cal-day om${we?' we':''}">${pn}</div>`;}for(let i=1;i<=dim;i++){const d=new Date(y,m,i),dw=d.getDay(),we=dw===0||dw===6,ds=_cStr(d),cl=['cal-day',we?'we':'',ds===ts?'tod':'',ds===ss?'sel':''].filter(Boolean).join(' ');g+=`<div class="${cl}"${we?'':` onclick="calPick(${y},${m},${i})"`}>${i}</div>`;}const tot=Math.ceil((so+dim)/7)*7;for(let i=1;i<=tot-so-dim;i++){const nd=new Date(y,m+1,i),we=nd.getDay()===0||nd.getDay()===6;g+=`<div class="cal-day om${we?' we':''}">${i}</div>`;}p.innerHTML=`<div class="cal-nav"><button onclick="calNav(-1)">‹</button><span class="cal-month">${ml}</span><button onclick="calNav(1)">›</button></div><div class="cal-grid">${g}</div>`;}
+function calPick(y,m,d){_cSel=new Date(y,m,d);_cVY=y;_cVM=m;const b=document.getElementById('rDateBtn');b.textContent=_cSel.toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'});b.classList.remove('empty');document.getElementById('rDate').value=_cStr(_cSel);calClose();}
+function calNav(dir){_cVM+=dir;if(_cVM<0){_cVM=11;_cVY--;}if(_cVM>11){_cVM=0;_cVY++;}calRender();}
+document.addEventListener('click',function(e){if(_cOpen&&!e.target.closest('#rDateWrap'))calClose();if(!e.target.closest('[id^="msDpW"]'))Object.keys(_msState).forEach(k=>{if(_msState[k].open)msClose(k);});});
 // INIT
-document.getElementById('rDate').valueAsDate = new Date();
+function calInit(){const d=new Date(),dw=d.getDay();if(dw===6)d.setDate(d.getDate()-1);if(dw===0)d.setDate(d.getDate()-2);_cSel=new Date(d.getFullYear(),d.getMonth(),d.getDate());_cVY=_cSel.getFullYear();_cVM=_cSel.getMonth();const b=document.getElementById('rDateBtn');b.textContent=_cSel.toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'});b.classList.remove('empty');document.getElementById('rDate').value=_cStr(_cSel);}
+calInit();
 addMilestone();
 addDeliverable();
 renderSaved();
