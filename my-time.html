@@ -157,7 +157,7 @@
     gap: 10px;
     margin-bottom: 18px;
   }
-  .week-strip button {
+  .week-strip .nav-btn {
     width: 30px; height: 30px;
     border: 1px solid var(--border);
     border-radius: var(--radius);
@@ -166,7 +166,20 @@
     font-size: 14px;
     transition: all 0.15s;
   }
-  .week-strip button:hover { background: var(--yellow); border-color: var(--yellow); }
+  .week-strip .nav-btn:hover { background: var(--yellow); border-color: var(--yellow); }
+  #todayBtn {
+    height: 30px;
+    padding: 0 12px;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--white);
+    color: var(--text-2);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  #todayBtn:hover { background: var(--yellow); border-color: var(--yellow); }
   .week-label { font-size: 13px; font-weight: 600; flex: 1; text-align: center; }
 
   /* STAT CARDS */
@@ -418,10 +431,10 @@
   </div>
 
   <div class="week-strip">
-    <button onclick="changeWeek(-1)">‹</button>
+    <button class="nav-btn" onclick="changeWeek(-1)">‹</button>
     <span class="week-label" id="weekLabel"></span>
-    <button onclick="changeWeek(1)">›</button>
-    <button onclick="currentWeekOffset=0;render()" id="todayBtn" style="margin-left:8px;font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--white);color:var(--text-2);cursor:pointer;transition:all .15s" onmouseover="this.style.background='var(--yellow)';this.style.borderColor='var(--yellow)'" onmouseout="this.style.background='var(--white)';this.style.borderColor='var(--border)'">Today</button>
+    <button class="nav-btn" onclick="changeWeek(1)">›</button>
+    <button onclick="currentWeekOffset=0;render()" id="todayBtn">Today</button>
   </div>
 
   <div class="stats-row">
