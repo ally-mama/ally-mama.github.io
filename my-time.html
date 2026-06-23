@@ -242,6 +242,54 @@
   .type-btn.active.work { background: var(--yellow); color: var(--black); }
   .type-btn.active.meeting { background: var(--meeting); color: white; }
   .desc-row { display: grid; grid-template-columns: 1fr 50px; gap: 10px; align-items: end; margin-top: 10px; }
+
+  /* CUSTOM DATE PICKER */
+  .date-picker-wrap { position: relative; }
+  .date-display {
+    width: 100%;
+    background: var(--off);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 9px 11px;
+    font-family: var(--sans);
+    font-size: 13px;
+    cursor: pointer;
+    text-align: left;
+    outline: none;
+    transition: border-color 0.15s;
+    color: var(--text);
+  }
+  .date-display.open { border-color: var(--yellow); background: white; }
+  .date-display.empty { color: var(--muted); }
+  .cal-popup {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 300;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    padding: 12px;
+    min-width: 238px;
+    display: none;
+  }
+  .cal-popup.open { display: block; }
+  .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .cal-nav button { background: none; border: none; cursor: pointer; padding: 4px 8px; border-radius: 6px; font-size: 15px; color: var(--text-2); }
+  .cal-nav button:hover { background: var(--mid); }
+  .cal-month { font-size: 13px; font-weight: 600; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+  .cal-dow { font-size: 10px; font-weight: 700; text-align: center; color: var(--muted); text-transform: uppercase; padding: 2px 0 6px; }
+  .cal-dow.we { color: var(--border); }
+  .cal-day { font-size: 12px; text-align: center; padding: 5px 2px; border-radius: 6px; cursor: pointer; transition: background 0.1s; }
+  .cal-day:hover:not(.we):not(.om) { background: var(--yellow-light); }
+  .cal-day.sel { background: var(--yellow); font-weight: 700; color: var(--black); }
+  .cal-day.tod { font-weight: 700; color: var(--yellow-dark); }
+  .cal-day.tod.sel { color: var(--black); }
+  .cal-day.we { color: #d8d5cd; cursor: default; pointer-events: none; }
+  .cal-day.om { color: #d8d5cd; }
+  .cal-day.om.we { color: #e8e5de; }
   .btn-log {
     height: 38px;
     background: var(--yellow);
@@ -461,7 +509,11 @@
       </div>
       <div class="form-field">
         <label>Date</label>
-        <input type="date" id="logDate">
+        <div class="date-picker-wrap" id="datePickerWrap">
+          <button type="button" class="date-display empty" id="dateDisplayBtn" onclick="calToggle()">Select date</button>
+          <div class="cal-popup" id="calPopup"></div>
+          <input type="hidden" id="logDate">
+        </div>
       </div>
       <div class="form-field">
         <label>Hours</label>
@@ -650,23 +702,28 @@ function enterApp() {
 
 // ─────────────────────────────────────────────
 // WEEK HELPERS
+// All date math uses local time to avoid UTC offset issues (e.g. UTC+2 shifting dates back a day)
 // ─────────────────────────────────────────────
+function toLocalDateStr(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
 function getWeekBounds(offset = 0) {
   const now = new Date();
-  const day = now.getDay();
-  const mon = new Date(now);
-  mon.setDate(now.getDate() - (day === 0 ? 6 : day - 1) + offset * 7);
-  mon.setHours(0,0,0,0);
-  const fri = new Date(mon);
-  fri.setDate(mon.getDate() + 4);
+  const localDay = now.getDay(); // 0=Sun, 1=Mon ... 6=Sat
+  const daysFromMon = localDay === 0 ? 6 : localDay - 1;
+  const mon = new Date(now.getFullYear(), now.getMonth(), now.getDate() - daysFromMon + offset * 7);
+  const fri = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 4);
   return { mon, fri };
 }
 function dateInWeek(dateStr, offset) {
   const { mon } = getWeekBounds(offset);
-  const d = new Date(dateStr);
-  d.setHours(0,0,0,0);
-  const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
-  return d >= mon && d <= sun;
+  const parts = dateStr.split('-');
+  const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+  const fri = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 4);
+  return d >= mon && d <= fri;
 }
 function fmtDate(d) { return d.toLocaleDateString('en-ZA', { day:'numeric', month:'short' }); }
 function changeWeek(dir) { currentWeekOffset += dir; render(); }
@@ -674,9 +731,8 @@ function getDaysOfWeek(offset) {
   const days = [];
   const { mon } = getWeekBounds(offset);
   for (let i = 0; i < 5; i++) {
-    const d = new Date(mon);
-    d.setDate(mon.getDate() + i);
-    days.push(d.toISOString().slice(0,10));
+    const d = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + i);
+    days.push(toLocalDateStr(d));
   }
   return days;
 }
@@ -813,19 +869,129 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2600);
 }
 
-// INIT
-const _initDate = new Date();
-const _initDow = _initDate.getDay();
-if (_initDow === 6) _initDate.setDate(_initDate.getDate() - 1); // Sat → Fri
-if (_initDow === 0) _initDate.setDate(_initDate.getDate() - 2); // Sun → Fri
-document.getElementById('logDate').valueAsDate = _initDate;
-document.getElementById('logDate').addEventListener('change', function() {
-  const _d = new Date(this.value + 'T12:00:00');
-  if (_d.getDay() === 0 || _d.getDay() === 6) {
-    showToast('Weekends can\'t be logged — select a weekday');
-    this.value = '';
+// ─────────────────────────────────────────────
+// CUSTOM DATE PICKER (weekdays only)
+// ─────────────────────────────────────────────
+let calSelDate = null;
+let calVY = new Date().getFullYear();
+let calVM = new Date().getMonth();
+let calIsOpen = false;
+
+function calInit() {
+  const d = new Date();
+  const dow = d.getDay();
+  if (dow === 6) d.setDate(d.getDate() - 1);
+  if (dow === 0) d.setDate(d.getDate() - 2);
+  calSelDate = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  calVY = calSelDate.getFullYear();
+  calVM = calSelDate.getMonth();
+  calUpdateDisplay();
+}
+
+function calUpdateDisplay() {
+  const btn = document.getElementById('dateDisplayBtn');
+  const hidden = document.getElementById('logDate');
+  if (calSelDate) {
+    btn.textContent = calSelDate.toLocaleDateString('en-ZA', { day:'numeric', month:'short', year:'numeric' });
+    btn.classList.remove('empty');
+    hidden.value = toLocalDateStr(calSelDate);
+  } else {
+    btn.textContent = 'Select date';
+    btn.classList.add('empty');
+    hidden.value = '';
   }
+}
+
+function calToggle() {
+  calIsOpen = !calIsOpen;
+  document.getElementById('calPopup').classList.toggle('open', calIsOpen);
+  document.getElementById('dateDisplayBtn').classList.toggle('open', calIsOpen);
+  if (calIsOpen) calRender();
+}
+
+function calClose() {
+  calIsOpen = false;
+  document.getElementById('calPopup').classList.remove('open');
+  document.getElementById('dateDisplayBtn').classList.remove('open');
+}
+
+function calRender() {
+  const popup = document.getElementById('calPopup');
+  const y = calVY, m = calVM;
+  const monthLabel = new Date(y, m, 1).toLocaleDateString('en-ZA', { month:'long', year:'numeric' });
+  const firstDow = new Date(y, m, 1).getDay(); // 0=Sun
+  const daysInMonth = new Date(y, m + 1, 0).getDate();
+  const todayStr = toLocalDateStr(new Date());
+  const selStr = calSelDate ? toLocalDateStr(calSelDate) : null;
+  const startOffset = firstDow === 0 ? 6 : firstDow - 1; // blanks before 1st (Mon-based grid)
+
+  let grid = '';
+  // Headers: Mon-Fri weekday, Sat-Sun greyed
+  ['M','T','W','T','F','S','S'].forEach((d, i) => {
+    grid += `<div class="cal-dow${i >= 5 ? ' we' : ''}">${d}</div>`;
+  });
+
+  // Previous month fill
+  const prevTotal = new Date(y, m, 0).getDate();
+  for (let i = 0; i < startOffset; i++) {
+    const pn = prevTotal - startOffset + i + 1;
+    const pd = new Date(y, m - 1, pn);
+    const isWE = pd.getDay() === 0 || pd.getDay() === 6;
+    grid += `<div class="cal-day om${isWE ? ' we' : ''}">${pn}</div>`;
+  }
+
+  // Current month
+  for (let i = 1; i <= daysInMonth; i++) {
+    const d = new Date(y, m, i);
+    const dow = d.getDay();
+    const isWE = dow === 0 || dow === 6;
+    const ds = toLocalDateStr(d);
+    const cls = ['cal-day',
+      isWE ? 'we' : '',
+      ds === todayStr ? 'tod' : '',
+      ds === selStr ? 'sel' : ''
+    ].filter(Boolean).join(' ');
+    const handler = isWE ? '' : `onclick="calPick(${y},${m},${i})"`;
+    grid += `<div class="${cls}" ${handler}>${i}</div>`;
+  }
+
+  // Next month fill
+  const total = Math.ceil((startOffset + daysInMonth) / 7) * 7;
+  for (let i = 1; i <= total - startOffset - daysInMonth; i++) {
+    const nd = new Date(y, m + 1, i);
+    const isWE = nd.getDay() === 0 || nd.getDay() === 6;
+    grid += `<div class="cal-day om${isWE ? ' we' : ''}">${i}</div>`;
+  }
+
+  popup.innerHTML = `
+    <div class="cal-nav">
+      <button onclick="calNav(-1)">‹</button>
+      <span class="cal-month">${monthLabel}</span>
+      <button onclick="calNav(1)">›</button>
+    </div>
+    <div class="cal-grid">${grid}</div>`;
+}
+
+function calPick(y, m, d) {
+  calSelDate = new Date(y, m, d);
+  calVY = y; calVM = m;
+  calUpdateDisplay();
+  calClose();
+}
+
+function calNav(dir) {
+  calVM += dir;
+  if (calVM < 0) { calVM = 11; calVY--; }
+  if (calVM > 11) { calVM = 0; calVY++; }
+  calRender();
+}
+
+document.addEventListener('click', function(e) {
+  if (calIsOpen && !e.target.closest('#datePickerWrap')) calClose();
 });
+
+// INIT
+calInit();
 if (Mama.Session.memberValid()) { me = Mama.Session.member(); storeSet(STORE_ME, me); }
 else { me = null; }
 renderIdentityGate();
