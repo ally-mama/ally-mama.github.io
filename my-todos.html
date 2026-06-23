@@ -331,6 +331,39 @@
   }
   .comment-add button:hover { background: var(--yellow-dark); }
 
+  /* CUSTOM DATE PICKER */
+  .date-picker-wrap { position: relative; }
+  .date-display {
+    width: 100%; background: var(--off); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 9px 11px; font-family: var(--sans);
+    font-size: 13px; cursor: pointer; text-align: left; outline: none;
+    transition: border-color 0.15s; color: var(--text);
+  }
+  .date-display.open { border-color: var(--yellow); background: white; }
+  .date-display.empty { color: var(--muted); }
+  .cal-popup {
+    position: absolute; top: calc(100% + 4px); left: 0; z-index: 300;
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    padding: 12px; min-width: 238px; display: none;
+  }
+  .cal-popup.open { display: block; }
+  .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .cal-nav button { background: none; border: none; cursor: pointer; padding: 4px 8px; border-radius: 6px; font-size: 15px; color: var(--text-2); }
+  .cal-nav button:hover { background: var(--mid); }
+  .cal-month { font-size: 13px; font-weight: 600; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+  .cal-dow { font-size: 10px; font-weight: 700; text-align: center; color: var(--muted); text-transform: uppercase; padding: 2px 0 6px; }
+  .cal-dow.we { color: var(--border); }
+  .cal-day { font-size: 12px; text-align: center; padding: 5px 2px; border-radius: 6px; cursor: pointer; transition: background 0.1s; }
+  .cal-day:hover:not(.we):not(.om) { background: var(--yellow-light); }
+  .cal-day.sel { background: var(--yellow); font-weight: 700; color: var(--black); }
+  .cal-day.tod { font-weight: 700; color: var(--yellow-dark); }
+  .cal-day.tod.sel { color: var(--black); }
+  .cal-day.we { color: #d8d5cd; cursor: default; pointer-events: none; }
+  .cal-day.om { color: #d8d5cd; }
+  .cal-day.om.we { color: #e8e5de; }
+
   .toast {
     position: fixed; bottom: 24px; right: 24px;
     background: var(--black); color: white;
@@ -428,11 +461,19 @@
       </div>
       <div class="form-field">
         <label>Due / start date</label>
-        <input type="date" id="newDue">
+        <div class="date-picker-wrap" id="dueWrap">
+          <button type="button" class="date-display empty" id="dueBtn" onclick="dpInstances['due'].toggle()">Due date</button>
+          <div class="cal-popup" id="duePopup"></div>
+          <input type="hidden" id="newDue">
+        </div>
       </div>
       <div class="form-field">
         <label>To (optional)</label>
-        <input type="date" id="newDueEnd" title="Leave empty for a single-day due date">
+        <div class="date-picker-wrap" id="dueEndWrap">
+          <button type="button" class="date-display empty" id="dueEndBtn" onclick="dpInstances['dueEnd'].toggle()">End date</button>
+          <div class="cal-popup" id="dueEndPopup"></div>
+          <input type="hidden" id="newDueEnd">
+        </div>
       </div>
       <button class="btn-add" onclick="addTask()">+</button>
     </div>
@@ -817,8 +858,8 @@ function addTask() {
   });
   persist();
   document.getElementById('newTask').value = '';
-  document.getElementById('newDue').value = '';
-  document.getElementById('newDueEnd').value = '';
+  dpInstances['due'].reset();
+  dpInstances['dueEnd'].reset();
   document.getElementById('newJob').value = '';
   document.getElementById('newPriority').value = 'medium';
   render();
@@ -911,6 +952,107 @@ function showToast(msg) {
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2200);
 }
+
+// ─────────────────────────────────────────────
+// GENERIC DATE PICKER FACTORY (weekdays only)
+// ─────────────────────────────────────────────
+const dpInstances = {};
+
+function makeDatePicker(cfg) {
+  let sel = null, vy = new Date().getFullYear(), vm = new Date().getMonth(), isOpen = false;
+
+  function toStr(d) {
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+  function updateDisplay() {
+    const btn = document.getElementById(cfg.btnId);
+    const hidden = document.getElementById(cfg.hiddenId);
+    if (sel) {
+      btn.textContent = sel.toLocaleDateString('en-ZA', {day:'numeric', month:'short', year:'numeric'});
+      btn.classList.remove('empty');
+      hidden.value = toStr(sel);
+    } else {
+      btn.textContent = cfg.placeholder || 'Select date';
+      btn.classList.add('empty');
+      hidden.value = '';
+    }
+  }
+  function close() {
+    isOpen = false;
+    document.getElementById(cfg.popupId).classList.remove('open');
+    document.getElementById(cfg.btnId).classList.remove('open');
+  }
+  function render() {
+    const popup = document.getElementById(cfg.popupId);
+    const y = vy, m = vm;
+    const monthLabel = new Date(y, m, 1).toLocaleDateString('en-ZA', {month:'long', year:'numeric'});
+    const firstDow = new Date(y, m, 1).getDay();
+    const daysInMonth = new Date(y, m + 1, 0).getDate();
+    const todayStr = toStr(new Date());
+    const selStr = sel ? toStr(sel) : null;
+    const startOffset = firstDow === 0 ? 6 : firstDow - 1;
+    let grid = '';
+    ['M','T','W','T','F','S','S'].forEach((d, i) => {
+      grid += `<div class="cal-dow${i >= 5 ? ' we' : ''}">${d}</div>`;
+    });
+    const prevTotal = new Date(y, m, 0).getDate();
+    for (let i = 0; i < startOffset; i++) {
+      const pn = prevTotal - startOffset + i + 1;
+      const pd = new Date(y, m - 1, pn);
+      const isWE = pd.getDay() === 0 || pd.getDay() === 6;
+      grid += `<div class="cal-day om${isWE?' we':''}">${pn}</div>`;
+    }
+    for (let i = 1; i <= daysInMonth; i++) {
+      const d = new Date(y, m, i);
+      const dow = d.getDay();
+      const isWE = dow === 0 || dow === 6;
+      const ds = toStr(d);
+      const cls = ['cal-day', isWE?'we':'', ds===todayStr?'tod':'', ds===selStr?'sel':''].filter(Boolean).join(' ');
+      const handler = isWE ? '' : `onclick="dpInstances['${cfg.id}'].pick(${y},${m},${i})"`;
+      grid += `<div class="${cls}" ${handler}>${i}</div>`;
+    }
+    const total = Math.ceil((startOffset + daysInMonth) / 7) * 7;
+    for (let i = 1; i <= total - startOffset - daysInMonth; i++) {
+      const nd = new Date(y, m + 1, i);
+      const isWE = nd.getDay() === 0 || nd.getDay() === 6;
+      grid += `<div class="cal-day om${isWE?' we':''}">${i}</div>`;
+    }
+    popup.innerHTML = `
+      <div class="cal-nav">
+        <button onclick="dpInstances['${cfg.id}'].nav(-1)">‹</button>
+        <span class="cal-month">${monthLabel}</span>
+        <button onclick="dpInstances['${cfg.id}'].nav(1)">›</button>
+      </div>
+      <div class="cal-grid">${grid}</div>`;
+  }
+  const inst = {
+    toggle() {
+      isOpen = !isOpen;
+      document.getElementById(cfg.popupId).classList.toggle('open', isOpen);
+      document.getElementById(cfg.btnId).classList.toggle('open', isOpen);
+      if (isOpen) render();
+    },
+    close, render,
+    pick(y, m, d) { sel = new Date(y, m, d); vy = y; vm = m; updateDisplay(); close(); },
+    nav(dir) {
+      vm += dir;
+      if (vm < 0) { vm = 11; vy--; }
+      if (vm > 11) { vm = 0; vy++; }
+      render();
+    },
+    reset() { sel = null; vy = new Date().getFullYear(); vm = new Date().getMonth(); updateDisplay(); },
+    isOpen() { return isOpen; },
+    ownsEl(el) { return !!el.closest('#' + cfg.wrapId); }
+  };
+  return inst;
+}
+
+dpInstances['due'] = makeDatePicker({ id:'due', wrapId:'dueWrap', btnId:'dueBtn', popupId:'duePopup', hiddenId:'newDue', placeholder:'Due date' });
+dpInstances['dueEnd'] = makeDatePicker({ id:'dueEnd', wrapId:'dueEndWrap', btnId:'dueEndBtn', popupId:'dueEndPopup', hiddenId:'newDueEnd', placeholder:'End date (optional)' });
+
+document.addEventListener('click', function(e) {
+  Object.values(dpInstances).forEach(inst => { if (inst.isOpen() && !inst.ownsEl(e.target)) inst.close(); });
+});
 
 // INIT
 if (Mama.Session.memberValid()) { me = Mama.Session.member(); storeSet(STORE_ME, me); }
