@@ -556,8 +556,13 @@ function continueFromReport(r) {
   document.getElementById('normalActionBar').style.display = 'none';
   document.getElementById('continueActionBar').style.display = 'block';
   document.getElementById('generatedSection').style.display = r.html ? 'block' : 'none';
-  const hasRaw = !!(r.milestones || r.next || r.progress);
-  showToast(hasRaw ? 'Pre-filled from last report — update what changed, then generate.' : 'Job and author pre-filled. Re-enter milestones and deliverables, then generate.');
+  const msCount = (r.milestones || []).length;
+  const dlCount = (r.deliverables || []).length;
+  if (msCount || dlCount) {
+    showToast(`Loaded ${msCount} milestone${msCount !== 1 ? 's' : ''}, ${dlCount} deliverable${dlCount !== 1 ? 's' : ''} — update what changed, then generate.`);
+  } else {
+    showToast('Job and author pre-filled. Add milestones and deliverables, then generate.');
+  }
   window.scrollTo(0, 0);
 }
 
@@ -591,7 +596,7 @@ function addMilestone(name = '', date = '', status = 'Upcoming') {
   const row = document.createElement('div');
   row.className = 'item-row';
   row.innerHTML = `
-    <input type="text" class="ms-name" placeholder="Milestone, e.g. Campaign launch" value="${name}">
+    <input type="text" class="ms-name" placeholder="Milestone, e.g. Campaign launch">
     <input type="date" class="ms-date" value="${date}">
     <select class="ms-status">
       <option${status==='Upcoming'?' selected':''}>Upcoming</option>
@@ -602,6 +607,7 @@ function addMilestone(name = '', date = '', status = 'Upcoming') {
     <button class="item-remove" onclick="this.parentElement.remove()">×</button>
   `;
   list.appendChild(row);
+  row.querySelector('.ms-name').value = name;
   const dateInput = row.querySelector('.ms-date');
   flagPastDate(dateInput);
   dateInput.addEventListener('change', () => flagPastDate(dateInput));
@@ -612,7 +618,7 @@ function addDeliverable(name = '', owner = '', status = 'Not started') {
   const row = document.createElement('div');
   row.className = 'item-row';
   row.innerHTML = `
-    <input type="text" class="dl-name" placeholder="Deliverable, e.g. 6x social carousels" value="${name}">
+    <input type="text" class="dl-name" placeholder="Deliverable, e.g. 6x social carousels">
     <select class="dl-owner">
       <option value="">Owner</option>
       <option${owner==='Cassidy'?' selected':''}>Cassidy</option>
@@ -631,6 +637,7 @@ function addDeliverable(name = '', owner = '', status = 'Not started') {
     <button class="item-remove" onclick="this.parentElement.remove()">×</button>
   `;
   list.appendChild(row);
+  row.querySelector('.dl-name').value = name;
 }
 
 function setRag(btn, status) {
@@ -807,21 +814,21 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2600);
 }
 
-// Handle action queued from Job Hub
-const _pa = (() => { try { return JSON.parse(localStorage.getItem('mama-report-action')); } catch(e) { return null; } })();
-if (_pa) {
-  localStorage.removeItem('mama-report-action');
-  if (_pa.action === 'continue') {
-    const _r = savedReports.find(r => r.jobId === _pa.jobId && (_pa.period ? r.period === _pa.period : true));
-    if (_r) setTimeout(() => continueFromReport(_r), 100);
-  }
-}
-
 // INIT
 document.getElementById('rDate').valueAsDate = new Date();
 addMilestone();
 addDeliverable();
 renderSaved();
+
+// Handle action queued from Job Hub (runs after INIT so DOM is ready)
+const _pa = (() => { try { return JSON.parse(localStorage.getItem('mama-report-action')); } catch(e) { return null; } })();
+if (_pa) {
+  localStorage.removeItem('mama-report-action');
+  if (_pa.action === 'continue') {
+    const _r = savedReports.find(r => r.jobId === _pa.jobId && (_pa.period ? r.period === _pa.period : true));
+    if (_r) continueFromReport(_r);
+  }
+}
 </script>
 </body>
 </html>
