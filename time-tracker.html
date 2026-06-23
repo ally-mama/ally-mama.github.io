@@ -1454,14 +1454,14 @@ try {
 } catch(e) {}
 
 // WEEKDAY DATE PICKER
-let _cSel=null,_cVY=new Date().getFullYear(),_cVM=new Date().getMonth(),_cOpen=false;
+let _cSel=null,_cVY=new Date().getFullYear(),_cVM=new Date().getMonth(),_cOpen=false,_cNavPending=false;
 function _cStr(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
 function calToggle(){_cOpen=!_cOpen;document.getElementById('logDatePop').classList.toggle('open',_cOpen);document.getElementById('logDateBtn').classList.toggle('open',_cOpen);if(_cOpen)calRender();}
 function calClose(){_cOpen=false;document.getElementById('logDatePop').classList.remove('open');document.getElementById('logDateBtn').classList.remove('open');}
 function calRender(){const p=document.getElementById('logDatePop'),y=_cVY,m=_cVM,ml=new Date(y,m,1).toLocaleDateString('en-ZA',{month:'long',year:'numeric'}),fd=new Date(y,m,1).getDay(),dim=new Date(y,m+1,0).getDate(),ts=_cStr(new Date()),ss=_cSel?_cStr(_cSel):null,so=fd===0?6:fd-1;let g='';['M','T','W','T','F','S','S'].forEach((d,i)=>{g+=`<div class="cal-dow${i>=5?' we':''}">${d}</div>`;});const pt=new Date(y,m,0).getDate();for(let i=0;i<so;i++){const pn=pt-so+i+1,pd=new Date(y,m-1,pn),we=pd.getDay()===0||pd.getDay()===6;g+=`<div class="cal-day om${we?' we':''}">${pn}</div>`;}for(let i=1;i<=dim;i++){const d=new Date(y,m,i),dw=d.getDay(),we=dw===0||dw===6,ds=_cStr(d),cl=['cal-day',we?'we':'',ds===ts?'tod':'',ds===ss?'sel':''].filter(Boolean).join(' ');g+=`<div class="${cl}"${we?'':` onclick="calPick(${y},${m},${i})"`}>${i}</div>`;}const tot=Math.ceil((so+dim)/7)*7;for(let i=1;i<=tot-so-dim;i++){const nd=new Date(y,m+1,i),we=nd.getDay()===0||nd.getDay()===6;g+=`<div class="cal-day om${we?' we':''}">${i}</div>`;}p.innerHTML=`<div class="cal-nav"><button onclick="calNav(-1);event.stopPropagation()">‹</button><span class="cal-month">${ml}</span><button onclick="calNav(1);event.stopPropagation()">›</button></div><div class="cal-grid">${g}</div>`;}
 function calPick(y,m,d){_cSel=new Date(y,m,d);_cVY=y;_cVM=m;const b=document.getElementById('logDateBtn');b.textContent=_cSel.toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'});b.classList.remove('empty');document.getElementById('logDate').value=_cStr(_cSel);calClose();}
-function calNav(dir){_cVM+=dir;if(_cVM<0){_cVM=11;_cVY--;}if(_cVM>11){_cVM=0;_cVY++;}calRender();}
-document.addEventListener('click',function(e){if(_cOpen&&!e.target.closest('#logDateWrap'))calClose();});
+function calNav(dir){_cNavPending=true;_cVM+=dir;if(_cVM<0){_cVM=11;_cVY--;}if(_cVM>11){_cVM=0;_cVY++;}calRender();}
+document.addEventListener('click',function(e){if(_cNavPending){_cNavPending=false;return;}if(_cOpen&&!e.target.closest('#logDateWrap'))calClose();});
 // INIT
 function calInit(){const d=new Date(),dw=d.getDay();if(dw===6)d.setDate(d.getDate()-1);if(dw===0)d.setDate(d.getDate()-2);_cSel=new Date(d.getFullYear(),d.getMonth(),d.getDate());_cVY=_cSel.getFullYear();_cVM=_cSel.getMonth();const b=document.getElementById('logDateBtn');b.textContent=_cSel.toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'});b.classList.remove('empty');document.getElementById('logDate').value=_cStr(_cSel);}
 calInit();

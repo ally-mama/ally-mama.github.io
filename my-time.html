@@ -876,6 +876,7 @@ let calSelDate = null;
 let calVY = new Date().getFullYear();
 let calVM = new Date().getMonth();
 let calIsOpen = false;
+let _calNavPending = false;
 
 function calInit() {
   const d = new Date();
@@ -980,6 +981,7 @@ function calPick(y, m, d) {
 }
 
 function calNav(dir) {
+  _calNavPending = true;
   calVM += dir;
   if (calVM < 0) { calVM = 11; calVY--; }
   if (calVM > 11) { calVM = 0; calVY++; }
@@ -987,6 +989,7 @@ function calNav(dir) {
 }
 
 document.addEventListener('click', function(e) {
+  if (_calNavPending) { _calNavPending = false; return; }
   if (calIsOpen && !e.target.closest('#datePickerWrap')) calClose();
 });
 

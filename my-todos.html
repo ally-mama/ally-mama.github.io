@@ -959,7 +959,7 @@ function showToast(msg) {
 const dpInstances = {};
 
 function makeDatePicker(cfg) {
-  let sel = null, vy = new Date().getFullYear(), vm = new Date().getMonth(), isOpen = false;
+  let sel = null, vy = new Date().getFullYear(), vm = new Date().getMonth(), isOpen = false, _navPending = false;
 
   function toStr(d) {
     return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -1035,11 +1035,14 @@ function makeDatePicker(cfg) {
     close, render,
     pick(y, m, d) { sel = new Date(y, m, d); vy = y; vm = m; updateDisplay(); close(); },
     nav(dir) {
+      _navPending = true;
       vm += dir;
       if (vm < 0) { vm = 11; vy--; }
       if (vm > 11) { vm = 0; vy++; }
       render();
     },
+    navPending() { return _navPending; },
+    clearNav() { _navPending = false; },
     reset() { sel = null; vy = new Date().getFullYear(); vm = new Date().getMonth(); updateDisplay(); },
     isOpen() { return isOpen; },
     ownsEl(el) { return !!el.closest('#' + cfg.wrapId); }
@@ -1051,7 +1054,10 @@ dpInstances['due'] = makeDatePicker({ id:'due', wrapId:'dueWrap', btnId:'dueBtn'
 dpInstances['dueEnd'] = makeDatePicker({ id:'dueEnd', wrapId:'dueEndWrap', btnId:'dueEndBtn', popupId:'dueEndPopup', hiddenId:'newDueEnd', placeholder:'End date (optional)' });
 
 document.addEventListener('click', function(e) {
-  Object.values(dpInstances).forEach(inst => { if (inst.isOpen() && !inst.ownsEl(e.target)) inst.close(); });
+  Object.values(dpInstances).forEach(inst => {
+    if (inst.navPending()) { inst.clearNav(); return; }
+    if (inst.isOpen() && !inst.ownsEl(e.target)) inst.close();
+  });
 });
 
 // INIT
