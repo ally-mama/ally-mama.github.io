@@ -441,13 +441,11 @@
   <div class="job-filter" id="jobFilterBar"></div>
 
   <div class="tabs">
-    <button class="tab active" id="tabOpen" onclick="switchView('open')">Open</button>
-    <button class="tab" id="tabTimeline" onclick="switchView('timeline')">Timeline</button>
+    <button class="tab active" id="tabTimeline" onclick="switchView('timeline')">Timeline</button>
     <button class="tab" id="tabDoneV" onclick="switchView('doneV')">Done</button>
   </div>
 
-  <div class="view-panel active" id="viewOpen"></div>
-  <div class="view-panel" id="viewTimeline"></div>
+  <div class="view-panel active" id="viewTimeline"></div>
   <div class="view-panel" id="viewDoneV"></div>
 </div>
 
@@ -646,6 +644,10 @@ function taskHTML(t) {
   const cmtBtn = `<button class="comment-btn" onclick="toggleComments(${t.id})" title="Comments / reminders">💬${comments.length ? `<span class="cmt-count">${comments.length}</span>` : ''}</button>`;
 
   const cmtPanel = cmtOpen ? `<div class="comments-panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Comments</span>
+      <button onclick="toggleComments(${t.id})" style="background:none;border:none;cursor:pointer;font-size:18px;line-height:1;color:var(--muted);padding:0 2px" title="Close">×</button>
+    </div>
     ${comments.length
       ? comments.map((c, ci) => `<div class="comment-item"><span>${c.text}</span><span class="comment-time">${fmtCommentTime(c.at)}</span></div>`).join('')
       : '<div style="font-size:11px;color:var(--muted);font-style:italic">No comments yet — leave yourself a note on where you\'re at.</div>'}
@@ -720,7 +722,7 @@ function render() {
       ? `${dueWeek.length} due in the next 7 days — on top of it`
       : open.length
         ? `${open.length} open, nothing urgent — all clear`
-        : `Nothing open — clean slate ✨`;
+        : `All clear — nothing open.`;
   document.getElementById('standing').textContent = standing;
 
   // Job select (assigned jobs only, like My Time)
@@ -736,21 +738,9 @@ function render() {
     { label: 'Today', cls: '', filter: t => daysFromToday(t.due) === 0 },
     { label: 'This week', cls: '', filter: t => { const d = daysFromToday(t.due); return d !== null && d >= 1 && d <= 7; } },
     { label: 'Later', cls: '', filter: t => { const d = daysFromToday(t.due); return d !== null && d > 7; } },
-    { label: 'No date', cls: '', filter: t => !t.due },
   ];
-  let openHtml = '';
-  groups.forEach(g => {
-    const items = open.filter(g.filter).sort((a,b) =>
-      (PRI_ORDER[a.priority||'medium'] - PRI_ORDER[b.priority||'medium']) ||
-      (a.due||'9999').localeCompare(b.due||'9999'));
-    if (items.length) {
-      openHtml += `<div class="group-label ${g.cls}">${g.label} <span class="count">${items.length}</span></div>`;
-      openHtml += items.map(taskHTML).join('');
-    }
-  });
-  document.getElementById('viewOpen').innerHTML = openHtml || '<div class="empty-state">No open to-dos. Add one above 👆</div>';
 
-  // TIMELINE VIEW — open tasks with dates, grouped per day chronologically
+  // TIMELINE VIEW — open tasks with dates, grouped per day; undated tasks at the bottom
   const dated = open.filter(t => t.due).sort((a,b) => a.due.localeCompare(b.due));
   const byDay = {};
   dated.forEach(t => { (byDay[t.due] = byDay[t.due] || []).push(t); });
@@ -764,13 +754,37 @@ function render() {
       ${byDay[day].map(taskHTML).join('')}
     </div>`;
   });
-  document.getElementById('viewTimeline').innerHTML = tlHtml || '<div class="empty-state">No dated to-dos yet — add due dates to see your timeline.</div>';
+  const undated = open.filter(t => !t.due).sort((a,b) =>
+    PRI_ORDER[a.priority||'medium'] - PRI_ORDER[b.priority||'medium']);
+  if (undated.length) {
+    tlHtml += `<div class="tl-day">
+      <div class="tl-day-label" style="color:var(--muted)">No date <span class="count">${undated.length}</span><div class="line"></div></div>
+      ${undated.map(taskHTML).join('')}
+    </div>`;
+  }
+  document.getElementById('viewTimeline').innerHTML = tlHtml || '<div class="empty-state">No open to-dos — add one above 👆</div>';
 
-  // DONE VIEW
-  const doneSorted = [...done].sort((a,b) => (b.doneAt||'').localeCompare(a.doneAt||''));
-  document.getElementById('viewDoneV').innerHTML = doneSorted.length
-    ? doneSorted.map(taskHTML).join('')
-    : '<div class="empty-state">Nothing completed yet — it\'ll feel good when there is.</div>';
+  // DONE VIEW — grouped by completion date, newest first
+  const doneByDate = {};
+  [...done].forEach(t => {
+    const key = t.doneAt ? t.doneAt.slice(0,10) : 'unknown';
+    (doneByDate[key] = doneByDate[key] || []).push(t);
+  });
+  let doneHtml = '';
+  Object.keys(doneByDate).sort().reverse().forEach(day => {
+    const label = day === 'unknown' ? 'Completed' :
+      (() => {
+        const dd = daysFromToday(day);
+        if (dd === 0) return 'Today';
+        if (dd === -1) return 'Yesterday';
+        return new Date(day).toLocaleDateString('en-ZA', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+      })();
+    doneHtml += `<div class="tl-day">
+      <div class="tl-day-label" style="color:var(--success)">${label} <span class="count">${doneByDate[day].length}</span><div class="line"></div></div>
+      ${doneByDate[day].map(taskHTML).join('')}
+    </div>`;
+  });
+  document.getElementById('viewDoneV').innerHTML = doneHtml || '<div class="empty-state">Nothing completed yet — it\'ll feel good when there is.</div>';
 }
 
 // ─────────────────────────────────────────────
