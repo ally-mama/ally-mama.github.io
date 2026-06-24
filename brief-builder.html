@@ -5,6 +5,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Brief Builder — Mama Hub</title>
+<!-- Google sign-in library (lets the page ask permission to use your Drive) -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<!-- Turns the brief into a real PDF file in the browser -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -1325,9 +1329,136 @@ function downloadPDF() {
   setTimeout(() => { w.focus(); w.print(); }, 500);
 }
 
+// ── Google Drive export (real upload, not just a link) ──────────────
+// Reads the OAuth Client ID and Drive folder ID you saved in Settings,
+// asks Google for permission the first time, then uploads the brief as
+// an editable Google Doc into that folder.
+
+var DRIVE_FALLBACK_FOLDER = '1IkvW4HGv2w_Ro2RSYy0Ii52CfhG_SQUO';
+var _driveToken = null;          // remembers permission for this page visit
+var _driveTokenClient = null;
+
+function getMamaSettings() {
+  try { return JSON.parse(localStorage.getItem('mama-settings') || '{}'); }
+  catch (e) { return {}; }
+}
+
+// Main button handler
 function openDriveUpload() {
-  showToast('Opening Google Drive folder…');
-  window.open('https://drive.google.com/drive/folders/1IkvW4HGv2w_Ro2RSYy0Ii52CfhG_SQUO', '_blank');
+  var s = getMamaSettings();
+  if (!s.clientId) {
+    showToast('Add your OAuth Client ID in Settings first');
+    return;
+  }
+  if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) {
+    showToast('Google sign-in still loading, try again in a moment');
+    return;
+  }
+  // If we already have permission this visit, upload straight away.
+  if (_driveToken) { uploadBriefToDrive(); return; }
+
+  // Otherwise set up the permission request. The popup appears on click.
+  _driveTokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: s.clientId,
+    scope: 'https://www.googleapis.com/auth/drive.file',
+    callback: function (resp) {
+      if (resp && resp.access_token) {
+        _driveToken = resp.access_token;
+        uploadBriefToDrive();
+      } else {
+        showToast('Google permission was not granted');
+      }
+    }
+  });
+  showToast('Opening Google permission popup…');
+  _driveTokenClient.requestAccessToken();
+}
+
+function uploadBriefToDrive() {
+  var s = getMamaSettings();
+  var folderId = s.driveFolder || DRIVE_FALLBACK_FOLDER;
+
+  var preview = document.getElementById('briefPreview');
+  if (!preview || !preview.innerHTML.trim()) {
+    showToast('Generate a brief first');
+    return;
+  }
+  if (typeof html2pdf === 'undefined') {
+    showToast('PDF library still loading, try again in a moment');
+    return;
+  }
+
+  // Name the file from the brief's heading, falling back to a dated name.
+  var headingEl = preview.querySelector('h1');
+  var name = (headingEl ? headingEl.innerText.trim() : '') ||
+             ('Brief ' + new Date().toISOString().slice(0, 10));
+
+  showToast('Building PDF…');
+
+  // Print-style CSS so the PDF reads like the Download PDF version.
+  var pdfStyle = '<style>' +
+    'body{font-family:sans-serif;color:#1a1a1a;font-size:13px;line-height:1.7;}' +
+    'h1{font-size:22px;margin-bottom:4px;}' +
+    'h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#8a6c00;margin:24px 0 8px;border-bottom:1px solid #eee;padding-bottom:4px;}' +
+    'h3{font-size:13px;font-weight:600;margin:14px 0 4px;}' +
+    '.q{font-size:11px;color:#888;margin:10px 0 2px;}' +
+    '.link-chip{display:inline-block;background:#f5f5f5;padding:2px 8px;border-radius:10px;font-size:11px;color:#8a6c00;margin:2px;text-decoration:none;}' +
+    '.brief-meta{font-size:12px;color:#888;margin-bottom:24px;}' +
+    '</style>';
+  var holder = document.createElement('div');
+  holder.innerHTML = pdfStyle + preview.innerHTML;
+
+  var opt = {
+    margin: 12,
+    filename: name + '.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+
+  // Make the PDF as a binary blob, then upload that blob to Drive.
+  html2pdf().set(opt).from(holder).outputPdf('blob').then(function (pdfBlob) {
+    showToast('Uploading PDF to Drive…');
+
+    var boundary = 'mamaBriefBoundary';
+    var metadata = {
+      name: name + '.pdf',
+      mimeType: 'application/pdf',
+      parents: [folderId]
+    };
+    var pre = '--' + boundary + '\r\n' +
+      'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
+      JSON.stringify(metadata) + '\r\n' +
+      '--' + boundary + '\r\n' +
+      'Content-Type: application/pdf\r\n\r\n';
+    var post = '\r\n--' + boundary + '--';
+    // Blob lets us mix text headers with the binary PDF safely.
+    var body = new Blob([pre, pdfBlob, post], { type: 'multipart/related; boundary=' + boundary });
+
+    return fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,webViewLink', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + _driveToken,
+        'Content-Type': 'multipart/related; boundary=' + boundary
+      },
+      body: body
+    });
+  })
+  .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+  .then(function (res) {
+    if (res.ok && res.d.id) {
+      showToast('PDF saved to Drive ✓ Opening it…');
+      if (res.d.webViewLink) window.open(res.d.webViewLink, '_blank');
+    } else {
+      var msg = res.d && res.d.error && res.d.error.message ? res.d.error.message : 'Upload failed';
+      showToast('Drive error: ' + msg);
+      _driveToken = null; // force a fresh permission request next time
+    }
+  })
+  .catch(function (err) {
+    showToast('Could not create or upload the PDF');
+    _driveToken = null;
+  });
 }
 
 // ============================================================
