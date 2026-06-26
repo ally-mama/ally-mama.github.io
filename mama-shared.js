@@ -5,6 +5,7 @@
      • a universal in-app Back button
      • an "unsaved changes" guard for forms
      • a small Store helper that later features build on
+     • Google sign-in (OAuth) — one sign-in, shared across every page
    No build step. Works on file://, a local server, or hosting.
    ────────────────────────────────────────────────────────────── */
 (function () {
@@ -148,7 +149,7 @@
     var btn = document.createElement('button');
     btn.type = 'button';
     btn.setAttribute('aria-label', 'Back to previous page');
-    btn.innerHTML = '\u2039 Back';
+    btn.innerHTML = '‹ Back';
     btn.style.cssText =
       'background:rgba(255,255,255,0.08);border:none;color:rgba(255,255,255,0.75);' +
       'font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;' +
@@ -213,6 +214,103 @@
     todos:   function () { return lget('mama-todos', []); }
   };
 
+  // ── Google sign-in (OAuth) ──────────────────────────────────────
+  // One sign-in, saved to the shared "notepad" (localStorage), read by
+  // every page. Uses Google Identity Services to get an access token.
+  // The token lets the app read/write Google Sheets on the signed-in
+  // person's behalf. Token lasts ~1h, then refreshes silently.
+  var GOOGLE_CLIENT_ID = '812767491733-tihh9j12lsingccrh703gfg5f6ohpekh.apps.googleusercontent.com';
+  var GOOGLE_SCOPES = 'openid email https://www.googleapis.com/auth/spreadsheets';
+  var GKEY = 'mama-google'; // shared notepad: { token, expiresAt, email }
+
+  var _tokenClient = null;
+  var _gsiReady = null;
+
+  function loadGsi() {
+    if (_gsiReady) return _gsiReady;
+    _gsiReady = new Promise(function (resolve, reject) {
+      if (window.google && window.google.accounts && window.google.accounts.oauth2) { resolve(); return; }
+      var s = document.createElement('script');
+      s.src = 'https://accounts.google.com/gsi/client';
+      s.async = true; s.defer = true;
+      s.onload = function () { resolve(); };
+      s.onerror = function () { reject(new Error('Could not load Google sign-in library')); };
+      document.head.appendChild(s);
+    });
+    return _gsiReady;
+  }
+
+  function gRead() { return lget(GKEY, { token: null, expiresAt: 0, email: null }); }
+  function gWrite(v) { lset(GKEY, v); }
+
+  var Google = {
+    CLIENT_ID: GOOGLE_CLIENT_ID,
+    email: function () { return gRead().email; },
+    isSignedIn: function () {
+      var s = gRead();
+      return !!s.token && Date.now() < s.expiresAt;
+    },
+    // Has this browser consented before? (so we can refresh quietly)
+    hasConsented: function () { return !!gRead().email; },
+
+    // Ask Google for an access token.
+    //   interactive: true  → shows the popup (use on a button click)
+    //   interactive: false → silent refresh, no popup
+    // Resolves with { email, token }.
+    signIn: function (opts) {
+      opts = opts || {};
+      var interactive = opts.interactive !== false;
+      return loadGsi().then(function () {
+        return new Promise(function (resolve, reject) {
+          if (!_tokenClient) {
+            _tokenClient = window.google.accounts.oauth2.initTokenClient({
+              client_id: GOOGLE_CLIENT_ID,
+              scope: GOOGLE_SCOPES,
+              callback: function () {}
+            });
+          }
+          _tokenClient.callback = function (resp) {
+            if (resp && resp.error) { reject(new Error(resp.error)); return; }
+            var store = gRead();
+            store.token = resp.access_token;
+            store.expiresAt = Date.now() + (((resp.expires_in || 3600) - 60) * 1000);
+            gWrite(store);
+            // look up the signed-in person's email
+            fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+              headers: { Authorization: 'Bearer ' + resp.access_token }
+            }).then(function (r) { return r.json(); }).then(function (info) {
+              var st = gRead();
+              st.email = (info && info.email) || st.email || null;
+              gWrite(st);
+              resolve({ email: st.email, token: resp.access_token });
+            }).catch(function () {
+              resolve({ email: gRead().email, token: resp.access_token });
+            });
+          };
+          _tokenClient.requestAccessToken({ prompt: interactive ? 'consent' : '' });
+        });
+      });
+    },
+
+    // Silent refresh — no popup.
+    refresh: function () { return this.signIn({ interactive: false }); },
+
+    // Always returns a usable token, refreshing quietly if it has expired.
+    getToken: function () {
+      var s = gRead();
+      if (s.token && Date.now() < s.expiresAt) return Promise.resolve(s.token);
+      return this.refresh().then(function (r) { return r.token; });
+    },
+
+    signOut: function () {
+      var s = gRead();
+      if (s.token && window.google && window.google.accounts && window.google.accounts.oauth2) {
+        try { window.google.accounts.oauth2.revoke(s.token, function () {}); } catch (e) {}
+      }
+      gWrite({ token: null, expiresAt: 0, email: null });
+    }
+  };
+
   // ── boot ──
   function boot() {
     pushHistory();
@@ -226,6 +324,7 @@
     Session: Session,
     Guard: Guard,
     Store: Store,
+    Google: Google,
     currentFile: currentFile,
     back: goBack,
     navigate: navigateTo

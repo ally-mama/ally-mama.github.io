@@ -182,6 +182,48 @@
     padding: 3px 9px;
     border-radius: 10px;
   }
+  .live-badge {
+    position: absolute;
+    top: 18px; right: 18px;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: #eaf4ee;
+    color: #2e7d52;
+    padding: 3px 9px;
+    border-radius: 10px;
+  }
+
+  /* GOOGLE CONNECTION PANEL */
+  .gcard {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px 24px;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .gcard-title { font-family: var(--serif); font-size: 16px; font-weight: 700; color: var(--black); }
+  .gcard-status { font-size: 13px; color: var(--text-2); margin-top: 4px; }
+  .gcard-btn {
+    background: var(--yellow);
+    color: var(--black);
+    border: none;
+    border-radius: var(--radius);
+    padding: 10px 18px;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+  .gcard-btn:hover { background: var(--yellow-dark); }
 
   /* QUICK SECTION */
   .section-heading {
@@ -292,10 +334,20 @@
 </div>
 
 <div class="container">
+
+  <!-- GOOGLE CONNECTION TEST -->
+  <div class="gcard" id="gcard">
+    <div>
+      <div class="gcard-title">Google connection</div>
+      <div class="gcard-status" id="gstatus">Checking…</div>
+    </div>
+    <button class="gcard-btn" id="gbtn" type="button">Connect Google account</button>
+  </div>
+
   <div class="tools-grid">
 
     <a href="brief-builder.html" class="tool-card">
-
+      <span class="live-badge">Live</span>
       <div class="tool-icon">✍️</div>
       <div class="tool-name">Brief Builder</div>
       <div class="tool-desc">Build a complete studio brief in minutes. Select the job, pick the offerings, answer the questions, and generate a formatted brief ready for Drive.</div>
@@ -303,7 +355,7 @@
     </a>
 
     <a href="my-time.html" class="tool-card">
-
+      <span class="live-badge">Live</span>
       <div class="tool-icon">⏱</div>
       <div class="tool-name">My Time</div>
       <div class="tool-desc">Your personal timesheet — log hours per job, tag meetings, and see your own week. Only you see your view.</div>
@@ -311,7 +363,7 @@
     </a>
 
     <a href="time-tracker.html" class="tool-card">
-
+      <span class="live-badge">Live</span>
       <div class="tool-icon">🔑</div>
       <div class="tool-name">Time — Admin</div>
       <div class="tool-desc">Management dashboard: the whole team's hours, meetings load, and capacity per job. PIN-protected, built to replace Streamtime.</div>
@@ -319,7 +371,7 @@
     </a>
 
     <a href="quote-builder.html" class="tool-card">
-
+      <span class="live-badge">Live</span>
       <div class="tool-icon">💰</div>
       <div class="tool-name">Quotes</div>
       <div class="tool-desc">Cost a job from the element catalogue, apply markup and discounts, and generate a client-ready quote with VAT — all editable.</div>
@@ -327,15 +379,15 @@
     </a>
 
     <a href="project-reports.html" class="tool-card">
-
+      <span class="live-badge">Live</span>
       <div class="tool-icon">📊</div>
-      <div class="tool-name">Status Reports</div>
+      <div class="tool-name">Project Reports</div>
       <div class="tool-desc">Status updates, milestones, and deliverables per job — exportable as client-ready reports.</div>
-      <div class="tool-cta">Open status reports →</div>
+      <div class="tool-cta">Open project reports →</div>
     </a>
 
     <a href="job-hub.html" class="tool-card">
-
+      <span class="live-badge">Live</span>
       <div class="tool-icon">🗂</div>
       <div class="tool-name">Job Hub</div>
       <div class="tool-desc">One home per client — every brief, report, timesheet and asset for SAFW, Gan Tamar, Better Angels and more, linked to its Drive folder.</div>
@@ -343,7 +395,7 @@
     </a>
 
     <a href="my-todos.html" class="tool-card">
-
+      <span class="live-badge">Live</span>
       <div class="tool-icon">✅</div>
       <div class="tool-name">My To-Dos</div>
       <div class="tool-desc">Your private task list — add to-dos, track progress, set due dates, and see exactly where you stand. Password-protected, visible only to you.</div>
@@ -351,7 +403,7 @@
     </a>
 
     <a href="settings.html" class="tool-card">
-
+      <span class="live-badge">Live</span>
       <div class="tool-icon">⚙️</div>
       <div class="tool-name">Settings</div>
       <div class="tool-desc">Google API credentials, where your data sits, backups, and the roadmap to full cloud integration. PIN-protected.</div>
@@ -389,6 +441,52 @@
 <div class="footer">
   <span>mama</span> hub · internal tools · built by the AI team
 </div>
+
+<!-- GOOGLE SIGN-IN TEST (uses Mama.Google from mama-shared.js) -->
+<script>
+(function(){
+  function $(id){ return document.getElementById(id); }
+
+  function render(){
+    var s = $('gstatus'), b = $('gbtn');
+    if(!s || !b || !window.Mama || !Mama.Google) return;
+    if(Mama.Google.isSignedIn()){
+      s.innerHTML = '✅ Signed in as <strong>' + (Mama.Google.email() || 'your Google account') +
+                    '</strong> · permission to read &amp; write Sheets granted';
+      b.textContent = 'Sign out';
+      b.onclick = function(){ Mama.Google.signOut(); render(); };
+    } else {
+      s.textContent = 'Not connected yet. Click to sign in with your Mama Google account.';
+      b.textContent = 'Connect Google account';
+      b.onclick = connect;
+    }
+  }
+
+  function connect(){
+    var s = $('gstatus');
+    if(s) s.textContent = 'Opening Google…';
+    Mama.Google.signIn().then(function(){
+      render();
+    }).catch(function(e){
+      if(s) s.textContent = 'Sign-in failed: ' + (e && e.message ? e.message : 'unknown error');
+    });
+  }
+
+  function start(){
+    if(!window.Mama || !Mama.Google){ setTimeout(start, 150); return; }
+    if(Mama.Google.isSignedIn()){ render(); return; }
+    if(Mama.Google.hasConsented()){
+      // token expired but this browser approved before — refresh quietly, no popup
+      Mama.Google.refresh().then(render).catch(render);
+    } else {
+      render();
+    }
+  }
+
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+  else start();
+})();
+</script>
 
 </body>
 </html>
